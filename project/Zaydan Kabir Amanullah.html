@@ -522,10 +522,10 @@
       position: absolute;
       inset: 0;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       padding: calc(clamp(48px, 6vw, 88px) + 64px) clamp(48px, 10vw, 160px) clamp(48px, 6vw, 88px);
-      overflow: hidden;
+      overflow-y: auto;
     }
     #panel-2-fig {
       position: absolute;
@@ -628,7 +628,9 @@
       line-height: 1.82;
       color: var(--gray2);
       font-style: italic;
+      margin-bottom: clamp(16px, 1.8vw, 28px);
     }
+    .p2-quote-text:last-child { margin-bottom: 0; }
     .p2-quote-attr {
       margin-top: clamp(20px, 2.4vw, 36px);
       font-family: 'VT323', monospace;
