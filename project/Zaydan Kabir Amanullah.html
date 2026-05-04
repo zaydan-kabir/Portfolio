@@ -944,7 +944,16 @@ const zaydanAnimationReady = (() => {
   function handleWheel(e) {
     if (e.ctrlKey) return;
     e.preventDefault();
-    moveHorizontal(e.deltaY + e.deltaX);
+    const delta = e.deltaY + e.deltaX;
+    if (currentX >= maxX * 0.95) {
+      const inner = document.getElementById('panel-2-inner');
+      if (inner && inner.scrollHeight > inner.clientHeight) {
+        const atBottom = delta > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
+        const atTop    = delta < 0 && inner.scrollTop <= 0;
+        if (!atBottom && !atTop) { inner.scrollBy(0, delta); return; }
+      }
+    }
+    moveHorizontal(delta);
   }
 
   scrollCapture.addEventListener('wheel', handleWheel, { passive: false });
