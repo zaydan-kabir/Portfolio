@@ -6,13 +6,7 @@
   <title>Clarity HyperFrame Preview</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-    }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
     [data-composition-id="clarity-preview"] {
       position: relative;
       width: 100vw;
@@ -29,30 +23,30 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: clamp(14px, 4vw, 54px) clamp(12px, 4.6vw, 70px) clamp(22px, 5vw, 74px);
+      padding: 1.5%;
     }
     .laptop {
       position: relative;
-      width: min(78vw, 1120px);
-      aspect-ratio: 1.48;
-      filter: drop-shadow(0 18px 22px rgba(0,0,0,.72));
+      width: min(97vw, calc(97vh * 1.62));
+      aspect-ratio: 1.62;
+      filter: drop-shadow(0 14px 18px rgba(0,0,0,.72));
     }
     .lid {
       position: absolute;
-      left: 8.2%;
-      right: 8.2%;
+      left: 6.8%;
+      right: 6.8%;
       top: 0;
-      bottom: 9.6%;
-      border-radius: 28px 28px 8px 8px;
+      bottom: 10.8%;
+      border-radius: clamp(10px, 2vw, 26px) clamp(10px, 2vw, 26px) 7px 7px;
       background: linear-gradient(90deg, #2f3134 0%, #a6a9ad 2.1%, #26292c 3.4%, #101113 4.4%, #101113 95.6%, #2a2d30 96.7%, #aeb1b5 98%, #34373a 100%);
       border: 1px solid rgba(255,255,255,.24);
-      box-shadow: inset 0 0 0 3px rgba(255,255,255,.09), inset 0 0 0 8px #050505;
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,.09), inset 0 0 0 7px #050505;
       overflow: hidden;
     }
     .screen {
       position: absolute;
-      inset: 4.4% 2.4% 2.6%;
-      border-radius: 12px 12px 2px 2px;
+      inset: 4.2% 2.4% 2.8%;
+      border-radius: 10px 10px 2px 2px;
       overflow: hidden;
       background: #89887d;
     }
@@ -64,7 +58,7 @@
       height: 5.9%;
       transform: translateX(-50%);
       background: #030303;
-      border-radius: 0 0 9px 9px;
+      border-radius: 0 0 8px 8px;
       z-index: 80;
     }
     .camera {
@@ -83,10 +77,10 @@
       left: 0;
       right: 0;
       bottom: 0;
-      height: 10.8%;
-      border-radius: 6px 6px 30px 30px / 8px 8px 24px 24px;
+      height: 11.8%;
+      border-radius: 5px 5px 30px 30px / 7px 7px 22px 22px;
       background:
-        radial-gradient(ellipse at 50% 0, rgba(255,255,255,.55) 0 12%, transparent 31%),
+        radial-gradient(ellipse at 50% 0, rgba(255,255,255,.56) 0 12%, transparent 31%),
         linear-gradient(180deg, #dedede 0%, #9b9b9b 28%, #676767 72%, #2b2b2b 100%);
       box-shadow: inset 0 7px 12px rgba(255,255,255,.45), inset 0 -7px 12px rgba(0,0,0,.28);
     }
@@ -162,9 +156,7 @@
       bottom: -12%;
       width: 74%;
       height: 33%;
-      background:
-        linear-gradient(118deg, rgba(255,255,255,.08), transparent 42%),
-        rgba(156,146,136,.9);
+      background: linear-gradient(118deg, rgba(255,255,255,.08), transparent 42%), rgba(156,146,136,.9);
       border-radius: 50% 50% 0 0 / 74% 74% 0 0;
       z-index: 14;
     }
@@ -218,13 +210,9 @@
       z-index: 3;
     }
     .w1, .w2, .w3 { top: 21%; width: 10.2%; height: 8.6%; }
-    .w1 { left: 24%; }
-    .w2 { left: 45%; }
-    .w3 { left: 66%; }
+    .w1 { left: 24%; } .w2 { left: 45%; } .w3 { left: 66%; }
     .w4, .w5, .w6 { top: 48%; width: 5.3%; height: 8%; }
-    .w4 { left: 30%; }
-    .w5 { left: 48%; }
-    .w6 { left: 67%; }
+    .w4 { left: 30%; } .w5 { left: 48%; } .w6 { left: 67%; }
     .forest {
       position: absolute;
       inset: auto -4% 0 -4%;
@@ -234,22 +222,22 @@
     .tree {
       position: absolute;
       bottom: 0;
-      width: 0;
-      height: 0;
-      border-left: var(--w) solid transparent;
-      border-right: var(--w) solid transparent;
-      border-bottom: var(--h) solid var(--c);
-      filter: drop-shadow(0 14px 10px rgba(0,0,0,.12));
+      width: var(--w);
+      height: var(--h);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--c) 92%, #fff 8%), var(--c));
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+      filter: drop-shadow(0 10px 8px rgba(0,0,0,.12));
+      transform-origin: bottom center;
     }
-    .t1 { --w: 4.5vw; --h: 31vh; --c: #162323; left: -2%; }
-    .t2 { --w: 1.8vw; --h: 17vh; --c: #314b49; left: 8%; opacity: .88; }
-    .t3 { --w: 4.5vw; --h: 33vh; --c: #254344; left: 25%; opacity: .9; }
-    .t4 { --w: 3.1vw; --h: 24vh; --c: #142020; left: 30.5%; }
-    .t5 { --w: 2.1vw; --h: 18vh; --c: #526a66; left: 47%; opacity: .75; }
-    .t6 { --w: 2.7vw; --h: 23vh; --c: #42625f; left: 62%; opacity: .82; }
-    .t7 { --w: 4.1vw; --h: 35vh; --c: #17393c; left: 70%; }
-    .t8 { --w: 6.1vw; --h: 46vh; --c: #173a3e; left: 79%; }
-    .t9 { --w: 3.1vw; --h: 26vh; --c: #102021; left: 86%; }
+    .t1 { --w: 7%; --h: 58%; --c: #162323; left: -1%; }
+    .t2 { --w: 3.2%; --h: 32%; --c: #314b49; left: 8.4%; opacity: .88; }
+    .t3 { --w: 7.5%; --h: 62%; --c: #254344; left: 25%; opacity: .9; }
+    .t4 { --w: 4.6%; --h: 42%; --c: #142020; left: 31%; }
+    .t5 { --w: 3.4%; --h: 31%; --c: #526a66; left: 47%; opacity: .75; }
+    .t6 { --w: 4.3%; --h: 39%; --c: #42625f; left: 62%; opacity: .82; }
+    .t7 { --w: 6.4%; --h: 61%; --c: #17393c; left: 70%; }
+    .t8 { --w: 9.4%; --h: 80%; --c: #173a3e; left: 79%; }
+    .t9 { --w: 4.8%; --h: 45%; --c: #102021; left: 86.4%; }
     .caption {
       position: absolute;
       left: 50%;
@@ -276,15 +264,13 @@
     .screen-vignette {
       position: absolute;
       inset: 0;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.12)),
-        radial-gradient(circle at 22% 25%, transparent 0 30%, rgba(0,0,0,.18) 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.12)), radial-gradient(circle at 22% 25%, transparent 0 30%, rgba(0,0,0,.18) 100%);
       z-index: 90;
       pointer-events: none;
     }
     @media (max-aspect-ratio: 1/1) {
-      .stage { padding: 8vw 3vw; }
-      .laptop { width: 96vw; }
+      .stage { padding: 2%; }
+      .laptop { width: min(98vw, calc(82vh * 1.62)); }
       .caption { font-size: 10px; bottom: 7%; width: 86%; }
       .click { display: none; }
     }
@@ -330,21 +316,21 @@
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
-      tl.from('.laptop', { y: 34, opacity: 0, scale: 0.96, duration: 0.7, ease: 'power3.out' }, 0)
+      tl.from('.laptop', { y: 24, opacity: 0, scale: 0.97, duration: 0.7, ease: 'power3.out' }, 0)
         .from('.sun', { opacity: 0, scale: 0.82, duration: 0.8, ease: 'sine.out' }, 0.18)
         .from('.mountain.back', { y: 30, opacity: 0, duration: 0.9, ease: 'power2.out' }, 0.2)
         .from('.mountain.mid', { y: 38, opacity: 0, duration: 0.9, ease: 'power3.out' }, 0.32)
         .from('.mountain.front', { y: 48, opacity: 0, duration: 0.95, ease: 'expo.out' }, 0.44)
         .from('.hill', { y: 46, opacity: 0, duration: 0.8, ease: 'power3.out' }, 0.52)
         .from('.tower', { y: 48, opacity: 0, duration: 0.85, ease: 'back.out(1.1)' }, 0.6)
-        .from('.forest .tree', { y: 58, opacity: 0, stagger: 0.055, duration: 0.62, ease: 'power4.out' }, 0.72)
+        .from('.forest .tree', { y: 40, opacity: 0, stagger: 0.055, duration: 0.62, ease: 'power4.out' }, 0.72)
         .from('.caption', { y: 10, opacity: 0, duration: 0.72, ease: 'sine.out' }, 1.08)
         .from('.click', { opacity: 0, y: 5, duration: 0.58, ease: 'power2.out' }, 1.32)
         .to('.cloud', { x: -18, duration: 6.2, ease: 'none' }, 1.35)
         .to('.mountain.back', { x: -10, duration: 6.2, ease: 'none' }, 1.35)
         .to('.mountain.mid', { x: -17, duration: 6.2, ease: 'none' }, 1.35)
         .to('.mountain.front', { x: -24, duration: 6.2, ease: 'none' }, 1.35)
-        .to('.forest', { x: -31, duration: 6.2, ease: 'none' }, 1.35)
+        .to('.forest', { x: -24, duration: 6.2, ease: 'none' }, 1.35)
         .to('.sun', { scale: 1.07, duration: 3.1, repeat: 1, yoyo: true, ease: 'sine.inOut' }, 1.4)
         .to('.mist', { opacity: 0.78, duration: 3.1, repeat: 1, yoyo: true, ease: 'sine.inOut' }, 1.4)
         .to('.click', { opacity: 0.42, duration: 0.9, repeat: 5, yoyo: true, ease: 'sine.inOut' }, 1.7);
