@@ -87,353 +87,43 @@
     applyTheme(theme);
   }
 
-  function initPanel2Manuscript() {
+  function initPanel2Manifesto() {
     var panel = document.getElementById('panel-2');
     var inner = document.getElementById('panel-2-inner');
-    var fig = document.getElementById('panel-2-fig');
-    var quote = document.querySelector('.p2-quote-text');
-    var attr = document.querySelector('.p2-quote-attr');
-    if (!panel || !inner || !fig || !quote) return;
+    if (!panel || !inner) return;
 
     var style = document.createElement('style');
     style.textContent = [
       '#panel-2-inner{display:block!important;padding:0!important;overflow:hidden!important;}',
-      '#panel-2-manuscript{position:absolute;z-index:1;display:block;pointer-events:none;}',
-      '#panel-2-flow{position:absolute;inset:0;z-index:2;pointer-events:none;}',
-      '#panel-2-flow span{position:absolute;white-space:pre;font-family:Lora,Georgia,serif;font-style:italic;font-weight:400;line-height:1;color:rgba(240,240,240,.86);}',
-      'html[data-theme=\"light\"] #panel-2-flow span{color:rgba(10,10,10,.9);}',
-      '#panel-2-flow .p2-flow-attr{font-family:VT323,monospace;font-style:normal;letter-spacing:.08em;color:rgba(240,240,240,.5);}',
-      'html[data-theme=\"light\"] #panel-2-flow .p2-flow-attr{color:rgba(10,10,10,.56);}',
-      '#panel-2 .p2-quote-wrap{display:none!important;}',
-      '#panel-2-fig{left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;width:clamp(88px,11vw,170px)!important;z-index:4!important;transform:translate(-50%,-50%)!important;filter:drop-shadow(0 12px 22px rgba(0,0,0,.28));will-change:left,top;}',
-      'body.panel-2-pointer-active #trail-canvas{display:none!important;opacity:0!important;}',
-      '@media(max-width:600px){#panel-2-fig{width:clamp(70px,24vw,105px)!important;}}'
+      '#panel-2-manuscript,#panel-2-flow,#panel-2 .p2-quote-wrap{display:none!important;opacity:0!important;visibility:hidden!important;}',
+      '#panel-2-manifesto{position:absolute;left:50%;top:52%;width:min(56vw,760px);height:min(74vh,820px);transform:translate(-50%,-50%);z-index:3;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:color-mix(in srgb,var(--bg) 88%,var(--ink) 12%);box-shadow:0 24px 60px rgba(0,0,0,.28);overflow:hidden;}',
+      '#panel-2-manifesto object{display:block;width:100%;height:100%;border:0;background:transparent;pointer-events:none;}',
+      '#panel-2-manifesto-fallback{height:100%;display:flex;align-items:center;justify-content:center;padding:28px;text-align:center;font-family:Lora,Georgia,serif;font-size:clamp(14px,1.1vw,17px);line-height:1.45;color:var(--ink);}',
+      '#panel-2-manifesto-fallback a{color:inherit;text-decoration:none;border-bottom:1px solid currentColor;}',
+      '#panel-2-fig{z-index:4!important;}',
+      '@media(max-width:600px){#panel-2-manifesto{top:52%;width:min(86vw,430px);height:min(66vh,570px);}}'
     ].join('\n');
     document.head.appendChild(style);
 
-    var canvas = document.getElementById('panel-2-manuscript');
-    if (!canvas) {
-      canvas = document.createElement('canvas');
-      canvas.id = 'panel-2-manuscript';
-      canvas.setAttribute('aria-hidden', 'true');
-      inner.insertBefore(canvas, inner.firstChild);
-    }
-    var ctx = canvas.getContext('2d');
-    var flow = document.getElementById('panel-2-flow');
-    if (!flow) {
-      flow = document.createElement('div');
-      flow.id = 'panel-2-flow';
-      flow.setAttribute('aria-hidden', 'true');
-      inner.insertBefore(flow, canvas.nextSibling);
-    }
-    var text = quote.textContent.trim();
-    var attribution = attr ? attr.textContent.trim() : '';
-    var isMobile = window.innerWidth < 600;
-    var figX = panel.clientWidth * 0.5;
-    var figY = -Math.max(180, panel.clientHeight * 0.22);
-    var targetX = figX;
-    var targetY = panel.clientHeight * 0.5;
-    var dropStarted = false;
-    var dropActive = false;
-    var dropVelocity = 0;
-    var pointerHasMoved = false;
-    var prepareWithSegments = null;
-    var lastLayoutKey = '';
+    var existing = document.getElementById('panel-2-manifesto');
+    if (existing) return;
 
-    import('./node_modules/@chenglou/pretext/dist/layout.js')
-      .then(function (mod) { prepareWithSegments = mod.prepareWithSegments; })
-      .catch(function () { prepareWithSegments = null; });
-
-    function measure(value, font) {
-      if (prepareWithSegments) {
-        try {
-          var prepared = prepareWithSegments(value, font);
-          if (prepared && prepared.widths && prepared.widths.length) {
-            return prepared.widths.reduce(function (sum, width) { return sum + width; }, 0);
-          }
-        } catch (err) {}
-      }
-      return ctx.measureText(value).width;
-    }
-
-    function textWidth(value, font) {
-      ctx.font = font;
-      return measure(value, font);
-    }
-
-    function getFigArtRect(figRect) {
-      var naturalRatio = fig.naturalWidth && fig.naturalHeight
-        ? fig.naturalWidth / fig.naturalHeight
-        : 0;
-      if (naturalRatio > 0 && naturalRatio < 0.9) {
-        return {
-          left: figRect.left + figRect.width * (136 / 896),
-          top: figRect.top + figRect.height * (306 / 1200),
-          width: figRect.width * (632 / 896),
-          height: figRect.height * (558 / 1200)
-        };
-      }
-      return {
-        left: figRect.left,
-        top: figRect.top,
-        width: figRect.width,
-        height: figRect.height
-      };
-    }
-
-    function setTarget(clientX, clientY) {
-      var rect = panel.getBoundingClientRect();
-      var figRect = fig.getBoundingClientRect();
-      var artRect = getFigArtRect(figRect);
-      var marginX = artRect.width * 0.5;
-      var marginY = artRect.height * 0.5;
-      pointerHasMoved = true;
-      dropStarted = true;
-      dropActive = false;
-      targetX = Math.max(marginX, Math.min(rect.width - marginX, clientX - rect.left));
-      targetY = Math.max(marginY + 70, Math.min(rect.height - marginY, clientY - rect.top));
-    }
-
-    function resetDropStart() {
-      figX = panel.clientWidth * 0.5;
-      figY = -Math.max(180, panel.clientHeight * 0.22);
-      targetX = figX;
-      targetY = panel.clientHeight * 0.5;
-      dropVelocity = 0;
-      lastLayoutKey = '';
-    }
-
-    function beginDrop() {
-      if (dropStarted || pointerHasMoved) return;
-      dropStarted = true;
-      dropActive = true;
-      resetDropStart();
-    }
-
-    function checkPanelVisible() {
-      if (dropStarted || pointerHasMoved) return;
-      var rect = panel.getBoundingClientRect();
-      var visibleX = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
-      var visibleY = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
-      var area = Math.max(1, rect.width * rect.height);
-      if ((visibleX * visibleY) / area > 0.14) beginDrop();
-    }
-
-    function setPanelPointerState(clientX, clientY) {
-      var rect = panel.getBoundingClientRect();
-      var active = clientX >= rect.left && clientX <= rect.right &&
-        clientY >= rect.top && clientY <= rect.bottom;
-      document.body.classList.toggle('panel-2-pointer-active', active);
-      if (active) {
-        var trail = document.getElementById('trail-canvas');
-        if (trail && trail.getContext) {
-          trail.getContext('2d').clearRect(0, 0, trail.width, trail.height);
-        }
-      }
-    }
-
-    document.addEventListener('mousemove', function (event) {
-      var rect = panel.getBoundingClientRect();
-      setPanelPointerState(event.clientX, event.clientY);
-      if (event.clientX >= rect.left && event.clientX <= rect.right &&
-          event.clientY >= rect.top && event.clientY <= rect.bottom) {
-        setTarget(event.clientX, event.clientY);
-      }
-    });
-
-    document.addEventListener('touchmove', function (event) {
-      if (!event.touches.length) return;
-      var touch = event.touches[0];
-      var rect = panel.getBoundingClientRect();
-      if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
-          touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-        setTarget(touch.clientX, touch.clientY);
-      }
-    }, { passive: true });
-
-    function layoutCanvas() {
-      var panelWidth = Math.max(1, panel.clientWidth || window.innerWidth);
-      var panelHeight = Math.max(1, panel.clientHeight || window.innerHeight);
-      var maxWidth = window.innerWidth < 600
-        ? panelWidth - 44
-        : Math.min(920, panelWidth * 0.76);
-      var boxWidth = Math.max(1, Math.min(panelWidth - 44, maxWidth));
-      var side = (panelWidth - boxWidth) / 2;
-      var top = window.innerWidth < 600
-        ? Math.max(150, panelHeight * 0.34)
-        : Math.max(260, panelHeight * 0.44);
-      var bottom = window.innerWidth < 600
-        ? 36
-        : Math.max(48, panelHeight * 0.08);
-      canvas.style.left = side + 'px';
-      canvas.style.top = top + 'px';
-      canvas.style.width = boxWidth + 'px';
-      canvas.style.height = Math.max(1, panelHeight - top - bottom) + 'px';
-    }
-
-    function resizeCanvas() {
-      layoutCanvas();
-      var rect = canvas.getBoundingClientRect();
-      var dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-      var width = Math.max(1, Math.round(rect.width * dpr));
-      var height = Math.max(1, Math.round(rect.height * dpr));
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
-      }
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      return rect;
-    }
-
-    function rangesForLine(lineY, lineHeight, obstacle) {
-      var overlaps = lineY + lineHeight > obstacle.top && lineY < obstacle.bottom;
-      if (!overlaps) return [{ start: 0, end: obstacle.width }];
-      var ranges = [];
-      if (obstacle.left > 72) ranges.push({ start: 0, end: obstacle.left });
-      if (obstacle.width - obstacle.right > 72) ranges.push({ start: obstacle.right, end: obstacle.width });
-      return ranges.length ? ranges : [{ start: 0, end: obstacle.width }];
-    }
-
-    function draw() {
-      var rect = resizeCanvas();
-      if (dropActive && !pointerHasMoved) {
-        figX += (targetX - figX) * 0.12;
-        dropVelocity += (targetY - figY) * 0.035;
-        dropVelocity *= 0.72;
-        figY += dropVelocity;
-        if (Math.abs(targetY - figY) < 0.5 && Math.abs(dropVelocity) < 0.5) {
-          figY = targetY;
-          dropActive = false;
-        }
-      } else {
-        figX += (targetX - figX) * 0.14;
-        figY += (targetY - figY) * 0.14;
-      }
-      fig.style.setProperty('left', figX.toFixed(1) + 'px', 'important');
-      fig.style.setProperty('top', figY.toFixed(1) + 'px', 'important');
-
-      var figRect = fig.getBoundingClientRect();
-      var figArtRect = getFigArtRect(figRect);
-      var figCenterX = figArtRect.left - rect.left + figArtRect.width / 2;
-      var figCenterY = figArtRect.top - rect.top + figArtRect.height / 2;
-      var padding = Math.max(1, Math.min(3, figArtRect.width * 0.018));
-      var obstacle = {
-        left: figArtRect.left - rect.left - padding,
-        right: figArtRect.left - rect.left + figArtRect.width + padding,
-        top: figArtRect.top - rect.top - padding,
-        bottom: figArtRect.top - rect.top + figArtRect.height + padding,
-        width: rect.width
-      };
-
-      var fontSize = Math.max(13, Math.min(18, rect.width * (isMobile ? 0.043 : 0.018)));
-      var lineHeight = fontSize * 1.68;
-      var font = 'italic 400 ' + fontSize + 'px Lora, Georgia, serif';
-      var words = text.split(/\s+/);
-      var wordIndex = 0;
-      var lineY = 0;
-      var layoutKey = [
-        Math.round(figCenterX / 8),
-        Math.round(figCenterY / 8),
-        Math.round(rect.width),
-        Math.round(rect.height),
-        Math.round(fontSize)
-      ].join(':');
-
-      ctx.clearRect(0, 0, rect.width, rect.height);
-      if (layoutKey !== lastLayoutKey) {
-        var frag = document.createDocumentFragment();
-        flow.replaceChildren();
-        flow.style.left = canvas.style.left;
-        flow.style.top = canvas.style.top;
-        flow.style.width = canvas.style.width;
-        flow.style.height = canvas.style.height;
-
-        function appendCenteredRange(range) {
-          var maxWidth = Math.max(0, range.end - range.start);
-          var lineWords = [];
-          var lineWidth = 0;
-          while (wordIndex < words.length) {
-            var word = words[wordIndex] + (wordIndex === words.length - 1 ? '' : ' ');
-            var wordWidth = textWidth(word, font);
-            if (lineWords.length && lineWidth + wordWidth > maxWidth) break;
-            if (!lineWords.length && wordWidth > maxWidth) break;
-            lineWords.push({ text: word, width: wordWidth });
-            lineWidth += wordWidth;
-            wordIndex++;
-          }
-          if (!lineWords.length) return;
-          var x = range.start + Math.max(0, (maxWidth - lineWidth) / 2);
-          lineWords.forEach(function (item) {
-            var span = document.createElement('span');
-            span.textContent = item.text;
-            span.style.left = x.toFixed(1) + 'px';
-            span.style.top = lineY.toFixed(1) + 'px';
-            span.style.fontSize = fontSize.toFixed(1) + 'px';
-            frag.appendChild(span);
-            x += item.width;
-          });
-        }
-
-        while (wordIndex < words.length && lineY < rect.height - lineHeight * 2) {
-          rangesForLine(lineY, lineHeight, obstacle).forEach(function (range) {
-            appendCenteredRange(range);
-          });
-          lineY += lineHeight;
-        }
-
-        if (attribution) {
-          var attrSpan = document.createElement('span');
-          attrSpan.className = 'p2-flow-attr';
-          attrSpan.textContent = attribution;
-          var attrFont = '400 ' + Math.max(11, fontSize * 0.78) + 'px VT323, monospace';
-          attrSpan.style.left = Math.max(0, (rect.width - textWidth(attribution, attrFont)) / 2).toFixed(1) + 'px';
-          attrSpan.style.top = Math.min(rect.height - lineHeight, lineY + lineHeight * 0.5).toFixed(1) + 'px';
-          attrSpan.style.fontSize = Math.max(11, fontSize * 0.78).toFixed(1) + 'px';
-          frag.appendChild(attrSpan);
-        }
-
-        flow.appendChild(frag);
-        lastLayoutKey = layoutKey;
-      }
-
-      requestAnimationFrame(draw);
-    }
-
-    window.addEventListener('resize', function () {
-      if (pointerHasMoved) {
-        figX = panel.clientWidth * 0.5;
-        figY = panel.clientHeight * 0.5;
-        targetX = figX;
-        targetY = figY;
-      } else if (!dropStarted) {
-        resetDropStart();
-      } else {
-        targetX = panel.clientWidth * 0.5;
-        targetY = panel.clientHeight * 0.5;
-      }
-      dropVelocity = 0;
-      dropActive = dropStarted && !pointerHasMoved;
-      isMobile = window.innerWidth < 600;
-    });
-
-    if ('IntersectionObserver' in window) {
-      var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.14) beginDrop();
-        });
-      }, { threshold: [0, 0.14, 0.28] });
-      observer.observe(panel);
-    }
-    window.addEventListener('scroll', checkPanelVisible, { passive: true });
-    window.addEventListener('resize', checkPanelVisible);
-    checkPanelVisible();
-
-    requestAnimationFrame(draw);
+    var manifesto = document.createElement('div');
+    manifesto.id = 'panel-2-manifesto';
+    manifesto.setAttribute('aria-label', 'Design Manifesto');
+    manifesto.innerHTML = [
+      '<object data="uploads/Design%20Manifesto-2.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf">',
+      '<div id="panel-2-manifesto-fallback">',
+      '<a href="uploads/Design%20Manifesto-2.pdf" target="_blank" rel="noopener noreferrer">Open Design Manifesto</a>',
+      '</div>',
+      '</object>'
+    ].join('');
+    inner.insertBefore(manifesto, inner.firstChild);
   }
 
   function initAll() {
     initThemeToggle();
-    initPanel2Manuscript();
+    initPanel2Manifesto();
   }
 
   if (document.body) initAll();
