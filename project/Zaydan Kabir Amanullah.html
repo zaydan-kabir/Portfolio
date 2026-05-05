@@ -326,14 +326,30 @@
        full-viewport re-rasterization. The grain's mix-blend-mode and the
        wordmark's drop-shadow filter are the two biggest offenders — the
        browser cannot cache them when anything beneath moves. */
-    body.is-scrolling::after { mix-blend-mode: normal; opacity: 0.04; }
+    body.is-scrolling::after { display: none; }
     body.is-scrolling #masthead-reference { filter: none; }
-    body.is-scrolling #trail-canvas { visibility: hidden; }
-    /* The handwriting drop-shadow on panel-2 forces a filter region to
-       re-rasterize each frame the panel slides in. Drop it during motion;
-       it returns once the panel is settled. */
+    body.is-scrolling #trail-canvas,
+    body.is-scrolling #cursor { visibility: hidden; }
     body.is-scrolling .p2-writing-line { filter: none; }
     body.is-scrolling #panel-2-writing { transition: none; }
+    /* Hard freeze: no element on the page may run a CSS animation or
+       transition while the track is in motion. Anything that animates
+       costs paint and steals from the slide. Resumes the moment scroll
+       settles. */
+    body.is-scrolling *,
+    body.is-scrolling *::before,
+    body.is-scrolling *::after {
+      animation-play-state: paused !important;
+      transition: none !important;
+    }
+    /* Decorative items inside the track are hidden during motion — the
+       compositor only has to translate the panel layers, not re-rasterize
+       drop-shadowed images and faux-italic text. They reappear instantly
+       once the slide lands. */
+    body.is-scrolling #upcoming-ticker,
+    body.is-scrolling #horse-canvas,
+    body.is-scrolling #panel-2-fig,
+    body.is-scrolling #panel-2-writing { visibility: hidden; }
 
     /* ── ZAYDAN masthead — pinned to first horizontal panel ─── */
     #masthead {
@@ -997,9 +1013,14 @@ const zaydanAnimationReady = (() => {
   }
 
   // Tracked input velocity (px/ms), exponentially decayed in the RAF loop.
-  // Used to make the smoother snappier when the user is scrolling hard.
   let inputVelocity = 0;
   let lastWheelTs = 0;
+  // Wheel events fire at up to ~120Hz on Mac trackpads. We accumulate the
+  // delta synchronously (so preventDefault works) but defer all of the
+  // clamp/velocity math to the next animation frame — the wheel handler
+  // itself is reduced to a few field writes so it can never block.
+  let pendingWheelDelta = 0;
+  let pendingInnerScroll = 0;
 
   function handleWheel(e) {
     if (e.ctrlKey) return;
@@ -1010,18 +1031,16 @@ const zaydanAnimationReady = (() => {
       if (inner && inner.scrollHeight > inner.clientHeight) {
         const atBottom = delta > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
         const atTop    = delta < 0 && inner.scrollTop <= 0;
-        if (!atBottom && !atTop) { inner.scrollBy(0, delta); return; }
+        if (!atBottom && !atTop) { pendingInnerScroll += delta; return; }
       }
     }
-    // Update input velocity (low-pass filtered). At high event rates the
-    // browser may fire 100+ wheel events/sec on a fast spin — this gives
-    // the smoother a measure of how hard the user is scrolling.
+    pendingWheelDelta += delta;
+    // Velocity tracking, kept here because it needs the inter-event timing.
     const now = e.timeStamp || performance.now();
     const dtw = lastWheelTs ? Math.max(1, now - lastWheelTs) : 16;
     lastWheelTs = now;
     const instant = Math.abs(delta) / dtw;
     inputVelocity = inputVelocity * 0.6 + instant * 0.4;
-    moveHorizontal(delta);
   }
 
   // Single listener on window (capture phase) — previously the same handler
@@ -1089,6 +1108,17 @@ const zaydanAnimationReady = (() => {
     if (!lastFrameTs) lastFrameTs = ts;
     const dt = Math.min(64, ts - lastFrameTs);
     lastFrameTs = ts;
+
+    // Flush deferred wheel input once per frame instead of per event.
+    if (pendingInnerScroll !== 0) {
+      const inner = document.getElementById('panel-2-inner');
+      if (inner) inner.scrollBy(0, pendingInnerScroll);
+      pendingInnerScroll = 0;
+    }
+    if (pendingWheelDelta !== 0) {
+      moveHorizontal(pendingWheelDelta);
+      pendingWheelDelta = 0;
+    }
 
     const moving = currentX !== targetX;
     if (moving !== isScrollingClass) {
@@ -1289,12 +1319,14 @@ const zaydanAnimationReady = (() => {
     lastTs = ts;
 
     const scrolling = currentX !== targetX;
-    if (!scrolling && ts - lastAsciiTs >= ASCII_FRAME_MS) {
-      if (horseGrid)    renderGrid(hCtx, horseGrid, H_CW, H_CH, animTime);
-      if (portraitGrid) renderGrid(pCtx, portraitGrid, P_CW, P_CH, animTime);
-      lastAsciiTs = ts;
+    if (!scrolling) {
+      if (ts - lastAsciiTs >= ASCII_FRAME_MS) {
+        if (horseGrid)    renderGrid(hCtx, horseGrid, H_CW, H_CH, animTime);
+        if (portraitGrid) renderGrid(pCtx, portraitGrid, P_CW, P_CH, animTime);
+        lastAsciiTs = ts;
+      }
+      tickHorse();
     }
-    tickHorse();
 
     requestAnimationFrame(tick);
   }
@@ -1417,6 +1449,13 @@ const zaydanAnimationReady = (() => {
   // cursor DOM write per frame instead of one per event.
   let trailDirty = true;
   (function drawTrail() {
+    // Skip all cursor + trail work while the track is moving — the
+    // canvas is hidden via CSS anyway and getImageData calls inside
+    // cursorColorAt are sync GPU readbacks that stall the pipeline.
+    if (currentX !== targetX) {
+      requestAnimationFrame(drawTrail);
+      return;
+    }
     if (cursorDirty) {
       cursorEl.style.left = pendingCursorX + 'px';
       cursorEl.style.top  = pendingCursorY + 'px';
@@ -1433,7 +1472,6 @@ const zaydanAnimationReady = (() => {
         drawBlackTrailOverZaydan();
         drawBlackTrailOverPopup();
       }
-      // Once the trail is empty we can stop redrawing until input arrives.
       if (pts.length === 0) trailDirty = false;
     }
     requestAnimationFrame(drawTrail);
