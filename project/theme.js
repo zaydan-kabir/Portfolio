@@ -1,7 +1,7 @@
 (function () {
   var storageKey = 'zaydan-theme';
   var root = document.documentElement;
-  var panelTwoVersion = '20260505-pretext-mouse-displacement';
+  var panelTwoVersion = '20260505-canvas-mouse-displacement';
 
   function getDefaultTheme() {
     return 'light';
@@ -136,7 +136,6 @@
 
     var measureCanvas = document.createElement('canvas');
     var ctx = measureCanvas.getContext('2d');
-    var prepareWithSegments = null;
     var words = manifestoText.split(/\s+/);
     var attribution = 'Design Manifesto';
     var lastLayoutKey = '';
@@ -149,39 +148,22 @@
     var fieldX = 0;
     var fieldY = 0;
 
-    import('./node_modules/@chenglou/pretext/dist/layout.js')
-      .then(function (mod) {
-        prepareWithSegments = mod.prepareWithSegments || null;
-        lastLayoutKey = '';
-      })
-      .catch(function () {
-        prepareWithSegments = null;
-      });
-
     function clamp(value, min, max) {
       return Math.max(min, Math.min(max, value));
     }
 
-    function pretextWidth(value, font) {
-      if (prepareWithSegments) {
-        try {
-          var prepared = prepareWithSegments(value, font);
-          if (prepared && prepared.widths && prepared.widths.length) {
-            return prepared.widths.reduce(function (sum, width) { return sum + width; }, 0);
-          }
-        } catch (err) {}
-      }
+    function textWidth(value, font) {
       ctx.font = font;
       return ctx.measureText(value).width;
     }
 
     function charWidth(ch, font) {
-      var cacheKey = font + '|' + (prepareWithSegments ? 'pretext' : 'canvas');
+      var cacheKey = font + '|canvas';
       if (cacheKey !== widthCacheKey) {
         widthCacheKey = cacheKey;
         widthCache = Object.create(null);
       }
-      if (widthCache[ch] == null) widthCache[ch] = pretextWidth(ch, font);
+      if (widthCache[ch] == null) widthCache[ch] = textWidth(ch, font);
       return widthCache[ch];
     }
 
@@ -225,7 +207,7 @@
       words.forEach(function (word, index) {
         var token = index === words.length - 1 ? word : word + ' ';
         var proposed = line + token;
-        if (line && pretextWidth(proposed, font) > boxWidth) {
+        if (line && textWidth(proposed, font) > boxWidth) {
           lines.push(line.trimEnd());
           line = token;
         } else {
@@ -263,7 +245,7 @@
         Math.round(size.height),
         Math.round(boxWidth),
         Math.round(fontSize * 10),
-        prepareWithSegments ? 'pretext' : 'canvas',
+        'canvas',
         root.dataset.theme || ''
       ].join(':');
 
@@ -277,7 +259,7 @@
       flow.style.height = size.height + 'px';
 
       lines.forEach(function (lineText, lineIndex) {
-        var lineWidth = pretextWidth(lineText, font);
+        var lineWidth = textWidth(lineText, font);
         var x = boxStart + Math.max(0, (boxWidth - lineWidth) / 2);
         var y = startY + lineIndex * lineHeight;
         for (var i = 0; i < lineText.length; i += 1) {
@@ -296,7 +278,7 @@
       });
 
       var attrSpan = document.createElement('span');
-      var attrWidth = pretextWidth(attribution, attrFont);
+      var attrWidth = textWidth(attribution, attrFont);
       attrSpan.className = 'p2-flow-attr';
       attrSpan.textContent = attribution;
       attrSpan.style.left = Math.max(0, (size.width - attrWidth) / 2).toFixed(1) + 'px';

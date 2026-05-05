@@ -8,8 +8,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@chenglou/pretext": "^0.0.6"
-  }
+  "license": "ISC"
 }

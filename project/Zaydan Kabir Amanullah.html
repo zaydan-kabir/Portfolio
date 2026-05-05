@@ -1013,65 +1013,8 @@ const zaydanAnimationReady = (() => {
   }
   requestAnimationFrame(renderHorizontalTrack);
 
-  // ── Variable-typographic ASCII via pretext ───────────────────────
-  let typoPalette = null;
-
-  async function buildTypoPalette(fontSize) {
-    const { prepareWithSegments } = await import('./node_modules/@chenglou/pretext/dist/layout.js');
-    const CHARS = " .,:;!il|-+=*#@%&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    const variants = [
-      { weight: 400, style: 'normal'  },
-      { weight: 400, style: 'italic'  },
-      { weight: 700, style: 'normal'  },
-      { weight: 700, style: 'italic'  },
-    ];
-    const tw = Math.ceil(fontSize * 3), th = Math.ceil(fontSize * 2);
-    const tmp = document.createElement('canvas');
-    tmp.width = tw; tmp.height = th;
-    const tc = tmp.getContext('2d', { willReadFrequently: true });
-    const entries = [];
-    for (const { weight, style } of variants) {
-      const fontStr = `${style} ${weight} ${fontSize}px 'Georgia',serif`;
-      for (const ch of CHARS) {
-        const prep = prepareWithSegments(ch, fontStr);
-        const width = (prep.widths && prep.widths.length > 0) ? prep.widths[0] : fontSize * 0.5;
-        let brightness = 0;
-        if (ch !== ' ') {
-          tc.clearRect(0, 0, tw, th);
-          tc.font = fontStr;
-          tc.fillStyle = '#000';
-          tc.textBaseline = 'alphabetic';
-          tc.fillText(ch, 1, Math.ceil(fontSize * 1.25));
-          const data = tc.getImageData(0, 0, tw, th).data;
-          let inkSum = 0;
-          for (let p = 3; p < data.length; p += 4) inkSum += data[p];
-          brightness = inkSum / (255 * tw * th);
-        }
-        entries.push({ ch, fontStr, width, brightness });
-      }
-    }
-    entries.sort((a, b) => a.brightness - b.brightness);
-    return entries;
-  }
-
-  function findBestChar(palette, targetBrightness, targetWidth) {
-    let lo = 0, hi = palette.length - 1;
-    while (lo < hi) {
-      const mid = (lo + hi) >> 1;
-      if (palette[mid].brightness < targetBrightness) lo = mid + 1;
-      else hi = mid;
-    }
-    let best = palette[lo], bestScore = Infinity;
-    const s = Math.max(0, lo - 20), e = Math.min(palette.length - 1, lo + 20);
-    for (let k = s; k <= e; k++) {
-      const en = palette[k];
-      const be = Math.abs(en.brightness - targetBrightness);
-      const we = Math.abs(en.width - targetWidth) / Math.max(targetWidth, 1);
-      const score = be * 2.5 + we;
-      if (score < bestScore) { bestScore = score; best = en; }
-    }
-    return best;
-  }
+  // ── ASCII ramp ────────────────────────────────────────────────────
+  const RAMP = ' .\'`,:;-+!iIlr=*o%#&@';
 
   // ── Luminance grid (min-lum for dark-chars-on-light-bg sources) ───
   function toGrid(img, cols, rows) {
@@ -1132,16 +1075,14 @@ const zaydanAnimationReady = (() => {
   }
   initGrids();
   window.addEventListener('load', initGrids);
-  buildTypoPalette(H_CH).then(p => { typoPalette = p; });
-
   // ── Render helpers ────────────────────────────────────────────────
-  const MONO_RAMP = " .'`,:;iltfcj-+!rILvzsx=*eaounCVZSX%mwdbpqMWDB#&@";
   function renderGrid(ctx, gridData, cw, ch, t) {
     ctx.clearRect(0, 0, gridData.cols * cw, gridData.rows * ch);
     if (!gridData) return;
     const { grid, cols, rows } = gridData;
     const theme = document.documentElement.dataset.theme;
     const asciiColor = theme === 'light' ? '0,0,0' : '255,255,255';
+    ctx.font = `bold ${ch}px 'Courier New', monospace`;
 
     let minLum = 1, maxLum = 0;
     for (let i = 0; i < grid.length; i++) {
@@ -1161,22 +1102,13 @@ const zaydanAnimationReady = (() => {
         const breath = Math.sin(t * 0.55 + c * 0.18 + r * 0.09) * 0.5 + 0.5;
         const alpha  = Math.min(1, norm * (theme === 'light' ? 1.2 : 0.6 + breath * 0.3));
 
-        if (typoPalette) {
-          const flicker = Math.sin(t * 1.1 + c * 0.38 + r * 0.22) > 0.88 ? 0.05 : 0;
-          const best = findBestChar(typoPalette, Math.min(1, norm + flicker), cw);
-          ctx.font = best.fontStr;
-          ctx.fillStyle = `rgba(${asciiColor},${alpha.toFixed(3)})`;
-          ctx.fillText(best.ch, c * cw, (r + 1) * ch);
-        } else {
-          const flicker = Math.sin(t * 1.1 + c * 0.38 + r * 0.22) > 0.82 ? 1 : 0;
-          const base = Math.floor(norm * (MONO_RAMP.length - 1));
-          const ci   = Math.max(0, Math.min(MONO_RAMP.length - 1, base + flicker));
-          const char = MONO_RAMP[ci];
-          if (!char || char === ' ') continue;
-          ctx.font = `bold ${ch}px 'Courier New',monospace`;
-          ctx.fillStyle = `rgba(${asciiColor},${alpha.toFixed(3)})`;
-          ctx.fillText(char, c * cw, (r + 1) * ch);
-        }
+        const flicker = Math.sin(t * 1.1 + c * 0.38 + r * 0.22) > 0.82 ? 1 : 0;
+        const base = Math.floor(norm * (RAMP.length - 1));
+        const ci   = Math.max(0, Math.min(RAMP.length - 1, base + flicker));
+        const char = RAMP[ci];
+        if (!char || char === ' ') continue;
+        ctx.fillStyle = `rgba(${asciiColor},${alpha.toFixed(3)})`;
+        ctx.fillText(char, c * cw, (r + 1) * ch);
       }
     }
   }
