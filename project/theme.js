@@ -3,6 +3,27 @@
   var root = document.documentElement;
   var panelTwoVersion = '20260505-pretext-mouse-displacement';
 
+  function installHorseRemovalStyles() {
+    if (!document.head || document.getElementById('zaydan-hide-horse-ascii')) return;
+    var style = document.createElement('style');
+    style.id = 'zaydan-hide-horse-ascii';
+    style.textContent = '#horse-canvas{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;}';
+    document.head.appendChild(style);
+  }
+
+  function hideHorseAscii() {
+    installHorseRemovalStyles();
+    var horse = document.getElementById('horse-canvas');
+    if (horse) {
+      horse.style.setProperty('display', 'none', 'important');
+      horse.style.setProperty('visibility', 'hidden', 'important');
+      horse.style.setProperty('opacity', '0', 'important');
+      horse.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  installHorseRemovalStyles();
+
   function getDefaultTheme() {
     return 'light';
   }
@@ -358,6 +379,7 @@
   }
 
   function initAll() {
+    hideHorseAscii();
     initThemeToggle();
     initPanel2Manuscript();
   }
