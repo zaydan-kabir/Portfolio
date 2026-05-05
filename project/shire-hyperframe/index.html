@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shire HyperFrame Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Anton&family=Special+Elite&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #ece1c4; }
+
+    [data-composition-id="shire-preview"] {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 38%, #f1e7cd 0%, #ece1c4 48%, #d9cca9 100%);
+      color: #1a2c5b;
+      font-family: 'Alfa Slab One', Georgia, serif;
+      isolation: isolate;
+    }
+
+    .paper-edge {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 14;
+      box-shadow:
+        inset 0 0 0 6px rgba(26,44,91,0.06),
+        inset 0 0 90px rgba(60,38,12,0.18);
+    }
+
+    .frame-rule {
+      position: absolute;
+      left: 5%;
+      right: 5%;
+      top: 6%;
+      bottom: 6%;
+      border: 2px solid #1a2c5b;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .frame-rule::before {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(26,44,91,0.4);
+    }
+
+    .chevrons {
+      position: absolute;
+      top: 38%;
+      width: 16%;
+      height: 26%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6%;
+      z-index: 2;
+    }
+    .chevrons.left  { left: 7.5%; }
+    .chevrons.right { right: 7.5%; transform: scaleX(-1); }
+    .chevrons .stripe {
+      width: 100%;
+      height: 18%;
+      background: #b62a1f;
+      clip-path: polygon(0 0, 70% 0, 100% 50%, 70% 100%, 0 100%, 30% 50%);
+      transform-origin: left center;
+    }
+
+    .banner {
+      position: absolute;
+      left: -8%;
+      right: -8%;
+      top: 12.5%;
+      height: 14%;
+      background: #b62a1f;
+      transform: rotate(-4.2deg);
+      transform-origin: 50% 50%;
+      box-shadow: 0 4px 0 rgba(26,44,91,0.18), 0 9px 16px rgba(26,44,91,0.18);
+      z-index: 5;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .banner::before, .banner::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 9%;
+      background: rgba(0,0,0,0.18);
+    }
+    .banner::before { left: 0;  clip-path: polygon(0 0, 100% 0, 60% 50%, 100% 100%, 0 100%); }
+    .banner::after  { right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 40% 50%); }
+
+    .banner .banner-text {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: clamp(22px, 4.4vw, 64px);
+      letter-spacing: 0.16em;
+      color: #ece1c4;
+      text-transform: uppercase;
+      white-space: nowrap;
+      text-shadow: 0 2px 0 rgba(26,44,91,0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6em;
+    }
+    .banner .banner-star {
+      display: inline-block;
+      width: 0.7em;
+      height: 0.7em;
+      background: #c89432;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    .wordmark {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 38%;
+      text-align: center;
+      font-family: 'Alfa Slab One', Georgia, serif;
+      font-size: clamp(80px, 16vw, 220px);
+      line-height: 0.85;
+      letter-spacing: -0.01em;
+      color: #1a2c5b;
+      z-index: 6;
+      pointer-events: none;
+      text-shadow:
+        2px 2px 0 rgba(26,44,91,0.18),
+        4px 4px 0 rgba(182,42,31,0.32);
+    }
+    .wordmark .l {
+      display: inline-block;
+      will-change: transform, opacity;
+    }
+
+    .star-row {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 70%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(8px, 1.4vw, 22px);
+      z-index: 6;
+    }
+    .star-row .star {
+      width: clamp(14px, 1.6vw, 22px);
+      aspect-ratio: 1;
+      background: #c89432;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      filter: drop-shadow(0 2px 0 rgba(26,44,91,0.28));
+    }
+    .star-row .star.big {
+      width: clamp(28px, 3.2vw, 44px);
+    }
+    .star-row .rule {
+      flex: 0 0 18%;
+      max-width: 130px;
+      height: 2px;
+      background: #1a2c5b;
+    }
+
+    .tagline {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 78%;
+      text-align: center;
+      font-family: 'Special Elite', 'Courier Prime', monospace;
+      font-size: clamp(13px, 1.45vw, 20px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #1a2c5b;
+      z-index: 6;
+    }
+
+    .footer {
+      position: absolute;
+      left: 8.5%;
+      right: 8.5%;
+      bottom: 8.4%;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: 'Special Elite', 'Courier Prime', monospace;
+      font-size: clamp(10px, 1vw, 14px);
+      letter-spacing: 0.1em;
+      color: rgba(26,44,91,.78);
+      z-index: 7;
+    }
+    .footer .disciplines { letter-spacing: 0.16em; text-transform: uppercase; }
+
+    .corner-mark {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #b62a1f;
+      z-index: 4;
+    }
+    .corner-mark.tl { left: 5%;   top: 6%;     border-right: none; border-bottom: none; transform: translate(-50%,-50%); }
+    .corner-mark.tr { right: 5%;  top: 6%;     border-left:  none; border-bottom: none; transform: translate( 50%,-50%); }
+    .corner-mark.bl { left: 5%;   bottom: 6%;  border-right: none; border-top:    none; transform: translate(-50%, 50%); }
+    .corner-mark.br { right: 5%;  bottom: 6%;  border-left:  none; border-top:    none; transform: translate( 50%, 50%); }
+
+    .halftone {
+      position: absolute;
+      inset: 0;
+      z-index: 13;
+      pointer-events: none;
+      opacity: 0.22;
+      mix-blend-mode: multiply;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(26,44,91,0.45) 0.6px, transparent 1.4px);
+      background-size: 4px 4px;
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      pointer-events: none;
+      opacity: 0.16;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+    }
+
+    .vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 11;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 58%, rgba(60,38,12,0.32) 100%);
+    }
+
+    @media (max-aspect-ratio: 1/1) {
+      .wordmark { font-size: clamp(64px, 18vw, 180px); }
+      .banner .banner-text { font-size: clamp(18px, 5vw, 48px); letter-spacing: 0.12em; }
+      .footer { font-size: 10px; letter-spacing: 0.06em; }
+    }
+  </style>
+</head>
+<body>
+  <div data-composition-id="shire-preview" data-width="1280" data-height="640" data-duration="11" data-start="0" data-track-index="0">
+    <div class="frame-rule"></div>
+    <div class="corner-mark tl"></div>
+    <div class="corner-mark tr"></div>
+    <div class="corner-mark bl"></div>
+    <div class="corner-mark br"></div>
+
+    <div class="chevrons left">
+      <span class="stripe"></span>
+      <span class="stripe"></span>
+      <span class="stripe"></span>
+    </div>
+    <div class="chevrons right">
+      <span class="stripe"></span>
+      <span class="stripe"></span>
+      <span class="stripe"></span>
+    </div>
+
+    <div class="banner">
+      <span class="banner-text">
+        <span class="banner-star"></span>
+        Currently Building
+        <span class="banner-star"></span>
+      </span>
+    </div>
+
+    <div class="wordmark">
+      <span class="l">S</span><span class="l">H</span><span class="l">I</span><span class="l">R</span><span class="l">E</span>
+    </div>
+
+    <div class="star-row">
+      <span class="rule"></span>
+      <span class="star"></span>
+      <span class="star big"></span>
+      <span class="star"></span>
+      <span class="rule"></span>
+    </div>
+
+    <div class="tagline">For Those Who Served</div>
+
+    <div class="footer">
+      <span>Edition 01 / Field Notes</span>
+      <span class="disciplines">UI/UX · System · Design Thinking</span>
+    </div>
+
+    <div class="halftone"></div>
+    <div class="vignette"></div>
+    <div class="grain"></div>
+    <div class="paper-edge"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      tl.from('.frame-rule', { opacity: 0, duration: 0.6, ease: 'sine.out' }, 0)
+        .from('.corner-mark', {
+          opacity: 0,
+          scale: 0.5,
+          duration: 0.45,
+          ease: 'back.out(2)',
+          stagger: 0.05
+        }, 0.18);
+
+      tl.from('.chevrons.left .stripe', {
+        x: -160,
+        opacity: 0,
+        duration: 0.55,
+        ease: 'expo.out',
+        stagger: 0.07
+      }, 0.35);
+
+      tl.from('.chevrons.right .stripe', {
+        x: -160,
+        opacity: 0,
+        duration: 0.55,
+        ease: 'expo.out',
+        stagger: 0.07
+      }, 0.42);
+
+      tl.from('.banner', {
+        x: '-110%',
+        rotation: -10,
+        duration: 0.7,
+        ease: 'expo.out',
+        transformOrigin: '50% 50%'
+      }, 0.6);
+
+      tl.from('.banner .banner-text', {
+        opacity: 0,
+        scale: 0.92,
+        duration: 0.5,
+        ease: 'power3.out'
+      }, 1.0);
+
+      tl.from('.wordmark .l', {
+        y: -90,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'expo.out',
+        stagger: 0.06
+      }, 1.15);
+
+      tl.from('.star-row .rule', {
+        scaleX: 0,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power3.out',
+        transformOrigin: 'center center',
+        stagger: 0.04
+      }, 1.6)
+      .from('.star-row .star', {
+        scale: 0,
+        opacity: 0,
+        rotation: -45,
+        duration: 0.5,
+        ease: 'back.out(2.4)',
+        stagger: 0.07
+      }, 1.65);
+
+      tl.from('.tagline', {
+        y: 12,
+        opacity: 0,
+        duration: 0.55,
+        ease: 'power2.out'
+      }, 1.95);
+
+      tl.from('.footer > *', {
+        opacity: 0,
+        y: 8,
+        duration: 0.55,
+        ease: 'power2.out',
+        stagger: 0.1
+      }, 2.1);
+
+      tl.to('.banner', {
+        rotation: -3.6,
+        duration: 4.2,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: 1,
+        transformOrigin: '50% 50%'
+      }, 2.5);
+
+      tl.to('.star-row .star.big', {
+        scale: 1.12,
+        duration: 1.6,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: 3,
+        transformOrigin: '50% 50%'
+      }, 2.6);
+
+      tl.to('.chevrons .stripe', {
+        x: 6,
+        duration: 2.6,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: 1,
+        stagger: { each: 0.1, from: 'random' }
+      }, 2.7);
+
+      window.__timelines['shire-preview'] = tl;
+
+      if (!window.__hyperframes) {
+        tl.eventCallback('onComplete', () => tl.restart());
+        tl.play(0);
+      }
+    </script>
+  </div>
+</body>
+</html>
