@@ -1095,51 +1095,76 @@ const zaydanAnimationReady = (() => {
   let horseGrid    = null;
   let portraitGrid = null;
 
-  function initGrids() {
-    const hImg = document.getElementById('img-horse');
-    const pImg = document.getElementById('img-portrait');
-    if (hImg && hImg.naturalWidth > 0 && !horseGrid)
-      horseGrid = toGrid(hImg, H_COLS, H_ROWS);
-    if (pImg && pImg.naturalWidth > 0 && !portraitGrid)
-      portraitGrid = toGrid(pImg, P_COLS, P_ROWS);
-  }
-  initGrids();
-  window.addEventListener('load', initGrids);
-  // ── Render helpers ────────────────────────────────────────────────
-  function renderGrid(ctx, gridData, cw, ch, t) {
-    ctx.clearRect(0, 0, gridData.cols * cw, gridData.rows * ch);
-    if (!gridData) return;
-    const { grid, cols, rows } = gridData;
-    const theme = document.documentElement.dataset.theme;
-    const asciiColor = theme === 'light' ? '0,0,0' : '255,255,255';
-    ctx.font = `bold ${ch}px 'Courier New', monospace`;
-
+  function precomputeGridStats(g) {
     let minLum = 1, maxLum = 0;
+    const grid = g.grid;
     for (let i = 0; i < grid.length; i++) {
       if (grid[i] < minLum) minLum = grid[i];
       if (grid[i] > maxLum) maxLum = grid[i];
     }
-    const maxPass = minLum + (maxLum - minLum) * 0.70;
-
-    ctx.textBaseline = 'alphabetic';
+    g.minLum = minLum;
+    g.maxPass = minLum + (maxLum - minLum) * 0.70;
+    // Cache the list of cells that will actually render (lum <= maxPass and
+    // norm >= 0.1) so the per-frame loop touches ~half as many cells.
+    const visible = [];
+    const { cols, rows } = g;
+    const denom = Math.max(0.01, g.maxPass - minLum);
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const lum = grid[r * cols + c];
-        if (lum > maxPass) continue;
-        const norm = 1 - (lum - minLum) / Math.max(0.01, maxPass - minLum);
+        if (lum > g.maxPass) continue;
+        const norm = 1 - (lum - minLum) / denom;
         if (norm < 0.1) continue;
-
-        const breath = Math.sin(t * 0.55 + c * 0.18 + r * 0.09) * 0.5 + 0.5;
-        const alpha  = Math.min(1, norm * (theme === 'light' ? 1.2 : 0.6 + breath * 0.3));
-
-        const flicker = Math.sin(t * 1.1 + c * 0.38 + r * 0.22) > 0.82 ? 1 : 0;
-        const base = Math.floor(norm * (RAMP.length - 1));
-        const ci   = Math.max(0, Math.min(RAMP.length - 1, base + flicker));
-        const char = RAMP[ci];
-        if (!char || char === ' ') continue;
-        ctx.fillStyle = `rgba(${asciiColor},${alpha.toFixed(3)})`;
-        ctx.fillText(char, c * cw, (r + 1) * ch);
+        visible.push(r, c, norm);
       }
+    }
+    g.visible = new Float32Array(visible);
+    return g;
+  }
+
+  function initGrids() {
+    const hImg = document.getElementById('img-horse');
+    const pImg = document.getElementById('img-portrait');
+    if (hImg && hImg.naturalWidth > 0 && !horseGrid)
+      horseGrid = precomputeGridStats(toGrid(hImg, H_COLS, H_ROWS));
+    if (pImg && pImg.naturalWidth > 0 && !portraitGrid)
+      portraitGrid = precomputeGridStats(toGrid(pImg, P_COLS, P_ROWS));
+  }
+  initGrids();
+  window.addEventListener('load', initGrids);
+  // ── Render helpers ────────────────────────────────────────────────
+  // Hot path — runs ~6500 fillText calls per frame across both grids.
+  // Pulled all invariants out of the inner loop and iterates a precomputed
+  // visible-cell list instead of re-scanning the full grid.
+  function renderGrid(ctx, gridData, cw, ch, t) {
+    if (!gridData || !gridData.visible) return;
+    ctx.clearRect(0, 0, gridData.cols * cw, gridData.rows * ch);
+    const theme = document.documentElement.dataset.theme;
+    const asciiColor = theme === 'light' ? '0,0,0' : '255,255,255';
+    const isLight = theme === 'light';
+    ctx.font = `bold ${ch}px 'Courier New', monospace`;
+    ctx.textBaseline = 'alphabetic';
+
+    const visible = gridData.visible;
+    const rampMax = RAMP.length - 1;
+    for (let i = 0; i < visible.length; i += 3) {
+      const r = visible[i], c = visible[i+1], norm = visible[i+2];
+
+      const breath = Math.sin(t * 0.55 + c * 0.18 + r * 0.09) * 0.5 + 0.5;
+      let alpha = norm * (isLight ? 1.2 : 0.6 + breath * 0.3);
+      if (alpha > 1) alpha = 1;
+
+      const flicker = Math.sin(t * 1.1 + c * 0.38 + r * 0.22) > 0.82 ? 1 : 0;
+      const base = (norm * rampMax) | 0;
+      let ci = base + flicker;
+      if (ci > rampMax) ci = rampMax;
+      const char = RAMP[ci];
+      if (!char || char === ' ') continue;
+      // Quantise alpha to 64 buckets — avoids string churn and lets the
+      // browser cache the fillStyle parse.
+      const aQ = ((alpha * 64) | 0) / 64;
+      ctx.fillStyle = `rgba(${asciiColor},${aQ})`;
+      ctx.fillText(char, c * cw, (r + 1) * ch);
     }
   }
 
@@ -1155,14 +1180,23 @@ const zaydanAnimationReady = (() => {
   }
 
   // ── Animation loop ─────────────────────────────────────────────────
+  // The two ASCII grids are the heaviest per-frame work on the page (~6500
+  // fillText calls). Throttle to ~30fps and skip entirely while the page is
+  // animating horizontally so the scroll smoother gets a clean frame budget.
+  const ASCII_FRAME_MS = 33; // ~30fps
+  let lastAsciiTs = 0;
   function tick(ts) {
     if (!lastTs) lastTs = ts;
     const dt = Math.min(0.05, (ts - lastTs) / 1000);
     animTime += dt;
     lastTs = ts;
 
-    if (horseGrid)    renderGrid(hCtx, horseGrid, H_CW, H_CH, animTime);
-    if (portraitGrid) renderGrid(pCtx, portraitGrid, P_CW, P_CH, animTime);
+    const scrolling = currentX !== targetX;
+    if (!scrolling && ts - lastAsciiTs >= ASCII_FRAME_MS) {
+      if (horseGrid)    renderGrid(hCtx, horseGrid, H_CW, H_CH, animTime);
+      if (portraitGrid) renderGrid(pCtx, portraitGrid, P_CW, P_CH, animTime);
+      lastAsciiTs = ts;
+    }
     tickHorse();
 
     requestAnimationFrame(tick);
@@ -1234,13 +1268,14 @@ const zaydanAnimationReady = (() => {
   window.addEventListener('resize', resizeTrail);
 
   const pts = [];
+  let pendingCursorX = 0, pendingCursorY = 0, cursorDirty = false;
   document.addEventListener('mousemove', e => {
-    cursorEl.style.left = e.clientX + 'px';
-    cursorEl.style.top  = e.clientY + 'px';
-    cursorEl.style.background = cursorColorAt(e.clientX, e.clientY);
+    pendingCursorX = e.clientX;
+    pendingCursorY = e.clientY;
+    cursorDirty = true;
     pts.push({ x: e.clientX, y: e.clientY, t: Date.now() });
     if (pts.length > 40) pts.shift();
-  });
+  }, { passive: true });
 
   function drawTrailPath(ctx, color) {
     ctx.lineCap = 'round';
@@ -1280,13 +1315,30 @@ const zaydanAnimationReady = (() => {
     tCtx.restore();
   }
 
+  // Trail loop: skip the expensive composites entirely when nothing is
+  // moving and the trail has fully faded. Also coalesce mousemove → one
+  // cursor DOM write per frame instead of one per event.
+  let trailDirty = true;
   (function drawTrail() {
-    tCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+    if (cursorDirty) {
+      cursorEl.style.left = pendingCursorX + 'px';
+      cursorEl.style.top  = pendingCursorY + 'px';
+      cursorEl.style.background = cursorColorAt(pendingCursorX, pendingCursorY);
+      cursorDirty = false;
+      trailDirty = true;
+    }
     const now = Date.now();
-    drawTrailPath(tCtx, '#fff');
-    drawBlackTrailOverZaydan();
-    drawBlackTrailOverPopup();
     while (pts.length && now - pts[0].t > 300) pts.shift();
+    if (trailDirty) {
+      tCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+      if (pts.length > 1) {
+        drawTrailPath(tCtx, '#fff');
+        drawBlackTrailOverZaydan();
+        drawBlackTrailOverPopup();
+      }
+      // Once the trail is empty we can stop redrawing until input arrives.
+      if (pts.length === 0) trailDirty = false;
+    }
     requestAnimationFrame(drawTrail);
   })();
 
