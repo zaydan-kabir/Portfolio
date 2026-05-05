@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fig Falling Into Text</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'VT323';
+      src: url('../uploads/VT323-Regular.ttf') format('truetype');
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: #0a0a0a;
+      overflow: hidden;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      color: #f0f0f0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    [data-composition-id="fig-fall-text"] {
+      position: relative;
+      width: min(100vw, 1920px);
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: #0a0a0a;
+      isolation: isolate;
+    }
+
+    .scene-content {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 124px 170px 108px;
+      box-sizing: border-box;
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      opacity: 0.055;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+    }
+
+    .manuscript {
+      position: absolute;
+      inset: 132px 185px 130px;
+      z-index: 1;
+    }
+
+    .line {
+      position: absolute;
+      height: 30px;
+      overflow: hidden;
+      white-space: nowrap;
+      font-family: Lora, Georgia, serif;
+      font-size: 25px;
+      line-height: 1;
+      font-style: italic;
+      color: rgba(240, 240, 240, 0.84);
+      transform-origin: left center;
+      will-change: transform, opacity, clip-path;
+    }
+
+    .line.dim {
+      color: rgba(240, 240, 240, 0.52);
+    }
+
+    .left {
+      text-align: right;
+    }
+
+    .right {
+      text-align: left;
+    }
+
+    .attribution {
+      position: absolute;
+      left: 50%;
+      bottom: 48px;
+      transform: translateX(-50%);
+      z-index: 2;
+      font-family: VT323, monospace;
+      font-size: 23px;
+      letter-spacing: 0.08em;
+      color: rgba(240, 240, 240, 0.44);
+      white-space: nowrap;
+    }
+
+    .fig-wrap {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 188px;
+      height: 166px;
+      z-index: 3;
+      transform: translate(-50%, -50%);
+      transform-origin: 50% 70%;
+      will-change: transform, filter;
+      filter: drop-shadow(0 26px 30px rgba(0, 0, 0, 0.35));
+    }
+
+    .fig-wrap img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    .impact-ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 246px;
+      height: 246px;
+      z-index: 0;
+      border: 1px solid rgba(240, 240, 240, 0.12);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      opacity: 0;
+    }
+
+    .fallback-play .full {
+      animation: line-write 0.9s ease-out 0.15s forwards;
+    }
+
+    .fallback-play .fig-wrap {
+      animation: fig-drop 1.55s cubic-bezier(.22, .84, .3, 1) 0.7s forwards;
+    }
+
+    .fallback-play .impact-ring {
+      animation: ring-pulse 0.72s ease-out 1.54s forwards;
+    }
+
+    .fallback-play .left,
+    .fallback-play .right {
+      animation: line-wrap 0.7s ease-out 1.45s forwards;
+    }
+
+    .fallback-play .right {
+      animation-delay: 1.5s;
+    }
+
+    .fallback-play .attribution {
+      animation: attribution-in 0.55s ease-out 2.45s forwards;
+    }
+
+    @keyframes line-write {
+      from { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateY(18px); }
+      to { opacity: 1; clip-path: inset(0 0 0 0); transform: translateY(0); }
+    }
+
+    @keyframes line-wrap {
+      from { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(var(--start-x, 0)); }
+      to { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); }
+    }
+
+    @keyframes fig-drop {
+      0% { transform: translate(-50%, -50%) translate(-18px, -720px) rotate(-9deg) scale(0.92); }
+      68% { transform: translate(-50%, -50%) translate(0, 18px) rotate(1.5deg) scale(1); }
+      82% { transform: translate(-50%, -50%) translate(0, -8px) rotate(-1deg) scale(1); }
+      100% { transform: translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    @keyframes ring-pulse {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+      22% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.28); }
+    }
+
+    @keyframes attribution-in {
+      from { opacity: 0; transform: translate(-50%, 12px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    @media (max-width: 900px) {
+      [data-composition-id="fig-fall-text"] {
+        width: 100vw;
+        height: 100vh;
+        aspect-ratio: auto;
+      }
+
+      .scene-content {
+        padding: 92px 34px 76px;
+      }
+
+      .manuscript {
+        inset: 118px 36px 104px;
+      }
+
+      .line {
+        font-size: 15px;
+        height: 19px;
+      }
+
+      .fig-wrap {
+        width: 108px;
+        height: 95px;
+      }
+
+      .impact-ring {
+        width: 150px;
+        height: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div data-composition-id="fig-fall-text" data-width="1920" data-height="1080">
+    <div id="fig-fall-clip" data-start="0" data-duration="5" data-track-index="0">
+      <div class="scene-content">
+        <div class="manuscript" aria-hidden="true">
+          <span class="line full" style="left: 0%; top: 0px; width: 100%;">I saw my life branching out before me like the green fig tree in the story.</span>
+          <span class="line full dim" style="left: 0%; top: 46px; width: 100%;">From the tip of every branch, like a fat purple fig, a wonderful future beckoned.</span>
+          <span class="line left" style="left: 0%; top: 104px; width: 42%;">One fig was a husband and a happy home</span>
+          <span class="line right" style="left: 58%; top: 104px; width: 42%;">and another fig was a famous poet</span>
+          <span class="line left dim" style="left: 0%; top: 150px; width: 39%;">and another fig was a brilliant professor</span>
+          <span class="line right dim" style="left: 61%; top: 150px; width: 39%;">and another fig was Europe and Africa</span>
+          <span class="line left" style="left: 0%; top: 196px; width: 37%;">I saw myself sitting in the crotch</span>
+          <span class="line right" style="left: 63%; top: 196px; width: 37%;">of this fig tree, starving to death</span>
+          <span class="line left dim" style="left: 0%; top: 242px; width: 39%;">because I couldn't make up my mind</span>
+          <span class="line right dim" style="left: 61%; top: 242px; width: 39%;">which of the figs I would choose</span>
+          <span class="line left" style="left: 0%; top: 288px; width: 42%;">I wanted each and every one of them</span>
+          <span class="line right" style="left: 58%; top: 288px; width: 42%;">but choosing one meant losing the rest</span>
+          <span class="line full dim" style="left: 0%; top: 346px; width: 100%;">and, one by one, they plopped to the ground at my feet.</span>
+        </div>
+        <div class="impact-ring"></div>
+        <div class="fig-wrap">
+          <img src="../uploads/Uncut Fig 1.png" alt="">
+        </div>
+        <div class="attribution">SYLVIA PLATH / THE BELL JAR</div>
+      </div>
+      <div class="grain"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      window.__timelines = window.__timelines || {};
+
+      if (!window.gsap) {
+        document.querySelector('[data-composition-id="fig-fall-text"]').classList.add('fallback-play');
+        document.querySelectorAll('.left').forEach(el => el.style.setProperty('--start-x', '-34px'));
+        document.querySelectorAll('.right').forEach(el => el.style.setProperty('--start-x', '34px'));
+      } else {
+
+        const tl = gsap.timeline({ paused: true });
+
+        gsap.set('.line', {
+          opacity: 0,
+          clipPath: 'inset(0 100% 0 0)'
+        });
+        gsap.set('.left', {
+          x: -34
+        });
+        gsap.set('.right', {
+          x: 34
+        });
+        gsap.set('.full', {
+          y: 18
+        });
+        gsap.set('.fig-wrap', {
+          y: -720,
+          x: -18,
+          rotation: -9,
+          scale: 0.92
+        });
+        gsap.set('.attribution', {
+          opacity: 0,
+          y: 12
+        });
+
+        tl.to('.full', {
+          opacity: 1,
+          clipPath: 'inset(0 0% 0 0)',
+          y: 0,
+          duration: 0.9,
+          stagger: 0.08,
+          ease: 'power2.out'
+        }, 0.15);
+
+        tl.to('.fig-wrap', {
+          y: 0,
+          x: 0,
+          rotation: 1.5,
+          scale: 1,
+          duration: 1.1,
+          ease: 'bounce.out'
+        }, 0.7);
+
+        tl.to('.impact-ring', {
+          opacity: 1,
+          scale: 1,
+          duration: 0.16,
+          ease: 'power2.out'
+        }, 1.54);
+
+        tl.to('.impact-ring', {
+          opacity: 0,
+          scale: 1.28,
+          duration: 0.6,
+          ease: 'power2.out'
+        }, 1.7);
+
+        tl.to('.left', {
+          opacity: 1,
+          clipPath: 'inset(0 0% 0 0)',
+          x: 0,
+          duration: 0.7,
+          stagger: 0.045,
+          ease: 'power3.out'
+        }, 1.45);
+
+        tl.to('.right', {
+          opacity: 1,
+          clipPath: 'inset(0 0% 0 0)',
+          x: 0,
+          duration: 0.7,
+          stagger: 0.045,
+          ease: 'power3.out'
+        }, 1.5);
+
+        tl.to('.fig-wrap', {
+          rotation: 0,
+          duration: 0.75,
+          ease: 'elastic.out(1, 0.45)'
+        }, 1.62);
+
+        tl.to('.attribution', {
+          opacity: 1,
+          y: 0,
+          duration: 0.55,
+          ease: 'power2.out'
+        }, 2.45);
+
+        tl.to('.scene-content', {
+          scale: 0.992,
+          duration: 1.8,
+          ease: 'power1.inOut'
+        }, 2.9);
+
+        window.__timelines['fig-fall-text'] = tl;
+      }
+    </script>
+  </div>
+</body>
+</html>

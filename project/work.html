@@ -2,282 +2,260 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Zaydan — Work</title>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg: #0a0a0a; --ink: #f0f0f0; --gray: #2a2a2a; --gray2: #8a8a8a; --gray3: #2a2a2a; }
+    :root {
+      --paper: #0a0a0a;
+      --ink: #f0f0f0;
+      --muted: rgba(240,240,240,.58);
+      --gray2: #8a8a8a;
+      --gray3: #2a2a2a;
+      --tile: #141414;
+      --tile-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 18px 30px rgba(0,0,0,.34);
+      --label-bg: rgba(240,240,240,.94);
+      --label-ink: #0a0a0a;
+      --label-muted: rgba(10,10,10,.62);
+      --label-border: rgba(255,255,255,.22);
+      --label-shadow: 0 12px 26px rgba(0,0,0,.28);
+      --trail-rgb: 240,240,240;
+    }
+    html[data-theme="light"] {
+      --paper: #f0f0f0;
+      --ink: #0a0a0a;
+      --muted: rgba(10,10,10,.62);
+      --gray2: #666;
+      --gray3: #cfcfcf;
+      --tile: #e4e4e4;
+      --tile-shadow: 0 0 0 1px rgba(10,10,10,.08), 0 18px 30px rgba(10,10,10,.12);
+      --label-bg: rgba(10,10,10,.92);
+      --label-ink: #f0f0f0;
+      --label-muted: rgba(240,240,240,.68);
+      --label-border: rgba(10,10,10,.2);
+      --label-shadow: 0 12px 28px rgba(10,10,10,.18);
+      --trail-rgb: 10,10,10;
+    }
+    html[data-theme="dark"] {
+      --paper: #0a0a0a;
+      --ink: #f0f0f0;
+      --muted: rgba(240,240,240,.58);
+      --gray2: #8a8a8a;
+      --gray3: #2a2a2a;
+      --tile: #141414;
+      --tile-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 18px 30px rgba(0,0,0,.34);
+      --label-bg: rgba(240,240,240,.94);
+      --label-ink: #0a0a0a;
+      --label-muted: rgba(10,10,10,.62);
+      --label-border: rgba(255,255,255,.22);
+      --label-shadow: 0 12px 26px rgba(0,0,0,.28);
+      --trail-rgb: 240,240,240;
+    }
 
-    html, body { width: 100%; min-height: 100%; background: var(--bg); font-family: 'Lora', serif; color: var(--ink); overflow-x: hidden; overflow-y: auto; cursor: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    html { width: 100%; min-height: 100%; background: var(--paper); scrollbar-width: none; overscroll-behavior-y: none; }
+    html::-webkit-scrollbar { display: none; }
+    body {
+      width: 100%; min-height: 100%; background: var(--paper); font-family: 'Lora', Georgia, serif;
+      color: var(--ink); overflow-x: hidden; cursor: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    }
     a, a:hover, a:active, button, button:hover { cursor: none !important; }
 
-    #cursor {
-      position: fixed; top: 0; left: 0;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #fff;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      z-index: 9999;
+    #safe-area-top {
+      position: fixed; left: 0; right: 0; top: calc(-1 * env(safe-area-inset-top, 0px));
+      height: calc(env(safe-area-inset-top, 0px) * 2); background: var(--paper); z-index: 2000;
+      pointer-events: none; -webkit-transform: translateZ(0); transform: translateZ(0);
     }
-    #trail-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-    #page-out { position: fixed; inset: 0; background: #f0f0f0; z-index: 8888; transform: scaleY(0); transform-origin: bottom; transition: transform 0.45s cubic-bezier(.76,0,.24,1); }
+    #cursor {
+      position: fixed; top: 0; left: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--ink);
+      pointer-events: none; transform: translate(-50%, -50%); z-index: 9999;
+    }
+    #trail-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9997; }
+    #page-out {
+      position: fixed; inset: 0; background: var(--ink); z-index: 8888; transform: scaleY(0); transform-origin: bottom;
+      transition: transform 0.45s cubic-bezier(.76,0,.24,1);
+    }
     #page-out.covering  { transform: scaleY(1); transform-origin: bottom; }
     #page-out.revealing { transform: scaleY(0); transform-origin: top; transition: transform 0.45s cubic-bezier(.76,0,.24,1) 0.05s; }
 
-    .page { display: grid; grid-template-rows: auto 1fr; grid-template-columns: 1fr; min-height: 100vh; padding: 24px 48px 56px; position: relative; z-index: 2; }
+    #header {
+      position: fixed; left: 0; right: 0; z-index: 1000; display: flex; align-items: baseline; justify-content: space-between;
+      border-bottom: 1px solid var(--gray3); background: var(--paper); -webkit-transform: translateZ(0); transform: translateZ(0);
+      will-change: transform; top: calc(-1 * env(safe-area-inset-top, 0px)); padding: calc(env(safe-area-inset-top, 0px) + 24px) 48px 10px;
+    }
+    .h-name {
+      font-family: 'Lora', serif; font-size: 14px; font-weight: 400; letter-spacing: -0.01em;
+      color: var(--gray2); text-decoration: none; transition: color .2s;
+    }
+    .h-name:hover, .h-name.active { color: var(--ink); }
+    .h-nav { display: flex; gap: 28px; align-items: baseline; }
+    .h-link {
+      font-family: 'Lora', serif; font-size: 13px; font-weight: 300; font-style: italic; color: var(--gray2);
+      text-decoration: none; letter-spacing: .02em; position: relative; transition: color .2s;
+    }
+    .h-link::after {
+      content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 1px;
+      background: var(--ink); transform: scaleX(0); transition: transform .2s ease;
+    }
+    .h-link:hover, .h-link.active { color: var(--ink); }
+    .h-link:hover::after, .h-link.active::after { transform: scaleX(1); }
 
-    .header { grid-column: 1/-1; display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--gray3); padding-bottom: 10px; margin-left: -48px; margin-right: -48px; padding-left: 48px; padding-right: 48px; }
-    .nav-links { display: flex; gap: 28px; align-items: baseline; }
-    .nav-link { font-size: 13px; font-weight: 400; font-style: italic; color: var(--gray2); text-decoration: none; letter-spacing: 0.02em; transition: color 0.2s; position: relative; }
-    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 1px; background: var(--ink); transform: scaleX(0); transition: transform 0.2s ease; }
-    .nav-link:hover { color: var(--ink); }
-    .nav-link:hover::after { transform: scaleX(1); }
-    .nav-link.active { color: var(--ink); }
-    .nav-link.active::after { transform: scaleX(1); }
+    .work-bio {
+      padding: calc(env(safe-area-inset-top, 0px) + 96px) clamp(18px, 3vw, 42px) clamp(28px, 5vw, 78px);
+      background: var(--paper);
+    }
+    .work-bio p {
+      max-width: min(1180px, 82vw); font-size: clamp(19px, 1.72vw, 31px); line-height: 1.28;
+      color: var(--muted); font-weight: 500; letter-spacing: 0;
+    }
+    .work-bio strong, .work-bio .accent { color: var(--ink); font-style: normal; font-weight: 600; text-shadow: 0 0 18px color-mix(in srgb, var(--ink) 13%, transparent); }
 
-    .work-shell { display: flex; flex-direction: column; gap: 34px; padding-top: 18px; }
-    .work-intro {
-      display: grid;
-      grid-template-columns: minmax(220px, .75fr) minmax(280px, 1fr);
-      gap: 28px;
-      align-items: end;
-      border-bottom: 1px solid var(--gray3);
-      padding-bottom: 24px;
+    .work-grid {
+      display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: clamp(76px, 8.4vw, 136px);
+      gap: clamp(22px, 2.8vw, 46px); padding: 0 clamp(18px, 3vw, 42px) clamp(42px, 6vw, 92px); align-items: stretch;
     }
-    .work-kicker {
-      font-size: 12px;
-      color: var(--gray2);
-      font-style: italic;
-      margin-bottom: 10px;
+    .grid-item {
+      position: relative; overflow: hidden; background: var(--tile); text-decoration: none; display: block; border-radius: 6px;
+      box-shadow: var(--tile-shadow); isolation: isolate;
     }
-    .work-title {
-      font-size: clamp(54px, 12vw, 148px);
-      font-weight: 400;
-      letter-spacing: -0.055em;
-      line-height: .86;
-      color: var(--ink);
+    .grid-item:nth-child(1) { grid-column: 1 / span 5; grid-row: span 3; }
+    .grid-item:nth-child(2) { grid-column: 6 / span 4; grid-row: span 4; }
+    .grid-item:nth-child(3) { grid-column: 10 / span 3; grid-row: span 2; }
+    .grid-item:nth-child(4) { grid-column: 1 / span 4; grid-row: span 3; }
+    .grid-item:nth-child(5) { grid-column: 5 / span 5; grid-row: span 2; }
+
+    .grid-item img, .grid-item iframe {
+      width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.08) saturate(.92) contrast(.96);
+      transition: transform .55s cubic-bezier(.25,.46,.45,.94), filter .4s ease;
     }
-    .work-copy {
-      justify-self: end;
-      font-size: clamp(13px, 1.6vw, 20px);
-      line-height: 1.45;
-      font-style: italic;
-      color: var(--gray2);
-      max-width: 540px;
-    }
-    .portfolio-list { display: flex; flex-direction: column; gap: 44px; }
-    .project-card {
-      position: relative;
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(250px, .8fr);
-      gap: 22px;
-      align-items: end;
-      color: var(--ink);
-      text-decoration: none;
-      border-bottom: 1px solid var(--gray3);
-      padding-bottom: 32px;
-    }
-    .project-card:nth-child(even) { grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr); }
-    .project-card:nth-child(even) .project-media { order: 2; }
-    .project-card:nth-child(even) .project-meta { order: 1; }
-    .project-media {
-      position: relative;
-      display: block;
-      min-height: clamp(280px, 52vw, 560px);
-      overflow: hidden;
-      border: 1px solid var(--gray3);
-      background: var(--gray);
-      isolation: isolate;
-    }
-    .project-media::before {
-      content: "";
+    .grid-item iframe { border: 0; pointer-events: none; background: #000; }
+    .grid-item:hover img, .grid-item:hover iframe { transform: scale(1.035); filter: grayscale(0) saturate(1.05) contrast(1.02); }
+
+    .grid-overlay {
       position: absolute;
-      inset: 0;
-      background-image: var(--project-image);
-      background-position: center;
-      background-size: cover;
-      filter: grayscale(1) contrast(.96);
-      opacity: .46;
-      transform: scale(1.01);
-      transition: opacity .35s ease, transform .55s ease, filter .35s ease;
-      will-change: filter, opacity, transform;
-      z-index: -1;
-    }
-    .project-media::after {
-      content: "view";
-      position: absolute;
-      left: 18px;
-      bottom: 16px;
-      font-size: 12px;
-      font-style: italic;
-      color: rgba(240,240,240,.6);
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity .25s ease, transform .25s ease;
-    }
-    .project-card:hover .project-media::before,
-    .project-card:focus-visible .project-media::before {
-      opacity: .82;
-      filter: grayscale(.35) contrast(1.05);
-      transform: scale(1.045);
-    }
-    .project-card:hover .project-media::after,
-    .project-card:focus-visible .project-media::after {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .project-meta {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(.94);
+      width: max-content;
+      min-width: 190px;
+      max-width: min(86%, 360px);
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
-      min-height: 220px;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 9px 15px 11px;
+      text-align: center;
+      border-radius: 16px;
+      border: 1px solid var(--label-border);
+      background: var(--label-bg);
+      color: var(--label-ink);
+      box-shadow: var(--label-shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .22s cubic-bezier(.22,1,.36,1);
+      z-index: 2;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
-    .project-name {
-      display: block;
-      font-size: clamp(32px, 6vw, 84px);
-      font-weight: 400;
-      letter-spacing: -0.055em;
-      line-height: .9;
-      transition: color .2s ease;
+    .grid-item:hover .grid-overlay {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
     }
-    .project-desc {
-      display: block;
-      margin-top: 14px;
-      font-size: clamp(13px, 1.4vw, 18px);
-      line-height: 1.5;
-      color: var(--gray2);
-      font-style: italic;
-      max-width: 460px;
+    .item-name {
+      display: block; max-width: 100%; font-size: clamp(14px, 1.18vw, 18px); font-weight: 600;
+      letter-spacing: 0; line-height: 1.1; color: var(--label-ink); white-space: normal;
     }
-    .project-year {
-      display: block;
-      margin-bottom: 16px;
-      font-size: 11px;
-      color: var(--gray2);
-      font-style: italic;
-      letter-spacing: .08em;
-      text-transform: uppercase;
+    .item-subtitle {
+      display: block; max-width: 100%; font-size: clamp(10px, .82vw, 12px); font-style: italic;
+      color: var(--label-muted); line-height: 1.25;
     }
-    .project-tags {
-      display: block;
-      margin-top: 18px;
-      padding-top: 10px;
-      border-top: 1px solid var(--gray3);
-      font-size: 11px;
-      color: rgba(240,240,240,.52);
-      font-style: italic;
-      line-height: 1.45;
-    }
-    .project-card:hover .project-name,
-    .project-card:focus-visible .project-name { color: #fff; }
-    .work-footer {
-      display: flex;
-      justify-content: space-between;
-      gap: 18px;
-      padding-top: 4px;
-      color: var(--gray2);
-      font-size: 11px;
-      font-style: italic;
-    }
-    @media (max-width: 900px) {
-      .page { padding: 18px 24px 36px; }
-      .header { margin-left: -24px; margin-right: -24px; padding-left: 24px; padding-right: 24px; }
-      .work-intro { grid-template-columns: 1fr; gap: 16px; align-items: start; }
-      .work-copy { justify-self: start; max-width: 580px; }
-      .project-card,
-      .project-card:nth-child(even) { grid-template-columns: 1fr; gap: 16px; }
-      .project-card:nth-child(even) .project-media,
-      .project-card:nth-child(even) .project-meta { order: initial; }
-      .project-media { min-height: 340px; }
-      .project-meta { min-height: 0; }
+    .work-footer-strip {
+      grid-column: 1 / -1; padding: 2px 0 0; font-size: 12px; font-style: italic; color: var(--muted);
+      display: flex; justify-content: space-between; gap: 18px;
     }
 
+    @media (max-width: 900px) {
+      #header { padding-left: 24px; padding-right: 24px; }
+      .work-bio p { max-width: 100%; }
+      .work-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: clamp(68px, 15vw, 116px); }
+      .grid-item:nth-child(1) { grid-column: 1 / span 6; grid-row: span 3; }
+      .grid-item:nth-child(2) { grid-column: 1 / span 3; grid-row: span 3; }
+      .grid-item:nth-child(3) { grid-column: 4 / span 3; grid-row: span 2; }
+      .grid-item:nth-child(4) { grid-column: 4 / span 3; grid-row: span 3; }
+      .grid-item:nth-child(5) { grid-column: 1 / span 3; grid-row: span 2; }
+    }
     @media (max-width: 560px) {
-      .header { flex-wrap: wrap; gap: 8px; }
-      .nav-links { gap: 16px; }
-      .work-shell { gap: 26px; }
-      .portfolio-list { gap: 30px; }
-      .project-media { min-height: 240px; }
-      .work-footer { flex-direction: column; }
+      #header { padding-left: 18px; padding-right: 18px; }
+      .h-nav { gap: 16px; }
+      .work-bio { padding-bottom: 34px; }
+      .work-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
+      .grid-item, .grid-item:nth-child(n) { grid-column: 1; grid-row: auto; aspect-ratio: 1 / .72; }
+      .grid-item:nth-child(1) { aspect-ratio: 1.55 / 1; }
+      .grid-overlay { min-width: 170px; max-width: calc(100% - 28px); padding: 8px 12px 10px; }
+      .work-footer-strip { flex-direction: column; }
+    }
+    @media (pointer: coarse) {
+      body { cursor: auto; }
+      a, button, a:hover, button:hover { cursor: auto !important; }
+      #cursor, #trail-canvas { display: none; }
+      .grid-overlay { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     }
   </style>
+  <script src="theme.js?v=20260501-light-first-all"></script>
+  <link rel="stylesheet" href="theme.css?v=20260501-light-first-all">
 </head>
 <body>
+  <div id="safe-area-top"></div>
   <div id="cursor"></div>
   <div id="page-out"></div>
   <canvas id="trail-canvas"></canvas>
 
-  <div class="page">
-    <div class="header">
-      <a class="nav-link" href="Zaydan%20Kabir%20Amanullah.html" data-page="Zaydan%20Kabir%20Amanullah.html" style="font-style:normal; color:var(--gray2); font-size:14px; letter-spacing:-0.01em;">Zaydan Kabir Amanullah</a>
-      <nav class="nav-links">
-        <a class="nav-link active" href="work.html">Work</a>
-        <a class="nav-link" href="index.html" data-page="index.html">About</a>
-      </nav>
-    </div>
-    <div class="work-shell">
-      <aside class="work-intro">
-        <div class="work-kicker">selected portfolio -</div>
-        <h1 class="work-title">Work</h1>
-        <p class="work-copy">A quiet index of research, design, and policy work. Hover for a closer read; each entry stays as a clean link slot for future case studies.</p>
-      </aside>
+  <header id="header">
+    <a class="h-name" href="Zaydan%20Kabir%20Amanullah.html" data-page="Zaydan%20Kabir%20Amanullah.html">Zaydan Kabir Amanullah</a>
+    <nav class="h-nav">
+      <a class="h-link active" href="work.html">Work</a>
+      <a class="h-link" href="index.html" data-page="index.html">About</a>
+    </nav>
+  </header>
 
-      <main class="portfolio-list" aria-label="Portfolio projects">
-        <a class="project-card" href="#" data-project-link="gordian-knot" aria-label="Gordian Knot Center portfolio link placeholder">
-          <span class="project-media" style="--project-image:url('uploads/Screenshot%202026-04-25%20at%2012.33.21%20PM.png')"></span>
-          <span class="project-meta">
-            <span class="project-year">Stanford - 2026</span>
-            <span class="project-name">Gordian Knot Center</span>
-            <span class="project-desc">UI/UX systems for national security innovation at Stanford.</span>
-            <span class="project-tags">UI/UX design, systems thinking, national security innovation</span>
-          </span>
-        </a>
-        <a class="project-card" href="#" data-project-link="stimson" aria-label="The Stimson Center portfolio link placeholder">
-          <span class="project-media" style="--project-image:url('uploads/IMG_2059.JPG')"></span>
-          <span class="project-meta">
-            <span class="project-year">Policy - 2026</span>
-            <span class="project-name">The Stimson Center</span>
-            <span class="project-desc">South Asia research shaped for policy audiences.</span>
-            <span class="project-tags">South Asia, policy research, writing</span>
-          </span>
-        </a>
-        <a class="project-card" href="#" data-project-link="impact-labs" aria-label="Stanford Impact Labs portfolio link placeholder">
-          <span class="project-media" style="--project-image:url('uploads/IMG_3073.jpg')"></span>
-          <span class="project-meta">
-            <span class="project-year">Research - 2026</span>
-            <span class="project-name">Stanford Impact Labs</span>
-            <span class="project-desc">Research support for civic and social impact work.</span>
-            <span class="project-tags">civic systems, social impact, applied research</span>
-          </span>
-        </a>
-        <a class="project-card" href="#" data-project-link="hoover" aria-label="The Hoover Institution portfolio link placeholder">
-          <span class="project-media" style="--project-image:url('uploads/0d1cbef6-b55a-4a5e-961b-bb37933b2c1a.jpg')"></span>
-          <span class="project-meta">
-            <span class="project-year">Research - 2025</span>
-            <span class="project-name">The Hoover Institution</span>
-            <span class="project-desc">Policy research with an eye toward systems, governance, and public consequence.</span>
-            <span class="project-tags">governance, public policy, institutions</span>
-          </span>
-        </a>
-        <a class="project-card" href="#" data-project-link="pwc" aria-label="PwC portfolio link placeholder">
-          <span class="project-media" style="--project-image:url('uploads/IMG_0104.jpg')"></span>
-          <span class="project-meta">
-            <span class="project-year">Internship - 2024</span>
-            <span class="project-name">PwC</span>
-            <span class="project-desc">Tax audit internship across financial review and client-facing process work.</span>
-            <span class="project-tags">tax audit, operations, client work</span>
-          </span>
-        </a>
-      </main>
+  <section class="work-bio">
+    <p><strong>Zaydan Kabir Amanullah</strong> is a <span class="accent">designer and researcher</span> from Bangladesh &amp; Canada, based in California. He studies Design and Political Science at Stanford University. His work moves through systems, people, interfaces, and social change.</p>
+  </section>
 
-      <footer class="work-footer">
-        <span>more work soon</span>
-        <span>links can be added directly to each project entry</span>
-      </footer>
-    </div>
-  </div>
+  <main class="work-grid">
+    <a class="grid-item" href="https://www.figma.com/proto/3dCviEDLEf30MnsgTHKnNu/Team-6?node-id=4437-308&amp;starting-point-node-id=4361%3A131" data-project-link="clarity" target="_blank" rel="noopener noreferrer" aria-label="Open Clarity Figma prototype">
+      <iframe src="clarity-hyperframe/index.html" title="Clarity animated preview" aria-hidden="true"></iframe>
+      <div class="grid-overlay">
+        <span class="item-name">Clarity</span>
+        <span class="item-subtitle">Game Design, UI Design, Design Thinking</span>
+      </div>
+    </a>
+
+    <a class="grid-item" href="#" data-project-link="stimson">
+      <img src="uploads/IMG_2059.JPG" alt="The Stimson Center">
+      <div class="grid-overlay"><span class="item-name">The Stimson Center</span><span class="item-subtitle">South Asia research shaped for policy audiences.</span></div>
+    </a>
+
+    <a class="grid-item" href="https://youtu.be/Q-NRXm59fLE" data-project-link="interstellar-automata" target="_blank" rel="noopener noreferrer" aria-label="Open Interstellar Automata video">
+      <iframe src="interstellar-automata-hyperframe/index.html" title="Interstellar Automata animated preview" aria-hidden="true"></iframe>
+      <div class="grid-overlay"><span class="item-name">Interstellar Automata</span><span class="item-subtitle">product design</span></div>
+    </a>
+
+    <a class="grid-item" href="#" data-project-link="hoover">
+      <img src="uploads/0d1cbef6-b55a-4a5e-961b-bb37933b2c1a.jpg" alt="The Hoover Institution">
+      <div class="grid-overlay"><span class="item-name">The Hoover Institution</span><span class="item-subtitle">Policy research on governance, systems, and public consequence.</span></div>
+    </a>
+
+    <a class="grid-item" href="#" data-project-link="pwc">
+      <img src="uploads/IMG_0104.jpg" alt="PwC">
+      <div class="grid-overlay"><span class="item-name">PwC</span><span class="item-subtitle">Tax audit internship across financial review and client-facing process work.</span></div>
+    </a>
+
+    <div class="work-footer-strip"><span>more work soon</span></div>
+  </main>
 
   <script>
     const overlay = document.getElementById('page-out');
@@ -289,10 +267,6 @@
       cursor.style.left = e.clientX + 'px';
       cursor.style.top  = e.clientY + 'px';
     });
-    document.querySelectorAll('a').forEach(el => {
-      el.addEventListener('mouseenter', () => {  });
-      el.addEventListener('mouseleave', () => {  });
-    });
 
     const canvas = document.getElementById('trail-canvas');
     const ctx = canvas.getContext('2d');
@@ -303,12 +277,13 @@
     (function drawTrail() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const now = Date.now();
+      const trailRgb = getComputedStyle(document.documentElement).getPropertyValue('--trail-rgb').trim() || '240,240,240';
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       for (let i = 1; i < pts.length; i++) {
         const age = (now - pts[i].t) / 300;
         const a = Math.max(0, 1 - age);
         ctx.beginPath(); ctx.moveTo(pts[i-1].x, pts[i-1].y); ctx.lineTo(pts[i].x, pts[i].y);
-        ctx.strokeStyle = `rgba(255,255,255,${a * 0.55})`; ctx.lineWidth = (i / pts.length) * 2.5; ctx.stroke();
+        ctx.strokeStyle = `rgba(${trailRgb},${a * 0.34})`; ctx.lineWidth = (i / pts.length) * 2.5; ctx.stroke();
       }
       while (pts.length && now - pts[0].t > 300) pts.shift();
       requestAnimationFrame(drawTrail);

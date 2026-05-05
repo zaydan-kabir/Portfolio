@@ -6,7 +6,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Zaydan Kabir Amanullah</title>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@100;200&display=swap" rel="stylesheet">
   <style>
@@ -227,34 +229,52 @@
       background: #0a0a0a;
       pointer-events: none;
       transform: translateZ(0);
+      height: 32px;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      contain: paint;
     }
+    #upcoming-ticker.ticker-ready { opacity: 1; }
     .upcoming-track {
       display: flex;
+      align-items: center;
       width: max-content;
-      transform: translate3d(100vw, 0, 0);
-      animation: upcoming-scroll 56s linear infinite;
+      height: 100%;
+      animation: upcoming-scroll 46s linear infinite;
+      animation-play-state: paused;
       will-change: transform;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
     }
+    #upcoming-ticker.ticker-ready .upcoming-track { animation-play-state: running; }
     .upcoming-group {
       display: flex;
+      align-items: center;
       flex: 0 0 auto;
+      height: 100%;
       min-width: max-content;
     }
     .upcoming-group span {
       flex: 0 0 auto;
-      padding: 6px 44px 7px 0;
+      display: grid;
+      place-items: center;
+      height: 100%;
+      padding: 0 56px 0 0;
       font-family: 'VT323', monospace;
       font-size: clamp(18px, 1.6vw, 24px);
+      line-height: 1;
       letter-spacing: 0.08em;
       color: rgba(255,255,255,0.76);
       text-shadow: 0 0 10px rgba(255,255,255,0.16);
       white-space: nowrap;
+      transform: translateY(-0.08em);
     }
     @keyframes upcoming-scroll {
-      from { transform: translate3d(100vw, 0, 0); }
-      to { transform: translate3d(-100%, 0, 0); }
+      from { transform: translate3d(0, 0, 0); }
+      to   { transform: translate3d(-50%, 0, 0); }
     }
     @media (prefers-reduced-motion: reduce) {
+      #upcoming-ticker { opacity: 1; }
       .upcoming-track { animation: none; }
     }
 
@@ -436,12 +456,11 @@
       background: none; border: none;
       cursor: none !important; padding: 0;
       text-transform: lowercase;
-      transition: color .15s, text-shadow .15s;
+      transition: color .15s;
       display: block; text-align: right;
     }
     .pixel-btn:hover {
       color: #fff;
-      text-shadow: 0 0 8px #fff, 0 0 20px rgba(255,255,255,.7), 0 0 40px rgba(255,255,255,.4);
     }
     .p-popup-overlay {
       position: fixed; inset: 0; z-index: 350;
@@ -451,9 +470,10 @@
     }
     .p-popup-box {
       background: #fff;
-      min-width: 320px; max-width: 460px; width: 90%;
+      min-width: 280px; max-width: 460px; width: 90%;
       padding: 48px 40px 40px; position: relative;
       box-shadow: 0 24px 64px rgba(0,0,0,.4);
+      max-height: 90vh; overflow-y: auto;
     }
     .p-popup-close {
       position: absolute; top: 14px; right: 20px;
@@ -465,7 +485,198 @@
     .p-popup-content {
       font-family: 'Lora', Georgia, serif;
       font-size: 15px; line-height: 1.75; color: #333;
+      text-align: center;
     }
+    .p-popup-content .contact-label {
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #999; margin-top: 20px; margin-bottom: 2px;
+    }
+    .p-popup-content .contact-label:first-child { margin-top: 0; }
+    .p-popup-content a {
+      color: #111; text-decoration: none; border-bottom: 1px solid #ccc;
+    }
+    .p-popup-content a:hover { border-bottom-color: #111; }
+
+    /* ── Mobile ─────────────────────────────────────────────── */
+    @media (pointer: coarse) {
+      body { cursor: auto; }
+      a, button, a:hover, button:hover, .pixel-btn { cursor: auto !important; }
+      #cursor, #trail-canvas { display: none; }
+      .pixel-btn:hover { color: rgba(255,255,255,.55); text-shadow: none; }
+    }
+    @media (max-width: 600px) {
+      #header { padding: 14px 20px 8px; }
+      #upcoming-ticker { top: 46px; }
+      #scroll-capture { inset: 58px 0 0; }
+      #page-info-contact { bottom: 20px; right: 16px; gap: 10px; }
+      .p-popup-box { padding: 36px 24px 28px; width: 94%; }
+      .p-popup-content { font-size: 14px; }
+      #masthead-guide { font-size: 13px; }
+      #masthead-replay { font-size: 13px; }
+      #horse-canvas { top: 90px; }
+      #portrait-canvas { transform: scale(0.5); transform-origin: bottom left; left: -40px; }
+    }
+
+    /* ── Panel 2 — quote ─────────────────────────────────────── */
+    #panel-2-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(72px, 8vh, 110px) clamp(32px, 7vw, 120px) clamp(24px, 4vh, 48px);
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    #panel-2-fig {
+      position: absolute;
+      right: clamp(18px, 4vw, 64px);
+      bottom: clamp(18px, 4vw, 58px);
+      width: clamp(120px, 18vw, 260px);
+      height: auto;
+      z-index: 2;
+      pointer-events: none;
+      user-select: none;
+    }
+    #panel-2-writing {
+      position: absolute;
+      right: clamp(26px, 4.8vw, 84px);
+      bottom: clamp(176px, 21vw, 292px);
+      width: clamp(190px, 20vw, 300px);
+      color: var(--ink);
+      z-index: 4;
+      pointer-events: none;
+      user-select: none;
+      opacity: 0;
+      transform: rotate(-3deg) translateY(8px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    #panel-2.writing-active #panel-2-writing {
+      opacity: 1;
+      transform: rotate(-3deg) translateY(0);
+    }
+    .p2-writing-line {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      font-family: 'Bradley Hand', 'Comic Sans MS', cursive;
+      font-size: clamp(16px, 1.45vw, 24px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: 0.01em;
+      filter: drop-shadow(0 0 1px currentColor);
+      clip-path: inset(0 100% 0 0);
+    }
+    #panel-2.writing-active .p2-writing-line {
+      animation: p2-write-text 1.8s steps(26, end) 0.55s forwards;
+    }
+    .p2-writing-arrow {
+      display: block;
+      width: clamp(44px, 4.8vw, 76px);
+      height: clamp(62px, 6.8vw, 104px);
+      margin: clamp(2px, 0.4vw, 6px) 28% 0 auto;
+      overflow: visible;
+    }
+    .p2-writing-arrow path {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 260;
+      stroke-dashoffset: 260;
+    }
+    .p2-writing-arrow polygon {
+      fill: currentColor;
+      opacity: 0;
+      transform-origin: 30px 15px;
+    }
+    #panel-2.writing-active .p2-writing-arrow path {
+      animation: p2-write-arrow 0.65s ease-out forwards;
+    }
+    #panel-2.writing-active .p2-writing-arrow polygon {
+      animation: p2-arrow-head 0.15s ease-out 0.55s forwards;
+    }
+    @keyframes p2-write-arrow {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes p2-arrow-head {
+      from { opacity: 0; transform: scale(0.6); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes p2-write-text {
+      to { clip-path: inset(0 0 0 0); }
+    }
+    .p2-quote-wrap {
+      max-width: 680px;
+      width: 100%;
+      position: relative;
+      z-index: 3;
+    }
+    .p2-quote-mark {
+      font-family: 'Lora', serif;
+      font-size: clamp(48px, 6vw, 88px);
+      line-height: 0.75;
+      color: rgba(255,255,255,0.07);
+      margin-bottom: clamp(12px, 1.6vw, 22px);
+      display: block;
+      user-select: none;
+    }
+    .p2-quote-text {
+      font-family: 'Lora', serif;
+      font-size: clamp(11.5px, 0.95vw, 14px);
+      line-height: 1.68;
+      color: var(--gray2);
+      font-style: italic;
+      margin-bottom: clamp(10px, 1.2vh, 18px);
+    }
+    .p2-quote-text:last-child { margin-bottom: 0; }
+    .p2-quote-attr {
+      margin-top: clamp(20px, 2.4vw, 36px);
+      font-family: 'VT323', monospace;
+      font-size: clamp(12px, 1vw, 15px);
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.28);
+      text-transform: uppercase;
+    }
+    html[data-theme="light"] .p2-quote-mark { color: rgba(0,0,0,0.07); }
+    html[data-theme="light"] .p2-quote-attr { color: rgba(0,0,0,0.28); }
+
+    @media (max-width: 600px) {
+      #panel-2-inner {
+        align-items: flex-start;
+        padding: 72px 22px 32px;
+        overflow-y: auto;
+      }
+      #panel-2-fig {
+        right: 14px;
+        bottom: 18px;
+        width: min(34vw, 130px);
+      }
+      #panel-2-writing {
+        right: 12px;
+        bottom: 126px;
+        width: min(58vw, 210px);
+      }
+      .p2-writing-line { font-size: clamp(13px, 4.1vw, 17px); }
+      .p2-writing-arrow {
+        width: 42px;
+        height: 58px;
+      }
+    }
+  </style>
+  <script src="theme.js?v=20260501-light-first-all"></script>
+  <link rel="stylesheet" href="theme.css?v=20260501-light-first-all">
+  <style>
+    html[data-theme="light"] #masthead-guide,
+    html[data-theme="light"] #masthead-replay { color: rgba(10,10,10,.42) !important; }
+    html[data-theme="dark"] #masthead-guide,
+    html[data-theme="dark"] #masthead-replay { color: rgba(255,255,255,.24) !important; }
+    html[data-theme="light"] #intro-wordmark,
+    html[data-theme="light"] #masthead-reference { filter: invert(1) drop-shadow(0 0 22px rgba(0,0,0,.08)) !important; }
+    html[data-theme="dark"] #intro-wordmark,
+    html[data-theme="dark"] #masthead-reference { filter: none !important; }
   </style>
 </head>
 <body>
@@ -520,7 +731,23 @@
       <canvas id="horse-canvas"></canvas>
       <canvas id="portrait-canvas"></canvas>
     </div>
-    <div class="panel" id="panel-2"></div>
+    <div class="panel" id="panel-2">
+      <img id="panel-2-fig" src="uploads/Uncut Fig 1.png" alt="" aria-hidden="true">
+      <div id="panel-2-writing" aria-hidden="true">
+        <div class="p2-writing-line">In this life, I choose design.</div>
+        <svg class="p2-writing-arrow" viewBox="0 0 80 120" focusable="false">
+          <path d="M 45 112 C 44 84 37 57 31 30"></path>
+          <polygon points="30,10 16,34 44,28"></polygon>
+        </svg>
+      </div>
+      <div id="panel-2-inner">
+        <div class="p2-quote-wrap">
+          <p class="p2-quote-text">During my years at Stanford, I often thought of Sylvia Plath&rsquo;s <em>The Bell Jar</em>. Most of the time, I saw my life branching out before me like that fig tree in the story, each fig a beautiful future, beckoning and winking. One is a humanitarian, changing the world one person at a time. Another one was a businessman, with a loving family. Another, a storm chaser with his horse in rural America, working the land and living authentically, and another, a man stuck in a town which slowly drains him of life until he concedes to whatever is demanded of him, coddled by a suffocating comfort.</p>
+          <p class="p2-quote-text">But as I sat at the crotch of that fig tree, starving, each of these figs fell to the ground, rotting at my feet. The words of Marguerite Duras often echoed through my being: &ldquo;that very early in my life it was too late.&rdquo;</p>
+          <p class="p2-quote-text">Studying abroad at the University of Oxford, and then another semester in Washington, changed all of that. I realized that Politics, Philosophy, and Art were my interests. But Design. Design was what I wanted to do for the rest of my life. A search for meaning and inspiration in everything. To create, and not just consume. To put beauty and love back into the world that has given me so much.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <div id="scroll-capture" aria-hidden="true"></div>
@@ -544,6 +771,48 @@
 </div>
 
 <script>
+const zaydanAnimationReady = (() => {
+  const maxWait = 15000;
+  const timeout = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  function waitForImage(img) {
+    if (!img) return Promise.resolve();
+    if (img.complete && img.naturalWidth) return Promise.resolve();
+
+    const loaded = img.decode
+      ? img.decode().catch(() => {})
+      : new Promise(resolve => {
+          img.addEventListener('load', resolve, { once: true });
+          img.addEventListener('error', resolve, { once: true });
+        });
+
+    return Promise.race([loaded, timeout(maxWait)]);
+  }
+
+  function waitForFonts() {
+    if (!document.fonts) return Promise.resolve();
+
+    const fonts = [
+      document.fonts.load('1em AtlanticCruise'),
+      document.fonts.load('1em UnifrakturCook'),
+      document.fonts.load('1em OldEnglishTextMT'),
+      document.fonts.load('1em FetteUNZFraktur'),
+      document.fonts.load('1em CloisterBlack')
+    ];
+
+    return Promise.race([
+      Promise.allSettled(fonts).then(() => document.fonts.ready),
+      timeout(maxWait)
+    ]);
+  }
+
+  return Promise.allSettled([
+    waitForFonts(),
+    waitForImage(document.getElementById('intro-wordmark')),
+    waitForImage(document.getElementById('masthead-reference'))
+  ]);
+})();
+
 (() => {
   'use strict';
 
@@ -607,7 +876,30 @@
     playMastheadRoll(true);
   });
 
-  playMastheadRoll();
+  zaydanAnimationReady.then(() => playMastheadRoll());
+
+  function revealUpcomingTicker() {
+    const ticker = document.getElementById('upcoming-ticker');
+    const track = ticker && ticker.querySelector('.upcoming-track');
+    if (!ticker || !track) return;
+
+    track.style.animation = 'none';
+    track.style.transform = 'translate3d(0,0,0)';
+    void track.offsetWidth;
+    track.style.animation = '';
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => ticker.classList.add('ticker-ready'));
+    });
+  }
+
+  const tickerReady = document.fonts
+    ? Promise.race([
+        document.fonts.load('1em VT323').then(() => document.fonts.ready),
+        new Promise(resolve => setTimeout(resolve, 3000))
+      ])
+    : Promise.resolve();
+  tickerReady.then(() => setTimeout(revealUpcomingTicker, 250));
 
   // ── Page-out transition ───────────────────────────────────────────
   const overlay = document.getElementById('page-out');
@@ -625,14 +917,18 @@
 
   // ── Down-scroll → horizontal movement ────────────────────────────
   const track = document.getElementById('track');
+  const panel2 = document.getElementById('panel-2');
   const scrollCapture = document.getElementById('scroll-capture');
   let targetX = 0;
   let currentX = 0;
   let maxX = window.innerWidth;
-  let touchStartY = null;
 
   function clampX(value) {
     return Math.max(0, Math.min(maxX, value));
+  }
+
+  function snapToNearest() {
+    targetX = targetX > maxX / 2 ? maxX : 0;
   }
 
   function moveHorizontal(delta) {
@@ -641,7 +937,7 @@
 
   function resizeHorizontalRange() {
     maxX = window.innerWidth;
-    targetX = clampX(targetX);
+    targetX = targetX > 0 ? maxX : 0;
     currentX = clampX(currentX);
   }
   window.addEventListener('resize', resizeHorizontalRange);
@@ -649,34 +945,133 @@
   function handleWheel(e) {
     if (e.ctrlKey) return;
     e.preventDefault();
-    moveHorizontal(-(e.deltaY || e.deltaX));
+    const delta = e.deltaY + e.deltaX;
+    if (currentX >= maxX * 0.95) {
+      const inner = document.getElementById('panel-2-inner');
+      if (inner && inner.scrollHeight > inner.clientHeight) {
+        const atBottom = delta > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
+        const atTop    = delta < 0 && inner.scrollTop <= 0;
+        if (!atBottom && !atTop) { inner.scrollBy(0, delta); return; }
+      }
+    }
+    moveHorizontal(delta);
   }
 
   scrollCapture.addEventListener('wheel', handleWheel, { passive: false });
   document.addEventListener('wheel', handleWheel, { passive: false });
 
+  // Touch: direct finger tracking + velocity snap on release
+  let isDragging = false;
+  let dragStartClientX = 0;
+  let dragStartTargetX = 0;
+  let swipeVelocity = 0;
+  let lastClientX = 0;
+  let lastClientTime = 0;
+
   scrollCapture.addEventListener('touchstart', e => {
-    touchStartY = e.touches[0].clientY;
+    isDragging = true;
+    dragStartClientX = e.touches[0].clientX;
+    dragStartTargetX = targetX;
+    lastClientX = dragStartClientX;
+    lastClientTime = Date.now();
+    swipeVelocity = 0;
   }, { passive: true });
 
   scrollCapture.addEventListener('touchmove', e => {
-    if (touchStartY === null) return;
+    if (!isDragging) return;
     e.preventDefault();
-    const nextY = e.touches[0].clientY;
-    moveHorizontal((nextY - touchStartY) * 1.25);
-    touchStartY = nextY;
+    const x = e.touches[0].clientX;
+    const now = Date.now();
+    const dt = now - lastClientTime;
+    if (dt > 0) swipeVelocity = (x - lastClientX) / dt;
+    lastClientX = x;
+    lastClientTime = now;
+    // swipe right (x > start) → targetX increases → moves toward panel 2
+    targetX = clampX(dragStartTargetX + (x - dragStartClientX));
   }, { passive: false });
 
+  scrollCapture.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    const SNAP_VEL = 0.25; // px/ms threshold for flick
+    if (swipeVelocity > SNAP_VEL) {
+      targetX = maxX; // flick right → panel 2
+    } else if (swipeVelocity < -SNAP_VEL) {
+      targetX = 0;    // flick left → panel 1
+    } else {
+      snapToNearest();
+    }
+  }, { passive: true });
+
   function renderHorizontalTrack() {
-    currentX += (targetX - currentX) * 0.18;
-    if (Math.abs(targetX - currentX) < 0.05) currentX = targetX;
+    const lerpFactor = isDragging ? 1 : 0.12;
+    currentX += (targetX - currentX) * lerpFactor;
+    if (Math.abs(targetX - currentX) < 0.5) currentX = targetX;
     track.style.transform = `translate3d(-${currentX.toFixed(2)}px,0,0)`;
+    panel2.classList.toggle('writing-active', currentX > maxX * 0.45);
     requestAnimationFrame(renderHorizontalTrack);
   }
-  renderHorizontalTrack();
+  requestAnimationFrame(renderHorizontalTrack);
 
-  // ── ASCII ramp ────────────────────────────────────────────────────
-  const RAMP = ' .\'`,:;-+!iIlr=*o%#&@';
+  // ── Variable-typographic ASCII via pretext ───────────────────────
+  let typoPalette = null;
+
+  async function buildTypoPalette(fontSize) {
+    const { prepareWithSegments } = await import('./node_modules/@chenglou/pretext/dist/layout.js');
+    const CHARS = " .,:;!il|-+=*#@%&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const variants = [
+      { weight: 400, style: 'normal'  },
+      { weight: 400, style: 'italic'  },
+      { weight: 700, style: 'normal'  },
+      { weight: 700, style: 'italic'  },
+    ];
+    const tw = Math.ceil(fontSize * 3), th = Math.ceil(fontSize * 2);
+    const tmp = document.createElement('canvas');
+    tmp.width = tw; tmp.height = th;
+    const tc = tmp.getContext('2d', { willReadFrequently: true });
+    const entries = [];
+    for (const { weight, style } of variants) {
+      const fontStr = `${style} ${weight} ${fontSize}px 'Georgia',serif`;
+      for (const ch of CHARS) {
+        const prep = prepareWithSegments(ch, fontStr);
+        const width = (prep.widths && prep.widths.length > 0) ? prep.widths[0] : fontSize * 0.5;
+        let brightness = 0;
+        if (ch !== ' ') {
+          tc.clearRect(0, 0, tw, th);
+          tc.font = fontStr;
+          tc.fillStyle = '#000';
+          tc.textBaseline = 'alphabetic';
+          tc.fillText(ch, 1, Math.ceil(fontSize * 1.25));
+          const data = tc.getImageData(0, 0, tw, th).data;
+          let inkSum = 0;
+          for (let p = 3; p < data.length; p += 4) inkSum += data[p];
+          brightness = inkSum / (255 * tw * th);
+        }
+        entries.push({ ch, fontStr, width, brightness });
+      }
+    }
+    entries.sort((a, b) => a.brightness - b.brightness);
+    return entries;
+  }
+
+  function findBestChar(palette, targetBrightness, targetWidth) {
+    let lo = 0, hi = palette.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (palette[mid].brightness < targetBrightness) lo = mid + 1;
+      else hi = mid;
+    }
+    let best = palette[lo], bestScore = Infinity;
+    const s = Math.max(0, lo - 20), e = Math.min(palette.length - 1, lo + 20);
+    for (let k = s; k <= e; k++) {
+      const en = palette[k];
+      const be = Math.abs(en.brightness - targetBrightness);
+      const we = Math.abs(en.width - targetWidth) / Math.max(targetWidth, 1);
+      const score = be * 2.5 + we;
+      if (score < bestScore) { bestScore = score; best = en; }
+    }
+    return best;
+  }
 
   // ── Luminance grid (min-lum for dark-chars-on-light-bg sources) ───
   function toGrid(img, cols, rows) {
@@ -703,15 +1098,23 @@
   }
 
   // ── Canvas setup ──────────────────────────────────────────────────
+  const isMobile = window.innerWidth < 600;
+  if (isMobile) {
+    const guide = document.getElementById('masthead-guide');
+    if (guide) guide.innerHTML = '&lt;swipe right&gt;<br>to move forward';
+    const replay = document.getElementById('masthead-replay');
+    if (replay) replay.innerHTML = '&lt;tap&gt;<br>to replay animation';
+  }
+
   const horseEl = document.getElementById('horse-canvas');
   const hCtx    = horseEl.getContext('2d');
-  const H_COLS = 70, H_ROWS = 62, H_CW = 6, H_CH = 6;
+  const H_COLS = 60, H_ROWS = 37, H_CW = 7, H_CH = 10;
   horseEl.width  = H_COLS * H_CW;
   horseEl.height = H_ROWS * H_CH;
 
   const portEl = document.getElementById('portrait-canvas');
   const pCtx   = portEl.getContext('2d');
-  const P_COLS = 64, P_ROWS = 96, P_CW = 7, P_CH = 7;
+  const P_COLS = 64, P_ROWS = 67, P_CW = 7, P_CH = 10;
   portEl.width  = P_COLS * P_CW;
   portEl.height = P_ROWS * P_CH;
 
@@ -729,22 +1132,25 @@
   }
   initGrids();
   window.addEventListener('load', initGrids);
+  buildTypoPalette(H_CH).then(p => { typoPalette = p; });
 
   // ── Render helpers ────────────────────────────────────────────────
+  const MONO_RAMP = " .'`,:;iltfcj-+!rILvzsx=*eaounCVZSX%mwdbpqMWDB#&@";
   function renderGrid(ctx, gridData, cw, ch, t) {
     ctx.clearRect(0, 0, gridData.cols * cw, gridData.rows * ch);
     if (!gridData) return;
     const { grid, cols, rows } = gridData;
-    ctx.font = `bold ${ch}px 'Courier New', monospace`;
+    const theme = document.documentElement.dataset.theme;
+    const asciiColor = theme === 'light' ? '0,0,0' : '255,255,255';
 
     let minLum = 1, maxLum = 0;
     for (let i = 0; i < grid.length; i++) {
       if (grid[i] < minLum) minLum = grid[i];
       if (grid[i] > maxLum) maxLum = grid[i];
     }
-    // Adaptive threshold: skip top 30% of luminance (background)
     const maxPass = minLum + (maxLum - minLum) * 0.70;
 
+    ctx.textBaseline = 'alphabetic';
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const lum = grid[r * cols + c];
@@ -752,89 +1158,172 @@
         const norm = 1 - (lum - minLum) / Math.max(0.01, maxPass - minLum);
         if (norm < 0.1) continue;
 
-        const flicker = Math.sin(t * 1.1 + c * 0.38 + r * 0.22) > 0.82 ? 1 : 0;
-        const base    = Math.floor(norm * (RAMP.length - 1));
-        const ci      = Math.max(0, Math.min(RAMP.length - 1, base + flicker));
-        const char    = RAMP[ci];
-        if (!char || char === ' ') continue;
-
         const breath = Math.sin(t * 0.55 + c * 0.18 + r * 0.09) * 0.5 + 0.5;
-        const alpha  = Math.min(0.95, norm * (0.6 + breath * 0.3));
-        ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(3)})`;
-        ctx.fillText(char, c * cw, (r + 1) * ch);
+        const alpha  = Math.min(1, norm * (theme === 'light' ? 1.2 : 0.6 + breath * 0.3));
+
+        if (typoPalette) {
+          const flicker = Math.sin(t * 1.1 + c * 0.38 + r * 0.22) > 0.88 ? 0.05 : 0;
+          const best = findBestChar(typoPalette, Math.min(1, norm + flicker), cw);
+          ctx.font = best.fontStr;
+          ctx.fillStyle = `rgba(${asciiColor},${alpha.toFixed(3)})`;
+          ctx.fillText(best.ch, c * cw, (r + 1) * ch);
+        } else {
+          const flicker = Math.sin(t * 1.1 + c * 0.38 + r * 0.22) > 0.82 ? 1 : 0;
+          const base = Math.floor(norm * (MONO_RAMP.length - 1));
+          const ci   = Math.max(0, Math.min(MONO_RAMP.length - 1, base + flicker));
+          const char = MONO_RAMP[ci];
+          if (!char || char === ' ') continue;
+          ctx.font = `bold ${ch}px 'Courier New',monospace`;
+          ctx.fillStyle = `rgba(${asciiColor},${alpha.toFixed(3)})`;
+          ctx.fillText(char, c * cw, (r + 1) * ch);
+        }
       }
     }
   }
 
-  // ── Idle horse sway ───────────────────────────────────────────────
+  // ── Horse idle sway ───────────────────────────────────────────────
   let animTime = 0, lastTs = null;
+  const horseScalePart = isMobile ? ' scale(0.45)' : '';
 
-  function applyHorseSway(t) {
-    const tx = Math.sin(t * 1.73) * 2.5 + Math.sin(t * 0.97) * 1.1;
-    const ty = Math.sin(t * 2.31) * 1.2 + Math.sin(t * 1.41) * 0.6;
-    const rz = Math.sin(t * 0.83) * 0.4;
-    horseEl.style.transform = `translate(${tx.toFixed(2)}px,${ty.toFixed(2)}px) rotate(${rz.toFixed(3)}deg)`;
+  function tickHorse() {
+    const tx = Math.sin(animTime * 1.73) * 2.5 + Math.sin(animTime * 0.97) * 1.1;
+    const ty = Math.sin(animTime * 2.31) * 1.2 + Math.sin(animTime * 1.41) * 0.6;
+    const rz = Math.sin(animTime * 0.83) * 0.4;
+    horseEl.style.transform = `translate(${tx.toFixed(2)}px,${ty.toFixed(2)}px) rotate(${rz.toFixed(3)}deg)${horseScalePart}`;
   }
 
   // ── Animation loop ─────────────────────────────────────────────────
   function tick(ts) {
     if (!lastTs) lastTs = ts;
-    animTime += Math.min(0.05, (ts - lastTs) / 1000);
+    const dt = Math.min(0.05, (ts - lastTs) / 1000);
+    animTime += dt;
     lastTs = ts;
 
     if (horseGrid)    renderGrid(hCtx, horseGrid, H_CW, H_CH, animTime);
     if (portraitGrid) renderGrid(pCtx, portraitGrid, P_CW, P_CH, animTime);
-    applyHorseSway(animTime);
+    tickHorse();
 
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
 
-  // ── Cursor + white trail ──────────────────────────────────────────
+  // ── Cursor + trail ────────────────────────────────────────────────
   const cursorEl    = document.getElementById('cursor');
   const trailCanvas = document.getElementById('trail-canvas');
   const tCtx        = trailCanvas.getContext('2d');
+  const trailOverlay = document.createElement('canvas');
+  const overlayCtx   = trailOverlay.getContext('2d');
+  const wordmarkImg  = document.getElementById('masthead-reference');
+  const wordmarkMask = document.createElement('canvas');
+  const wordmarkCtx  = wordmarkMask.getContext('2d', { willReadFrequently: true });
+  let wordmarkMaskReady = false;
+
+  function buildWordmarkMask() {
+    if (!wordmarkImg.complete || !wordmarkImg.naturalWidth) return;
+    wordmarkMask.width = wordmarkImg.naturalWidth;
+    wordmarkMask.height = wordmarkImg.naturalHeight;
+    wordmarkCtx.clearRect(0, 0, wordmarkMask.width, wordmarkMask.height);
+    wordmarkCtx.drawImage(wordmarkImg, 0, 0);
+    wordmarkMaskReady = true;
+  }
+
+  if (wordmarkImg.complete && wordmarkImg.naturalWidth) buildWordmarkMask();
+  else wordmarkImg.addEventListener('load', buildWordmarkMask, { once: true });
+
+  function isOverZaydanLetter(x, y) {
+    if (wordmarkMaskReady) {
+      const rect = wordmarkImg.getBoundingClientRect();
+      if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+        const px = Math.max(0, Math.min(wordmarkMask.width - 1, Math.floor(((x - rect.left) / rect.width) * wordmarkMask.width)));
+        const py = Math.max(0, Math.min(wordmarkMask.height - 1, Math.floor(((y - rect.top) / rect.height) * wordmarkMask.height)));
+        const data = wordmarkCtx.getImageData(px, py, 1, 1).data;
+        const luminance = data[0] * 0.299 + data[1] * 0.587 + data[2] * 0.114;
+        return data[3] > 24 && luminance > 96;
+      }
+    }
+
+    if (masthead.classList.contains('wordmark-landed')) return false;
+
+    const textRect = mastheadText.getBoundingClientRect();
+    return x >= textRect.left && x <= textRect.right && y >= textRect.top && y <= textRect.bottom;
+  }
+
+  function isOverPopup(x, y) {
+    const popup = document.querySelector('.p-popup-box');
+    if (!popup || getComputedStyle(popup.parentElement).display === 'none') return false;
+
+    const rect = popup.getBoundingClientRect();
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+  }
+
+  function cursorColorAt(x, y) {
+    const overInvertedSurface = isOverPopup(x, y) || isOverZaydanLetter(x, y);
+    const theme = document.documentElement.dataset.theme;
+    return overInvertedSurface === (theme === 'light') ? '#fff' : '#000';
+  }
 
   const resizeTrail = () => {
     trailCanvas.width = innerWidth;
     trailCanvas.height = innerHeight;
+    trailOverlay.width = innerWidth;
+    trailOverlay.height = innerHeight;
   };
   resizeTrail();
   window.addEventListener('resize', resizeTrail);
-
-  let overPopup = false;
-  document.querySelector('.p-popup-box').addEventListener('mouseenter', () => {
-    overPopup = true;
-    cursorEl.style.background = '#000';
-  });
-  document.querySelector('.p-popup-box').addEventListener('mouseleave', () => {
-    overPopup = false;
-    cursorEl.style.background = '#fff';
-  });
 
   const pts = [];
   document.addEventListener('mousemove', e => {
     cursorEl.style.left = e.clientX + 'px';
     cursorEl.style.top  = e.clientY + 'px';
+    cursorEl.style.background = cursorColorAt(e.clientX, e.clientY);
     pts.push({ x: e.clientX, y: e.clientY, t: Date.now() });
     if (pts.length > 40) pts.shift();
   });
 
+  function drawTrailPath(ctx, color) {
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    for (let i = 1; i < pts.length; i++) {
+      ctx.beginPath();
+      ctx.moveTo(pts[i - 1].x, pts[i - 1].y);
+      ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = (i / pts.length) * 2.5;
+      ctx.stroke();
+    }
+  }
+
+  function drawBlackTrailOverZaydan() {
+    if (!wordmarkMaskReady) return;
+
+    const rect = wordmarkImg.getBoundingClientRect();
+    overlayCtx.clearRect(0, 0, trailOverlay.width, trailOverlay.height);
+    drawTrailPath(overlayCtx, '#000');
+    overlayCtx.globalCompositeOperation = 'destination-in';
+    overlayCtx.drawImage(wordmarkMask, rect.left, rect.top, rect.width, rect.height);
+    overlayCtx.globalCompositeOperation = 'source-over';
+    tCtx.drawImage(trailOverlay, 0, 0);
+  }
+
+  function drawBlackTrailOverPopup() {
+    const popup = document.querySelector('.p-popup-box');
+    if (!popup || getComputedStyle(popup.parentElement).display === 'none') return;
+
+    const rect = popup.getBoundingClientRect();
+    tCtx.save();
+    tCtx.beginPath();
+    tCtx.rect(rect.left, rect.top, rect.width, rect.height);
+    tCtx.clip();
+    drawTrailPath(tCtx, '#000');
+    tCtx.restore();
+  }
+
   (function drawTrail() {
     tCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
     const now = Date.now();
-    tCtx.lineCap = 'round'; tCtx.lineJoin = 'round';
-    const trailColor = overPopup ? '0,0,0' : '255,255,255';
-    for (let i = 1; i < pts.length; i++) {
-      const age = (now - pts[i].t) / 300;
-      const a = Math.max(0, 1 - age);
-      tCtx.beginPath();
-      tCtx.moveTo(pts[i-1].x, pts[i-1].y);
-      tCtx.lineTo(pts[i].x, pts[i].y);
-      tCtx.strokeStyle = `rgba(${trailColor},${(a * 0.55).toFixed(3)})`;
-      tCtx.lineWidth = (i / pts.length) * 2.5;
-      tCtx.stroke();
-    }
+    drawTrailPath(tCtx, '#fff');
+    drawBlackTrailOverZaydan();
+    drawBlackTrailOverPopup();
     while (pts.length && now - pts[0].t > 300) pts.shift();
     requestAnimationFrame(drawTrail);
   })();
@@ -849,11 +1338,24 @@
   const pagePopup  = document.getElementById('page-popup');
   const pagePopupTxt = document.getElementById('page-popup-content');
   document.getElementById('page-btn-info').addEventListener('click', () => {
-    pagePopupTxt.innerHTML = '<p>Info coming soon.</p>';
+    pagePopupTxt.innerHTML = `
+      <p>Zaydan is an interdisciplinary designer based in Stanford, California, whose work sits at the intersection of human-centered design, systems thinking, and social impact.</p>
+      <p style="margin-top:14px">He is currently building with the Stanford Impact Lab for Equitable Access to Education and The Gordian Knot Center for National Security Innovation, leveraging design to widen access to secondary education and reimagine disability benefit access for veterans.</p>
+      <p style="margin-top:14px">Working across UI/UX design, product development, user research, and needfinding, his practice is rooted in identifying structural gaps and translating them into intuitive, equitable, and materially effective solutions.</p>
+    `;
     pagePopup.style.display = 'flex';
   });
   document.getElementById('page-btn-contact').addEventListener('click', () => {
-    pagePopupTxt.innerHTML = '<p>Contact coming soon.</p>';
+    pagePopupTxt.innerHTML = `
+      <p class="contact-label">General Inquiries</p>
+      <p><a href="mailto:zaydan1234@gmail.com">zaydan1234@gmail.com</a></p>
+      <p class="contact-label">LinkedIn</p>
+      <p><a href="https://www.linkedin.com/in/zaydanka" target="_blank">Zaydan Kabir Amanullah</a></p>
+      <p class="contact-label">Instagram</p>
+      <p><a href="https://instagram.com/zaydan_kabir" target="_blank">@zaydan_kabir</a></p>
+      <p class="contact-label">Substack</p>
+      <p><a href="https://zaydanamanullah.substack.com" target="_blank">zaydanamanullah</a></p>
+    `;
     pagePopup.style.display = 'flex';
   });
   document.getElementById('page-btn-resume').addEventListener('click', () => {
@@ -890,9 +1392,8 @@
     setTimeout(dismiss, 1400);
   }
 
-  // Fade in already showing UnifrakturCook (same as page masthead's first font),
-  // then roll through the remaining fonts exactly as the page does
-  setTimeout(() => {
+  function playIntro() {
+    if (screen._gone) return;
     title.style.opacity = '1';
     title.style.transform = 'translateY(0)';
     setFont(classes[0]);
@@ -900,7 +1401,11 @@
       setTimeout(() => setFont(cls), (i + 1) * 170)
     );
     setTimeout(landWordmark, classes.length * 170);
-  }, 150);
+  }
+
+  // Fade in after the wordmark image and custom fonts are ready, so slow loads
+  // do not let the final logo moment happen before the assets exist.
+  zaydanAnimationReady.then(() => setTimeout(playIntro, 150));
 
   // Skip on click or key
   screen.addEventListener('click', dismiss);

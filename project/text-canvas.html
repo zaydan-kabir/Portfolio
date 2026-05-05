@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pretext Canvas Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      background: #f5f4f0;
+      font-family: 'Inter', sans-serif;
+      padding: 48px 24px;
+    }
+
+    h1 {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #999;
+    }
+
+    #canvas {
+      display: block;
+      background: #fff;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+      border-radius: 4px;
+    }
+
+    #stats {
+      font-size: 12px;
+      color: #aaa;
+      letter-spacing: 0.03em;
+    }
+  </style>
+</head>
+<body>
+  <h1>@chenglou/pretext — canvas render</h1>
+  <canvas id="canvas"></canvas>
+  <div id="stats"></div>
+
+  <script type="module">
+    import { prepareWithSegments, layoutWithLines } from
+      './node_modules/@chenglou/pretext/dist/layout.js';
+
+    const FONT       = '18px Inter';
+    const MAX_WIDTH  = 400;
+    const LINE_H     = 28;   // px between baselines
+    const PAD_X      = 32;
+    const PAD_Y      = 36;
+
+    const TEXT = `Raised between Bangladesh and Canada and now based in California, Zaydan studies Design and Political Science at Stanford University. His work sits at the intersection of systems, people, and social change — shaped by a belief that good design and rigorous policy thinking belong in the same room.
+
+He has contributed to projects at the Gordian Knot Center, the Stimson Center, Stanford Impact Labs, and the Hoover Institution, each time asking the same question: what would it take to actually make this work?`;
+
+    const canvas = document.getElementById('canvas');
+    const ctx    = canvas.getContext('2d');
+    const stats  = document.getElementById('stats');
+
+    // Wait for Inter to load so pretext measures with the real font
+    await document.fonts.load(FONT);
+
+    // Prepare once — pretext segments, analyses, and caches measurements here
+    const prepared = prepareWithSegments(TEXT, FONT);
+
+    // Layout at fixed 400 px width — pure arithmetic after prepare()
+    const { lines, height } = layoutWithLines(prepared, MAX_WIDTH, LINE_H);
+
+    // Size the canvas to fit the text plus padding
+    const dpr = window.devicePixelRatio || 1;
+    const W   = MAX_WIDTH + PAD_X * 2;
+    const H   = height    + PAD_Y * 2;
+
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.scale(dpr, dpr);
+
+    // Draw text
+    ctx.font         = FONT;
+    ctx.fillStyle    = '#1a1a1a';
+    ctx.textBaseline = 'alphabetic';
+
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i].text, PAD_X, PAD_Y + i * LINE_H);
+    }
+
+    // Faint bounding-box guide
+    ctx.strokeStyle = 'rgba(99,102,241,0.18)';
+    ctx.lineWidth   = 1;
+    ctx.strokeRect(PAD_X - 0.5, PAD_Y - LINE_H + 4, MAX_WIDTH + 1, height + 4);
+
+    stats.textContent =
+      `${lines.length} lines · ${height}px tall · ${TEXT.length} chars`;
+  </script>
+</body>
+</html>

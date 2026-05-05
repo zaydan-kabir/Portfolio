@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Zaydan — Portfolio</title>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
   <style>
@@ -24,8 +26,23 @@
       width:100%; height:100%;
       background:var(--bg);
       scrollbar-width:none;
+      /* Prevent rubber-band overscroll from pulling content above the header */
+      overscroll-behavior-y: none;
     }
     html::-webkit-scrollbar { display:none; }
+
+    #safe-area-top {
+      position: fixed;
+      left: 0; right: 0;
+      /* Sit at the physical screen top (above CSS top:0) */
+      top: calc(-1 * env(safe-area-inset-top, 0px));
+      height: calc(env(safe-area-inset-top, 0px) * 2);
+      background: #0a0a0a;
+      z-index: 2000;
+      pointer-events: none;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
 
     body {
       width:100%; min-height:100%;
@@ -95,11 +112,17 @@
 
     /* ── Header ──────────────────────────────────────────── */
     #header {
-      position:fixed; top:0; left:0; right:0; z-index:200;
+      position:fixed; left:0; right:0; z-index:1000;
       display:flex; align-items:baseline; justify-content:space-between;
-      padding:24px 48px 10px;
       border-bottom:1px solid var(--gray3);
-      background:var(--bg);
+      background:#0a0a0a;
+      /* GPU compositing layer — prevents iOS scroll-momentum flicker */
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      will-change: transform;
+      /* Extend up into the iOS status bar zone; env() = 0 on non-iOS */
+      top: calc(-1 * env(safe-area-inset-top, 0px));
+      padding: calc(env(safe-area-inset-top, 0px) + 24px) 48px 10px;
     }
     .h-name {
       font-family:'Lora', serif; font-size:14px; font-weight:400;
@@ -188,16 +211,6 @@
     /* Center image: portrait photo, cover fills the cell */
     #box-0 { background:#0a0a0a; }
     #box-0 img { object-fit:cover; object-position:center top; }
-    .img-placeholder {
-      position:absolute; inset:0;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      gap:8px; pointer-events:none;
-    }
-    .img-placeholder svg { opacity:.3; }
-    .img-placeholder span { font-size:11px; font-style:italic; color:#aaa; letter-spacing:.02em; }
-    .img-box.has-image .img-placeholder { display:none; }
-    input[type="file"] { display:none; }
 
     /* Arrow */
     #arrow-svg { position:fixed;width:48px;height:110px;overflow:visible;opacity:0;transition:opacity .2s;pointer-events:none;z-index:10; }
@@ -343,7 +356,8 @@
       body.zaydan-active { overflow-y:scroll !important; }
 
       #header {
-        padding:14px 20px 10px;
+        top: calc(-1 * env(safe-area-inset-top, 0px));
+        padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 10px;
         flex-wrap:wrap;
         gap:6px;
       }
@@ -379,26 +393,40 @@
       .edu-school { font-size:12px; }
       .edu-degree { font-size:11px; }
 
-      /* Center image: tall portrait box below left column */
+      /* Center portrait: full width, show full image uncropped */
       .img-col-center {
-        height:75vw;
-        max-height:420px;
-        min-height:240px;
+        height:auto;
+        max-height:none;
+        min-height:0;
         margin-top:20px;
       }
-
-      /* Right images: side-by-side row below center image */
-      .img-col-right {
-        flex-direction:row;
-        height:44vw;
-        max-height:260px;
-        min-height:160px;
-        margin-top:12px;
-        margin-bottom:24px;
-        gap:10px;
+      .img-col-center .img-box {
+        flex:none;
+        height:auto;
+      }
+      .img-col-center .img-box img {
+        height:auto !important;
+        object-fit:contain !important;
+        object-position:center center;
       }
 
-      #arrow-svg { display:block; }
+      /* Right images: stacked full-width landscape panels */
+      .img-col-right {
+        flex-direction:column;
+        height:auto;
+        max-height:none;
+        min-height:0;
+        margin-top:14px;
+        margin-bottom:28px;
+        gap:12px;
+      }
+      .img-col-right .img-box {
+        flex:none;
+        width:100%;
+        height:58vw;
+      }
+
+      #arrow-svg { display:none !important; }
 
       /* Zaydan view: disable horizontal scroll on mobile, just show masthead */
       #view-zaydan { min-height:100vh; min-height:100dvh; }
@@ -406,18 +434,26 @@
       #z-masthead { position:absolute; }
     }
 
+    @media (pointer: coarse) {
+      body { cursor: auto; }
+      a, button, a:hover, button:hover { cursor: auto !important; }
+      #cursor, #cursor-bubble, #trail-canvas { display: none; }
+    }
+
     /* ── Small phone: ≤400px ── */
     @media (max-width:400px) {
       .h-name { font-size:12px; }
       .h-link { font-size:12px; }
       .name { font-size:21px; }
-      .img-col-center { height:85vw; }
-      .img-col-right  { height:50vw; }
+      .img-col-right .img-box { height:62vw; }
     }
   </style>
+  <script src="theme.js?v=20260501-light-first-all"></script>
+  <link rel="stylesheet" href="theme.css?v=20260501-light-first-all">
 </head>
 <body>
 
+<div id="safe-area-top"></div>
 <div id="cursor"></div>
 <div id="cursor-bubble"><span id="cursor-label"></span></div>
 <canvas id="trail-canvas"></canvas>
@@ -445,7 +481,7 @@
         <path id="arrow-head" d="M 32 48 L 22 40 M 32 48 L 22 56" transform="rotate(8 32 48)" stroke="#fff" stroke-width="1.8" stroke-linecap="round" fill="none" style="stroke-dasharray:20;stroke-dashoffset:20;"/>
       </svg>
       <div class="divider"></div>
-      <p class="bio">I'm based in California, but grew up in Bangladesh and Canada. I study Design and Political Science at Stanford University, where I focus on building impactful work at the intersection of systems and people. I'm driven by a commitment to uplift others and actively embodying the change I want to see in the world.</p>
+      <p class="bio">Raised between Bangladesh and Canada and now based in California, I study Design and Political Science at Stanford University, where I build impactful work at the intersection of systems, people, and social change. My work is driven by a commitment to uplift others and to embody the change I want to see in the world.</p>
       <div class="divider"></div>
       <div class="section-label">You are talking to a doppelgänger if I am not:</div>
       <div class="hobbies">
@@ -482,9 +518,8 @@
 
     <!-- RIGHT IMAGES -->
     <div class="img-col-right">
-      <div class="img-box has-image" id="box-1" data-input="file-1">
+      <div class="img-box has-image" id="box-1">
         <img id="img-1" alt="Community photo" src="uploads/IMG_2059.JPG" style="display:block" />
-        <div class="img-placeholder"><svg width="32" height="32" viewBox="0 0 40 40" fill="none"><rect x="4" y="8" width="32" height="24" rx="2" stroke="#555" stroke-width="1.5"/><circle cx="14" cy="16" r="3" stroke="#555" stroke-width="1.5"/><path d="M4 26l8-7 6 5 5-4 9 7" stroke="#555" stroke-width="1.5" stroke-linejoin="round"/></svg><span>click or drag to add image</span></div>
       </div>
       <div class="img-box has-image" id="box-2">
         <img id="img-2" alt="Hiking photo" src="uploads/IMG_3073.jpg" style="display:block" />
@@ -514,9 +549,6 @@
   <img id="img-portrait" src="assets/bottom-left.png" style="display:none">
   <div id="z-progress"></div>
 </div>
-
-<!-- Shared file inputs -->
-<input type="file" id="file-1" accept="image/*" />
 
 <!-- ── Info / Contact (Zaydan view) ─────────────────── -->
 <div id="z-info-contact">
@@ -679,27 +711,6 @@
   }
   startAboutTyping();
 
-  // ── ABOUT: image upload ───────────────────────────────────────────
-  function handleFile(file, idx) {
-    if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const box = document.getElementById('box-'+idx);
-      const img = document.getElementById('img-'+idx);
-      img.src = ev.target.result; box.classList.add('has-image');
-      try { localStorage.setItem('zaydan-img-'+idx, ev.target.result); } catch(e) {}
-    };
-    reader.readAsDataURL(file);
-  }
-  const box1 = document.getElementById('box-1');
-  const inp1 = document.getElementById('file-1');
-  try { const s=localStorage.getItem('zaydan-img-1'); if(s){ document.getElementById('img-1').src=s; box1.classList.add('has-image'); } } catch(e){}
-  box1.addEventListener('click', () => inp1.click());
-  inp1.addEventListener('change', e => { handleFile(e.target.files[0], 1); inp1.value=''; });
-  box1.addEventListener('dragover', e => { e.preventDefault(); box1.classList.add('drag-over'); });
-  box1.addEventListener('dragleave', () => box1.classList.remove('drag-over'));
-  box1.addEventListener('drop', e => { e.preventDefault(); box1.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0], 1); });
-
   // ── ZAYDAN: scroll → horizontal translate ─────────────────────────
   const zTrack    = document.getElementById('z-track');
   const zProgress = document.getElementById('z-progress');
@@ -723,7 +734,7 @@
   });
 
   // ── ZAYDAN: ASCII art ─────────────────────────────────────────────
-  const RAMP = ' .\'`,:;-+!iIlr=*o%#&@';
+  const RAMP = ' .\'`,:;iltfcj-+!rILvzsx=*eaounCVZSX%mwdbpqMWDB#&@';
 
   function toGrid(img, cols, rows) {
     const sw=cols*2, sh=rows*2;
@@ -765,17 +776,19 @@
     ctx.font=`bold ${ch}px 'Courier New',monospace`;
     let minL=1,maxL=0;
     for(let i=0;i<grid.length;i++){if(grid[i]<minL)minL=grid[i];if(grid[i]>maxL)maxL=grid[i];}
-    const mxP=minL+(maxL-minL)*.70;
+    const mxP=minL+(maxL-minL)*.99;
     for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
       const lum=grid[r*cols+c]; if(lum>mxP) continue;
-      const norm=1-(lum-minL)/Math.max(.01,mxP-minL); if(norm<.1) continue;
+      const norm=1-(lum-minL)/Math.max(.01,mxP-minL);
       const flicker=Math.sin(t*1.1+c*.38+r*.22)>.82?1:0;
-      const base=Math.floor(norm*(RAMP.length-1));
+      const base=Math.max(1,Math.ceil(norm*(RAMP.length-1)));
       const ci=Math.max(0,Math.min(RAMP.length-1,base+flicker));
       const char=RAMP[ci]; if(!char||char===' ') continue;
       const breath=Math.sin(t*.55+c*.18+r*.09)*.5+.5;
-      const alpha=Math.min(.95,norm*(.6+breath*.3));
-      ctx.fillStyle=`rgba(255,255,255,${alpha.toFixed(3)})`;
+      const theme=document.documentElement.dataset.theme;
+      const alpha=Math.min(1,norm*(theme==='light'?1.2:.6+breath*.3));
+      const asciiColor=theme==='light'?'0,0,0':'255,255,255';
+      ctx.fillStyle=`rgba(${asciiColor},${alpha.toFixed(3)})`;
       ctx.fillText(char,c*cw,(r+1)*ch);
     }
   }
@@ -816,6 +829,31 @@
   });
   document.getElementById('z-popup-close').addEventListener('click', () => { zPopupEl.style.display = 'none'; });
   zPopupEl.addEventListener('click', e => { if (e.target === zPopupEl) zPopupEl.style.display = 'none'; });
+
+  // JS fallback: read the real computed env(safe-area-inset-top) and apply the
+  // header shift explicitly, so it works even if CSS env() didn't evaluate at parse time.
+  (function() {
+    const header = document.getElementById('header');
+    if (!header) return;
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;' +
+      'visibility:hidden;height:env(safe-area-inset-top,0px)';
+    document.documentElement.appendChild(probe);
+    const sat = probe.getBoundingClientRect().height;
+    document.documentElement.removeChild(probe);
+    if (sat > 0) {
+      header.style.top = (-sat) + 'px';
+      const padSide = window.innerWidth <= 767 ? '20px' : '48px';
+      const padBase = window.innerWidth <= 767 ? 14 : 24;
+      header.style.paddingTop = (sat + padBase) + 'px';
+    }
+    // safe-area-top cover: shift it up the same amount
+    const cover = document.getElementById('safe-area-top');
+    if (cover && sat > 0) {
+      cover.style.top = (-sat) + 'px';
+      cover.style.height = (sat * 2) + 'px';
+    }
+  })();
 
 })();
 </script>
