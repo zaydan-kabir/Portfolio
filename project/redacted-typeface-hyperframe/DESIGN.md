@@ -1,19 +1,19 @@
 ## Style Prompt
-A hidden type specimen sheet — large serif letterforms drift into place on a bright paper page, and heavy ink-black redaction bars sweep across to censor the title. The mood is a print proof under embargo: archival, deliberate, slightly playful. Motion should feel like printer's blocks settling, not like a digital UI animation.
+A redacted intelligence-file page for "Zaydan's New TypeFace". Off-white photocopy paper with heavy grain, a typewritten subject block that types in line by line, fat black ink-redaction bars that sweep across to censor it, and a distressed red "ACCESS DENIED" stamp that slams down over the title at a rake. The mood is archival declassification: matter-of-fact, slightly grimy, deliberately analog.
 
 ## Colors
-- Paper: #f0f0f0
-- Manuscript ink: #0a0a0a
-- Muted ink: rgba(10,10,10,0.55)
-- Redaction bar: #050505
-- Margin rule: rgba(10,10,10,0.2)
+- Photocopy paper: #ece6d8
+- Typewriter ink: #1a1a1a
+- Redaction ink: #050505
+- Stamp red: #c1281d
+- Soft shadow: rgba(10,10,10,0.16)
 
 ## Typography
-- Lora, Georgia, serif for specimen letterforms (large, generous tracking).
-- VT323 / monospace for technical labels and the "coming soon" tag.
+- Special Elite for the typewritten body, headers, and footers.
+- Anton (or Oswald) for the heavy condensed "ACCESS DENIED" stamp text.
 
 ## What NOT to Do
-- Do not use neon or saturated colors.
-- Do not animate glitch noise or sci-fi scanlines.
-- Do not show a fake glyph palette UI or font-management chrome.
-- Do not let the redaction bars sit perfectly straight — keep a faint print misalignment.
+- Do not use crisp digital edges on the redaction bars or stamp — both must read as ink on paper, with broken edges and erosion.
+- Do not introduce additional colors. The palette is paper + black ink + one red.
+- Do not animate flashy glitch / scanline / particle effects.
+- Do not let the typewriter text appear all at once — it must reveal character by character.

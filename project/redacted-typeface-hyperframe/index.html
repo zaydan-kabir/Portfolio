@@ -4,186 +4,160 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Redacted Typeface HyperFrame Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Special+Elite&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    @font-face {
-      font-family: 'VT323';
-      src: url('../uploads/VT323-Regular.ttf') format('truetype');
-      font-display: swap;
-    }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #f0f0f0; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #ece6d8; }
+
     [data-composition-id="redacted-typeface-preview"] {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: #f0f0f0;
-      color: #0a0a0a;
-      font-family: 'Lora', Georgia, serif;
+      background:
+        radial-gradient(ellipse at 50% 42%, #f1ecdf 0%, #ece6d8 48%, #d4cdb9 100%);
+      color: #1a1a1a;
+      font-family: 'Special Elite', 'Courier Prime', 'Courier New', monospace;
       isolation: isolate;
     }
 
     .sheet {
       position: absolute;
-      inset: 0;
-      padding: 6.5% 7.5%;
-    }
-
-    .margin-rule {
-      position: absolute;
-      background: rgba(10,10,10,.2);
-      pointer-events: none;
-    }
-    .margin-rule.top    { left: 7.5%; right: 7.5%; top: 6.5%;    height: 1px; }
-    .margin-rule.bottom { left: 7.5%; right: 7.5%; bottom: 6.5%; height: 1px; }
-    .margin-rule.left   { top: 6.5%; bottom: 6.5%; left: 7.5%;   width: 1px; }
-    .margin-rule.right  { top: 6.5%; bottom: 6.5%; right: 7.5%;  width: 1px; }
-
-    .corner-mark {
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      border: 1px solid rgba(10,10,10,.34);
-    }
-    .corner-mark.tl { left: 7.5%;  top: 6.5%;    transform: translate(-50%, -50%); border-right: none; border-bottom: none; }
-    .corner-mark.tr { right: 7.5%; top: 6.5%;    transform: translate( 50%, -50%); border-left: none;  border-bottom: none; }
-    .corner-mark.bl { left: 7.5%;  bottom: 6.5%; transform: translate(-50%,  50%); border-right: none; border-top: none; }
-    .corner-mark.br { right: 7.5%; bottom: 6.5%; transform: translate( 50%,  50%); border-left: none;  border-top: none; }
-
-    .header-row {
-      position: absolute;
-      left: 9%;
-      right: 9%;
-      top: 8.6%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: 'VT323', monospace;
-      font-size: clamp(10px, 1vw, 14px);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(10,10,10,.55);
+      inset: 7% 8.5% 9%;
       z-index: 4;
-    }
-    .header-row .embargo {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .embargo-dot {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #0a0a0a;
-    }
-
-    .specimen {
-      position: absolute;
-      left: 9%;
-      right: 9%;
-      top: 16%;
-      bottom: 30%;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 0;
+      gap: clamp(10px, 1.6vw, 22px);
     }
 
-    .glyph-row {
-      position: relative;
+    .top-row {
       display: flex;
-      align-items: baseline;
       justify-content: space-between;
-      font-family: 'Lora', Georgia, serif;
-      font-weight: 500;
-      letter-spacing: -0.02em;
-      line-height: 1;
-      color: #0a0a0a;
-    }
-    .glyph-row .g { display: inline-block; }
-    .glyph-row.row-1 { font-size: clamp(54px, 13vw, 188px); font-style: normal; }
-    .glyph-row.row-2 { font-size: clamp(44px, 10vw, 142px); font-style: italic; color: rgba(10,10,10,.78); }
-    .glyph-row.row-3 { font-size: clamp(38px, 8.4vw, 116px); font-weight: 600; }
-
-    .row-label {
-      position: absolute;
-      right: 0;
-      top: 6%;
-      font-family: 'VT323', monospace;
-      font-size: clamp(9px, 0.78vw, 12px);
-      letter-spacing: 0.2em;
-      color: rgba(10,10,10,.42);
+      align-items: baseline;
+      font-size: clamp(10px, 1.05vw, 14px);
+      letter-spacing: 0.18em;
       text-transform: uppercase;
+      color: rgba(26,26,26,.66);
+    }
+
+    .body {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(10px, 1.4vw, 18px);
+      flex: 1;
+      justify-content: center;
+    }
+
+    .label {
+      font-size: clamp(11px, 1.05vw, 14px);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(26,26,26,.62);
+    }
+
+    .line {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      will-change: clip-path;
+    }
+    .line.hidden-clip { clip-path: inset(0 100% 0 0); }
+
+    .hero {
+      font-size: clamp(28px, 4.3vw, 64px);
+      letter-spacing: -0.005em;
+      line-height: 1.1;
+      color: #1a1a1a;
+      max-width: 100%;
+      white-space: normal;
+    }
+
+    .sub {
+      font-size: clamp(13px, 1.45vw, 20px);
+      letter-spacing: 0.02em;
+      line-height: 1.45;
+      color: rgba(26,26,26,.78);
+    }
+    .sub .key {
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(26,26,26,.6);
+      margin-right: 0.6em;
+    }
+
+    .bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: clamp(10px, 0.95vw, 13px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(26,26,26,.6);
     }
 
     .redaction {
       position: absolute;
       background: #050505;
-      box-shadow: 0 0 0 1px rgba(0,0,0,.9), 0 8px 18px rgba(0,0,0,.22);
       transform-origin: left center;
       z-index: 6;
+      will-change: transform;
+      filter: url(#bar-grunge);
     }
-    .redaction.r-1 { left: 9%;   top: 19%;   width: 0;     height: 12.5%; transform: rotate(-0.6deg); }
-    .redaction.r-2 { left: 9%;   top: 36.5%; width: 0;     height: 10.4%; transform: rotate(0.4deg); }
-    .redaction.r-3 { left: 9%;   top: 53%;   width: 0;     height: 9%;    transform: rotate(-0.3deg); }
-
-    .stamp {
-      position: absolute;
-      left: 50%;
-      top: 73%;
-      transform: translate(-50%, -50%) rotate(-3deg);
-      padding: 12px 26px 14px;
-      border: 2px solid rgba(10,10,10,.92);
-      color: #0a0a0a;
-      font-family: 'VT323', monospace;
-      font-size: clamp(14px, 1.6vw, 22px);
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      background: rgba(240,240,240,.78);
-      box-shadow: 0 4px 12px rgba(0,0,0,.18);
-      z-index: 8;
-      white-space: nowrap;
-    }
-    .stamp::before {
+    .redaction::after {
       content: '';
       position: absolute;
-      inset: 4px;
-      border: 1px solid rgba(10,10,10,.42);
+      inset: 0;
+      background-image: radial-gradient(circle at 30% 60%, rgba(255,255,255,0.06) 0 1px, transparent 2px),
+                        radial-gradient(circle at 70% 30%, rgba(255,255,255,0.05) 0 1px, transparent 2px);
+      background-size: 14px 14px, 22px 22px;
       pointer-events: none;
+      mix-blend-mode: screen;
     }
 
-    .footer-row {
+    .stamp-wrap {
       position: absolute;
-      left: 9%;
-      right: 9%;
-      bottom: 8.6%;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      font-family: 'VT323', monospace;
-      font-size: clamp(10px, 1vw, 14px);
-      letter-spacing: 0.18em;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(-9deg);
+      z-index: 9;
+      pointer-events: none;
+      will-change: transform;
+      filter: drop-shadow(0 4px 0 rgba(193,40,29,0.06));
+    }
+
+    .stamp {
+      position: relative;
+      padding: clamp(8px, 1.1vw, 14px) clamp(20px, 2.6vw, 36px) clamp(10px, 1.3vw, 16px);
+      border: clamp(3px, 0.32vw, 5px) solid #c1281d;
+      box-shadow:
+        inset 0 0 0 clamp(3px, 0.34vw, 5px) #ece6d8,
+        inset 0 0 0 clamp(4px, 0.42vw, 6px) #c1281d;
+      color: #c1281d;
+      font-family: 'Anton', 'Oswald', Impact, sans-serif;
+      font-size: clamp(28px, 4.6vw, 64px);
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: rgba(10,10,10,.55);
-      z-index: 4;
+      line-height: 1;
+      white-space: nowrap;
+      background: rgba(236,230,216,0.05);
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 200' preserveAspectRatio='none'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7 0.05' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 5 -1.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+              mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 200' preserveAspectRatio='none'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7 0.05' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 5 -1.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      -webkit-mask-size: 100% 100%;
+              mask-size: 100% 100%;
+      -webkit-mask-repeat: no-repeat;
+              mask-repeat: no-repeat;
     }
-    .footer-row .title-fragment {
-      font-family: 'Lora', Georgia, serif;
-      font-style: italic;
-      letter-spacing: 0.04em;
-      text-transform: none;
-      font-size: clamp(11px, 1.1vw, 16px);
-      color: rgba(10,10,10,.7);
-    }
+
+    .stamp .word { display: inline-block; }
 
     .grain {
       position: absolute;
       inset: 0;
       z-index: 12;
       pointer-events: none;
-      opacity: 0.08;
+      opacity: 0.18;
       mix-blend-mode: multiply;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 160px 160px;
@@ -194,95 +168,163 @@
       inset: 0;
       z-index: 11;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 60%, rgba(10,10,10,.18) 100%);
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(40,30,10,0.28) 100%);
+    }
+
+    .paper-edge {
+      position: absolute;
+      inset: 0;
+      z-index: 14;
+      pointer-events: none;
+      box-shadow: inset 0 0 0 6px rgba(26,26,26,0.04), inset 0 0 80px rgba(60,38,12,0.18);
     }
 
     @media (max-aspect-ratio: 1/1) {
-      .header-row, .footer-row { font-size: 10px; letter-spacing: 0.14em; }
-      .stamp { font-size: 12px; padding: 10px 18px; letter-spacing: 0.26em; }
+      .hero { font-size: clamp(28px, 6.8vw, 60px); }
+      .sub { font-size: clamp(12px, 2.4vw, 18px); }
+      .top-row, .bottom-row { font-size: 10px; letter-spacing: 0.12em; }
     }
   </style>
 </head>
 <body>
-  <div data-composition-id="redacted-typeface-preview" data-width="982" data-height="1280" data-duration="11" data-start="0" data-track-index="0">
-    <div class="sheet"></div>
-    <div class="margin-rule top"></div>
-    <div class="margin-rule bottom"></div>
-    <div class="margin-rule left"></div>
-    <div class="margin-rule right"></div>
-    <div class="corner-mark tl"></div>
-    <div class="corner-mark tr"></div>
-    <div class="corner-mark bl"></div>
-    <div class="corner-mark br"></div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <filter id="bar-grunge" x="-2%" y="-15%" width="104%" height="130%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9 0.05" numOctaves="2" seed="9" result="noise"/>
+        <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 7 -2.0"/>
+        <feComposite in2="SourceGraphic" operator="in"/>
+        <feMorphology operator="dilate" radius="0.4"/>
+      </filter>
+    </defs>
+  </svg>
 
-    <div class="header-row">
-      <span>Specimen / Draft 03</span>
-      <span class="embargo"><span class="embargo-dot"></span>Embargoed</span>
+  <div data-composition-id="redacted-typeface-preview" data-width="982" data-height="1280" data-duration="13" data-start="0" data-track-index="0">
+    <div class="sheet">
+      <div class="top-row">
+        <span class="line hidden-clip" data-line>Subject File · 04 / 05 / 2026</span>
+        <span class="line hidden-clip" data-line>Confidential — Draft 03</span>
+      </div>
+
+      <div class="body">
+        <span class="line hidden-clip label" data-line>Project Name</span>
+        <span class="line hidden-clip hero" data-line>Zaydan's New TypeFace</span>
+        <span class="line hidden-clip sub" data-line><span class="key">Status</span> in development — release pending review.</span>
+        <span class="line hidden-clip sub" data-line><span class="key">Designer</span> Zaydan Kabir Amanullah</span>
+        <span class="line hidden-clip sub" data-line><span class="key">Distribution</span> internal only — do not transmit.</span>
+        <span class="line hidden-clip sub" data-line><span class="key">Note</span> further details withheld at this time.</span>
+      </div>
+
+      <div class="bottom-row">
+        <span class="line hidden-clip" data-line>File 04 · Page 01</span>
+        <span class="line hidden-clip" data-line>End — pending review</span>
+      </div>
     </div>
 
-    <div class="specimen">
-      <div class="glyph-row row-1">
-        <span class="g">A</span><span class="g">a</span><span class="g">G</span><span class="g">g</span>
-        <span class="row-label">Roman</span>
-      </div>
-      <div class="glyph-row row-2">
-        <span class="g">R</span><span class="g">e</span><span class="g">d</span><span class="g">a</span><span class="g">k</span>
-        <span class="row-label">Italic</span>
-      </div>
-      <div class="glyph-row row-3">
-        <span class="g">&amp;</span><span class="g">Æ</span><span class="g">ß</span><span class="g">@</span>
-        <span class="row-label">Display</span>
-      </div>
-    </div>
+    <div class="redaction r-1" style="left: 8.5%; top: 7%; width: 0; height: 1.1%;"></div>
+    <div class="redaction r-2" style="right: 8.5%; top: 7%; width: 0; height: 1.1%; transform-origin: right center;"></div>
 
-    <div class="redaction r-1"></div>
-    <div class="redaction r-2"></div>
-    <div class="redaction r-3"></div>
+    <div class="redaction r-hero-1" style="left: 8.5%; top: 38.5%; width: 0; height: 6.4%; transform: rotate(-0.6deg);"></div>
+    <div class="redaction r-hero-2" style="left: 8.5%; top: 45%;   width: 0; height: 5.8%; transform: rotate( 0.4deg);"></div>
 
-    <div class="stamp">Coming Soon</div>
+    <div class="redaction r-3" style="left: 8.5%; top: 55%;   width: 0; height: 2.2%; transform: rotate(-0.4deg);"></div>
+    <div class="redaction r-4" style="left: 8.5%; top: 60.5%; width: 0; height: 2.2%; transform: rotate( 0.3deg);"></div>
+    <div class="redaction r-5" style="left: 8.5%; top: 66%;   width: 0; height: 2.2%; transform: rotate(-0.2deg);"></div>
+    <div class="redaction r-6" style="left: 8.5%; top: 71.5%; width: 0; height: 2.2%; transform: rotate( 0.5deg);"></div>
 
-    <div class="footer-row">
-      <span class="title-fragment">[redacted] typeface</span>
-      <span>Type Design / Web</span>
+    <div class="redaction r-7" style="left: 8.5%; bottom: 9%; width: 0; height: 1.1%;"></div>
+    <div class="redaction r-8" style="right: 8.5%; bottom: 9%; width: 0; height: 1.1%; transform-origin: right center;"></div>
+
+    <div class="stamp-wrap">
+      <div class="stamp"><span class="word">Access&nbsp;Denied</span></div>
     </div>
 
     <div class="vignette"></div>
     <div class="grain"></div>
+    <div class="paper-edge"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      tl.from('.margin-rule', { opacity: 0, duration: 0.7, ease: 'sine.out', stagger: 0.06 }, 0)
-        .from('.corner-mark', { opacity: 0, scale: 0.6, duration: 0.45, ease: 'back.out(2)', stagger: 0.05 }, 0.18)
-        .from('.header-row > *', { opacity: 0, y: -8, duration: 0.55, ease: 'power2.out', stagger: 0.08 }, 0.35)
-        .from('.footer-row > *', { opacity: 0, y: 8, duration: 0.55, ease: 'power2.out', stagger: 0.08 }, 0.4)
-        .from('.row-1 .g', { y: 32, opacity: 0, duration: 0.6, ease: 'expo.out', stagger: 0.06 }, 0.55)
-        .from('.row-2 .g', { y: 28, opacity: 0, duration: 0.6, ease: 'power3.out', stagger: 0.05 }, 0.95)
-        .from('.row-3 .g', { y: 24, opacity: 0, duration: 0.55, ease: 'power3.out', stagger: 0.05 }, 1.35)
-        .from('.row-label', { opacity: 0, x: 14, duration: 0.55, ease: 'sine.out', stagger: 0.1 }, 0.85);
+      const lines = gsap.utils.toArray('[data-line]');
 
-      tl.to('.embargo-dot', { opacity: 0.32, duration: 0.7, repeat: 9, yoyo: true, ease: 'sine.inOut' }, 1.2);
-
-      tl.to('.r-1', { width: '82%', duration: 0.32, ease: 'expo.out' }, 2.4)
-        .to('.r-2', { width: '82%', duration: 0.36, ease: 'expo.out' }, 2.65)
-        .to('.r-3', { width: '82%', duration: 0.32, ease: 'expo.out' }, 2.9);
-
-      tl.from('.stamp', {
-        opacity: 0,
-        scale: 0.4,
-        rotation: 18,
+      tl.to(lines.slice(0, 2), {
+        clipPath: 'inset(0 0% 0 0)',
         duration: 0.55,
+        ease: 'steps(18)',
+        stagger: 0.18
+      }, 0.15);
+
+      tl.to(lines[2], {
+        clipPath: 'inset(0 0% 0 0)',
+        duration: 0.4,
+        ease: 'steps(12)'
+      }, 0.7);
+
+      tl.to(lines[3], {
+        clipPath: 'inset(0 0% 0 0)',
+        duration: 1.05,
+        ease: 'steps(28)'
+      }, 1.0);
+
+      tl.to(lines.slice(4, 8), {
+        clipPath: 'inset(0 0% 0 0)',
+        duration: 0.85,
+        ease: 'steps(28)',
+        stagger: 0.36
+      }, 2.05);
+
+      tl.to(lines.slice(8, 10), {
+        clipPath: 'inset(0 0% 0 0)',
+        duration: 0.5,
+        ease: 'steps(16)',
+        stagger: 0.16
+      }, 3.65);
+
+      tl.to('.r-3', { width: '74%', duration: 0.28, ease: 'expo.out' }, 4.4)
+        .to('.r-1', { width: '24%', duration: 0.22, ease: 'expo.out' }, 4.5)
+        .to('.r-2', { width: '22%', duration: 0.22, ease: 'expo.out' }, 4.55)
+        .to('.r-4', { width: '64%', duration: 0.3,  ease: 'expo.out' }, 4.7)
+        .to('.r-5', { width: '78%', duration: 0.32, ease: 'expo.out' }, 4.95)
+        .to('.r-6', { width: '58%', duration: 0.3,  ease: 'expo.out' }, 5.2)
+        .to('.r-7', { width: '36%', duration: 0.24, ease: 'expo.out' }, 5.45)
+        .to('.r-8', { width: '30%', duration: 0.24, ease: 'expo.out' }, 5.5);
+
+      tl.to('.r-hero-1', { width: '64%', duration: 0.34, ease: 'expo.out' }, 5.7)
+        .to('.r-hero-2', { width: '78%', duration: 0.36, ease: 'expo.out' }, 5.92);
+
+      tl.from('.stamp-wrap', {
+        scale: 2.6,
+        opacity: 0,
+        rotation: 24,
+        duration: 0.32,
+        ease: 'power4.in'
+      }, 6.4);
+
+      tl.fromTo('.stamp-wrap', { rotation: 24 }, {
+        rotation: -9,
+        duration: 0.18,
+        ease: 'power4.out'
+      }, 6.72);
+
+      tl.fromTo('.stamp-wrap', { scale: 1.18 }, {
+        scale: 1,
+        duration: 0.22,
         ease: 'back.out(2.4)'
-      }, 3.05);
+      }, 6.78);
 
-      tl.to('.stamp', { rotation: -3.6, duration: 0.18, ease: 'sine.inOut' }, 3.6)
-        .to('.stamp', { rotation: -3,   duration: 0.22, ease: 'sine.inOut' }, 3.78);
+      tl.to('.stamp-wrap', { rotation: -7.5, duration: 0.14, ease: 'sine.inOut' }, 7.1)
+        .to('.stamp-wrap', { rotation: -9,   duration: 0.18, ease: 'sine.inOut' }, 7.24);
 
-      tl.to('.r-1', { x: 4, duration: 1.3, ease: 'sine.inOut', yoyo: true, repeat: 2 }, 4.2)
-        .to('.r-2', { x: -3, duration: 1.5, ease: 'sine.inOut', yoyo: true, repeat: 2 }, 4.3)
-        .to('.r-3', { x: 5, duration: 1.4, ease: 'sine.inOut', yoyo: true, repeat: 2 }, 4.4);
+      tl.to('.redaction', {
+        x: 3,
+        duration: 1.6,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: 1,
+        stagger: { each: 0.06, from: 'random' }
+      }, 7.7);
 
       window.__timelines['redacted-typeface-preview'] = tl;
 
