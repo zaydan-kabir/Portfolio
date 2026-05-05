@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shire HyperFrame Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Anton&family=Special+Elite&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,900;1,400&family=Special+Elite&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #ece1c4; }
@@ -15,208 +15,130 @@
       height: 100vh;
       overflow: hidden;
       background:
-        radial-gradient(ellipse at 50% 38%, #f1e7cd 0%, #ece1c4 48%, #d9cca9 100%);
+        radial-gradient(ellipse at 38% 42%, #f3eacf 0%, #ece1c4 50%, #d8caa3 100%);
       color: #1a2c5b;
-      font-family: 'Alfa Slab One', Georgia, serif;
+      font-family: 'Playfair Display', Georgia, serif;
       isolation: isolate;
     }
 
-    .paper-edge {
+    .stage {
       position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 14;
-      box-shadow:
-        inset 0 0 0 6px rgba(26,44,91,0.06),
-        inset 0 0 90px rgba(60,38,12,0.18);
+      inset: 8% 8.5%;
+      display: grid;
+      grid-template-columns: minmax(120px, 0.42fr) minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(28px, 5vw, 86px);
+      z-index: 4;
     }
 
-    .frame-rule {
-      position: absolute;
-      left: 5%;
-      right: 5%;
-      top: 6%;
-      bottom: 6%;
-      border: 2px solid #1a2c5b;
-      pointer-events: none;
-      z-index: 3;
+    .medal-frame {
+      position: relative;
+      width: 100%;
+      max-width: 240px;
+      justify-self: end;
+      filter: drop-shadow(0 6px 0 rgba(26,44,91,0.16)) drop-shadow(0 18px 22px rgba(26,44,91,0.18));
+      will-change: transform;
     }
-    .frame-rule::before {
-      content: '';
-      position: absolute;
-      inset: 5px;
-      border: 1px solid rgba(26,44,91,0.4);
+    .medal-frame svg {
+      display: block;
+      width: 100%;
+      height: auto;
     }
 
-    .chevrons {
-      position: absolute;
-      top: 38%;
-      width: 16%;
-      height: 26%;
+    .copy {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: 6%;
-      z-index: 2;
-    }
-    .chevrons.left  { left: 7.5%; }
-    .chevrons.right { right: 7.5%; transform: scaleX(-1); }
-    .chevrons .stripe {
-      width: 100%;
-      height: 18%;
-      background: #b62a1f;
-      clip-path: polygon(0 0, 70% 0, 100% 50%, 70% 100%, 0 100%, 30% 50%);
-      transform-origin: left center;
+      align-items: flex-start;
+      gap: clamp(6px, 0.8vw, 14px);
     }
 
-    .banner {
-      position: absolute;
-      left: -8%;
-      right: -8%;
-      top: 12.5%;
-      height: 14%;
-      background: #b62a1f;
-      transform: rotate(-4.2deg);
-      transform-origin: 50% 50%;
-      box-shadow: 0 4px 0 rgba(26,44,91,0.18), 0 9px 16px rgba(26,44,91,0.18);
-      z-index: 5;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .banner::before, .banner::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 9%;
-      background: rgba(0,0,0,0.18);
-    }
-    .banner::before { left: 0;  clip-path: polygon(0 0, 100% 0, 60% 50%, 100% 100%, 0 100%); }
-    .banner::after  { right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 40% 50%); }
-
-    .banner .banner-text {
-      font-family: 'Anton', Impact, sans-serif;
-      font-size: clamp(22px, 4.4vw, 64px);
-      letter-spacing: 0.16em;
-      color: #ece1c4;
+    .eyebrow {
+      font-family: 'Special Elite', 'Courier Prime', monospace;
+      font-size: clamp(11px, 1.05vw, 16px);
+      letter-spacing: 0.32em;
       text-transform: uppercase;
-      white-space: nowrap;
-      text-shadow: 0 2px 0 rgba(26,44,91,0.32);
+      color: #b62a1f;
       display: inline-flex;
       align-items: center;
-      gap: 0.6em;
+      gap: 0.85em;
     }
-    .banner .banner-star {
+    .eyebrow .rule {
       display: inline-block;
-      width: 0.7em;
-      height: 0.7em;
-      background: #c89432;
-      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      width: clamp(28px, 4vw, 64px);
+      height: 1px;
+      background: #b62a1f;
     }
 
     .wordmark {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 38%;
-      text-align: center;
-      font-family: 'Alfa Slab One', Georgia, serif;
-      font-size: clamp(80px, 16vw, 220px);
-      line-height: 0.85;
-      letter-spacing: -0.01em;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 900;
+      font-size: clamp(72px, 14vw, 188px);
+      line-height: 0.86;
+      letter-spacing: -0.012em;
       color: #1a2c5b;
-      z-index: 6;
-      pointer-events: none;
-      text-shadow:
-        2px 2px 0 rgba(26,44,91,0.18),
-        4px 4px 0 rgba(182,42,31,0.32);
+      margin: 0;
+      will-change: transform;
     }
     .wordmark .l {
       display: inline-block;
       will-change: transform, opacity;
     }
 
-    .star-row {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 70%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: clamp(8px, 1.4vw, 22px);
-      z-index: 6;
-    }
-    .star-row .star {
-      width: clamp(14px, 1.6vw, 22px);
-      aspect-ratio: 1;
-      background: #c89432;
-      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-      filter: drop-shadow(0 2px 0 rgba(26,44,91,0.28));
-    }
-    .star-row .star.big {
-      width: clamp(28px, 3.2vw, 44px);
-    }
-    .star-row .rule {
-      flex: 0 0 18%;
-      max-width: 130px;
-      height: 2px;
-      background: #1a2c5b;
+    .tagline {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(15px, 1.7vw, 26px);
+      letter-spacing: 0.01em;
+      color: #1a2c5b;
+      max-width: 28ch;
     }
 
-    .tagline {
+    .credit {
       position: absolute;
-      left: 0;
-      right: 0;
-      top: 78%;
-      text-align: center;
+      bottom: 6.4%;
+      right: 8.5%;
       font-family: 'Special Elite', 'Courier Prime', monospace;
-      font-size: clamp(13px, 1.45vw, 20px);
+      font-size: clamp(10px, 0.95vw, 13px);
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: #1a2c5b;
+      color: rgba(26,44,91,0.72);
+      text-align: right;
       z-index: 6;
     }
 
-    .footer {
+    .stamp {
       position: absolute;
-      left: 8.5%;
+      top: 8%;
       right: 8.5%;
-      bottom: 8.4%;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
+      transform: rotate(-6deg);
       font-family: 'Special Elite', 'Courier Prime', monospace;
-      font-size: clamp(10px, 1vw, 14px);
-      letter-spacing: 0.1em;
-      color: rgba(26,44,91,.78);
-      z-index: 7;
+      font-size: clamp(9px, 0.92vw, 12px);
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+      color: #b62a1f;
+      padding: 6px 12px 7px;
+      border: 1.5px solid #b62a1f;
+      background: rgba(236,225,196,0.4);
+      z-index: 6;
+      white-space: nowrap;
     }
-    .footer .disciplines { letter-spacing: 0.16em; text-transform: uppercase; }
-
-    .corner-mark {
+    .stamp::before {
+      content: '';
       position: absolute;
-      width: 14px;
-      height: 14px;
-      border: 2px solid #b62a1f;
-      z-index: 4;
+      inset: 2px;
+      border: 1px solid rgba(182,42,31,0.5);
+      pointer-events: none;
     }
-    .corner-mark.tl { left: 5%;   top: 6%;     border-right: none; border-bottom: none; transform: translate(-50%,-50%); }
-    .corner-mark.tr { right: 5%;  top: 6%;     border-left:  none; border-bottom: none; transform: translate( 50%,-50%); }
-    .corner-mark.bl { left: 5%;   bottom: 6%;  border-right: none; border-top:    none; transform: translate(-50%, 50%); }
-    .corner-mark.br { right: 5%;  bottom: 6%;  border-left:  none; border-top:    none; transform: translate( 50%, 50%); }
 
     .halftone {
       position: absolute;
       inset: 0;
       z-index: 13;
       pointer-events: none;
-      opacity: 0.22;
+      opacity: 0.18;
       mix-blend-mode: multiply;
-      background-image:
-        radial-gradient(circle at 1px 1px, rgba(26,44,91,0.45) 0.6px, transparent 1.4px);
+      background-image: radial-gradient(circle at 1px 1px, rgba(26,44,91,0.42) 0.55px, transparent 1.4px);
       background-size: 4px 4px;
     }
 
@@ -225,7 +147,7 @@
       inset: 0;
       z-index: 12;
       pointer-events: none;
-      opacity: 0.16;
+      opacity: 0.18;
       mix-blend-mode: multiply;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 160px 160px;
@@ -236,60 +158,109 @@
       inset: 0;
       z-index: 11;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 58%, rgba(60,38,12,0.32) 100%);
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(60,38,12,0.34) 100%);
+    }
+
+    .paper-edge {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 14;
+      box-shadow: inset 0 0 0 6px rgba(26,44,91,0.05), inset 0 0 80px rgba(60,38,12,0.18);
     }
 
     @media (max-aspect-ratio: 1/1) {
-      .wordmark { font-size: clamp(64px, 18vw, 180px); }
-      .banner .banner-text { font-size: clamp(18px, 5vw, 48px); letter-spacing: 0.12em; }
-      .footer { font-size: 10px; letter-spacing: 0.06em; }
+      .stage {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        align-content: center;
+        justify-items: center;
+        text-align: center;
+      }
+      .medal-frame { max-width: 180px; justify-self: center; }
+      .copy { align-items: center; text-align: center; }
+      .wordmark { font-size: clamp(56px, 18vw, 160px); }
+      .tagline { font-size: clamp(13px, 3.6vw, 22px); }
+    }
+    @media (max-aspect-ratio: 2/1) and (min-aspect-ratio: 1/1) {
+      .medal-frame { max-width: 200px; }
     }
   </style>
 </head>
 <body>
   <div data-composition-id="shire-preview" data-width="1280" data-height="640" data-duration="11" data-start="0" data-track-index="0">
-    <div class="frame-rule"></div>
-    <div class="corner-mark tl"></div>
-    <div class="corner-mark tr"></div>
-    <div class="corner-mark bl"></div>
-    <div class="corner-mark br"></div>
+    <div class="stage">
+      <div class="medal-frame">
+        <svg viewBox="0 0 160 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"  stop-color="#e3b65a" />
+              <stop offset="48%" stop-color="#c89432" />
+              <stop offset="100%" stop-color="#8a6520" />
+            </linearGradient>
+            <linearGradient id="brassRim" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"  stop-color="#a47820" />
+              <stop offset="100%" stop-color="#5e4310" />
+            </linearGradient>
+            <linearGradient id="ribbonRed" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"  stop-color="#c8362b" />
+              <stop offset="100%" stop-color="#8a1a12" />
+            </linearGradient>
+            <linearGradient id="ribbonNavy" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"  stop-color="#26417a" />
+              <stop offset="100%" stop-color="#11203f" />
+            </linearGradient>
+          </defs>
 
-    <div class="chevrons left">
-      <span class="stripe"></span>
-      <span class="stripe"></span>
-      <span class="stripe"></span>
+          <!-- Pin bar -->
+          <rect class="m-pin" x="40" y="6" width="80" height="6" rx="1.5" fill="url(#brassRim)" />
+
+          <!-- Striped ribbon bar -->
+          <g class="m-bar">
+            <rect x="36" y="14" width="88" height="44" fill="#1a2c5b" />
+            <rect x="36" y="14" width="29.33" height="44" fill="url(#ribbonNavy)" />
+            <rect x="65.33" y="14" width="29.33" height="44" fill="#ece1c4" />
+            <rect x="94.67" y="14" width="29.33" height="44" fill="url(#ribbonRed)" />
+            <rect x="36" y="14" width="88" height="44" fill="none" stroke="#1a2c5b" stroke-width="1.4" />
+            <line x1="36" y1="22" x2="124" y2="22" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+          </g>
+
+          <!-- Hanging cord (folded ribbon) -->
+          <g class="m-cord">
+            <path d="M 60 58 L 56 130 L 80 156 L 104 130 L 100 58 Z" fill="url(#ribbonRed)" />
+            <path d="M 60 58 L 56 130 L 80 156 L 104 130 L 100 58 Z" fill="none" stroke="#5b110a" stroke-width="1.2" />
+            <path d="M 80 58 L 80 156" stroke="rgba(255,255,255,0.14)" stroke-width="1" />
+          </g>
+
+          <!-- Star medal -->
+          <g class="m-star" transform="translate(80 200)">
+            <circle r="56" fill="url(#brass)" stroke="url(#brassRim)" stroke-width="2.2" />
+            <circle r="46" fill="none" stroke="rgba(94,67,16,0.5)" stroke-width="1" />
+            <polygon
+              points="0,-36  9,-12  35,-12  14,4  22,32  0,16  -22,32  -14,4  -35,-12  -9,-12"
+              fill="#ece1c4"
+              stroke="rgba(94,67,16,0.55)"
+              stroke-width="1.2"
+              stroke-linejoin="round" />
+            <circle r="6" fill="#1a2c5b" />
+            <circle r="2.4" fill="#c89432" />
+          </g>
+        </svg>
+      </div>
+
+      <div class="copy">
+        <span class="eyebrow"><span class="rule"></span>Currently Building</span>
+        <h1 class="wordmark">
+          <span class="l">S</span><span class="l">H</span><span class="l">I</span><span class="l">R</span><span class="l">E</span>
+        </h1>
+        <p class="tagline">A quiet shelter — for those who served.</p>
+      </div>
     </div>
-    <div class="chevrons right">
-      <span class="stripe"></span>
-      <span class="stripe"></span>
-      <span class="stripe"></span>
-    </div>
 
-    <div class="banner">
-      <span class="banner-text">
-        <span class="banner-star"></span>
-        Currently Building
-        <span class="banner-star"></span>
-      </span>
-    </div>
+    <div class="stamp">Edition 01 · In Progress</div>
 
-    <div class="wordmark">
-      <span class="l">S</span><span class="l">H</span><span class="l">I</span><span class="l">R</span><span class="l">E</span>
-    </div>
-
-    <div class="star-row">
-      <span class="rule"></span>
-      <span class="star"></span>
-      <span class="star big"></span>
-      <span class="star"></span>
-      <span class="rule"></span>
-    </div>
-
-    <div class="tagline">For Those Who Served</div>
-
-    <div class="footer">
-      <span>Edition 01 / Field Notes</span>
-      <span class="disciplines">UI/UX · System · Design Thinking</span>
+    <div class="credit">
+      UI/UX &nbsp;·&nbsp; System &nbsp;·&nbsp; Design Thinking
     </div>
 
     <div class="halftone"></div>
@@ -302,112 +273,92 @@
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      tl.from('.frame-rule', { opacity: 0, duration: 0.6, ease: 'sine.out' }, 0)
-        .from('.corner-mark', {
-          opacity: 0,
-          scale: 0.5,
-          duration: 0.45,
-          ease: 'back.out(2)',
-          stagger: 0.05
-        }, 0.18);
-
-      tl.from('.chevrons.left .stripe', {
-        x: -160,
-        opacity: 0,
-        duration: 0.55,
-        ease: 'expo.out',
-        stagger: 0.07
-      }, 0.35);
-
-      tl.from('.chevrons.right .stripe', {
-        x: -160,
-        opacity: 0,
-        duration: 0.55,
-        ease: 'expo.out',
-        stagger: 0.07
-      }, 0.42);
-
-      tl.from('.banner', {
-        x: '-110%',
-        rotation: -10,
-        duration: 0.7,
-        ease: 'expo.out',
-        transformOrigin: '50% 50%'
-      }, 0.6);
-
-      tl.from('.banner .banner-text', {
+      tl.from('.medal-frame', {
+        y: -28,
         opacity: 0,
         scale: 0.92,
-        duration: 0.5,
+        duration: 0.95,
         ease: 'power3.out'
-      }, 1.0);
+      }, 0.2);
 
-      tl.from('.wordmark .l', {
-        y: -90,
+      tl.from('.m-pin', {
+        scaleY: 0,
         opacity: 0,
-        duration: 0.6,
-        ease: 'expo.out',
-        stagger: 0.06
-      }, 1.15);
-
-      tl.from('.star-row .rule', {
-        scaleX: 0,
+        duration: 0.4,
+        ease: 'power2.out',
+        transformOrigin: '50% 0%'
+      }, 0.4)
+      .from('.m-bar', {
+        scaleY: 0,
         opacity: 0,
-        duration: 0.5,
+        duration: 0.45,
         ease: 'power3.out',
-        transformOrigin: 'center center',
-        stagger: 0.04
-      }, 1.6)
-      .from('.star-row .star', {
+        transformOrigin: '50% 0%'
+      }, 0.5)
+      .from('.m-cord', {
+        scaleY: 0,
+        opacity: 0,
+        duration: 0.55,
+        ease: 'power3.out',
+        transformOrigin: '50% 0%'
+      }, 0.7)
+      .from('.m-star', {
         scale: 0,
         opacity: 0,
-        rotation: -45,
-        duration: 0.5,
-        ease: 'back.out(2.4)',
+        rotation: -28,
+        duration: 0.7,
+        ease: 'back.out(1.8)',
+        transformOrigin: '50% 50%'
+      }, 0.95);
+
+      tl.from('.eyebrow', {
+        x: -14,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power2.out'
+      }, 1.05);
+
+      tl.from('.wordmark .l', {
+        y: 70,
+        opacity: 0,
+        duration: 0.7,
+        ease: 'expo.out',
         stagger: 0.07
-      }, 1.65);
+      }, 1.25);
 
       tl.from('.tagline', {
-        y: 12,
+        y: 16,
         opacity: 0,
-        duration: 0.55,
+        duration: 0.65,
         ease: 'power2.out'
-      }, 1.95);
+      }, 1.85);
 
-      tl.from('.footer > *', {
+      tl.from('.credit', {
         opacity: 0,
         y: 8,
-        duration: 0.55,
-        ease: 'power2.out',
-        stagger: 0.1
-      }, 2.1);
+        duration: 0.6,
+        ease: 'power2.out'
+      }, 2.05);
 
-      tl.to('.banner', {
-        rotation: -3.6,
+      tl.from('.stamp', {
+        opacity: 0,
+        scale: 0.5,
+        rotation: 12,
+        duration: 0.6,
+        ease: 'back.out(2)'
+      }, 2.2);
+
+      tl.to('.stamp', { rotation: -8, duration: 0.18, ease: 'sine.inOut' }, 2.78)
+        .to('.stamp', { rotation: -6, duration: 0.22, ease: 'sine.inOut' }, 2.96);
+
+      tl.to('.medal-frame', {
+        rotation: 1.6,
         duration: 4.2,
         ease: 'sine.inOut',
         yoyo: true,
         repeat: 1,
-        transformOrigin: '50% 50%'
-      }, 2.5);
-
-      tl.to('.star-row .star.big', {
-        scale: 1.12,
-        duration: 1.6,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 3,
-        transformOrigin: '50% 50%'
+        transformOrigin: '50% 6%'
       }, 2.6);
-
-      tl.to('.chevrons .stripe', {
-        x: 6,
-        duration: 2.6,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 1,
-        stagger: { each: 0.1, from: 'random' }
-      }, 2.7);
 
       window.__timelines['shire-preview'] = tl;
 
