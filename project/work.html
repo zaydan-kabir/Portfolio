@@ -211,28 +211,32 @@
       display: block;
       object-fit: cover;
     }
-    .adobe-mark { background: #ff0000; color: #fff; font-size: 12px; }
+    .adobe-mark {
+      background: #111;
+      border: 1px solid rgba(255,255,255,.2);
+    }
     .illustrator-mark { background: #2e1606; color: #ff9a00; border: 1px solid #ff9a00; }
     .photoshop-mark { background: #001e36; color: #31a8ff; border: 1px solid #31a8ff; }
     .codex-mark {
-      background: linear-gradient(135deg, #06070a, #1f2937);
-      color: #f8fafc;
-      border: 1px solid rgba(248,250,252,.5);
+      background: #fff;
+      border: 1px solid rgba(10,10,10,.14);
     }
     .claude-code-mark {
-      background: #2d1c14;
-      color: #f6c7a3;
-      border: 1px solid rgba(246,199,163,.56);
+      background: #d97755;
+      border: 1px solid rgba(255,255,255,.24);
     }
     .claude-design-mark {
-      background: linear-gradient(135deg, #d97745, #7c2d12);
-      color: #fff8f0;
-      border: 1px solid rgba(255,248,240,.5);
+      background: #d97755;
+      border: 1px solid rgba(255,255,255,.24);
     }
     .lovable-mark {
       background: #f3eee7;
       border: 1px solid rgba(10,10,10,.16);
     }
+    .adobe-mark img,
+    .codex-mark img,
+    .claude-code-mark img,
+    .claude-design-mark img,
     .lovable-mark img,
     .framer-mark img,
     .weavy-mark img {
@@ -391,12 +395,12 @@
           <ul class="stack-list">
             <li class="tool-pill"><span class="tool-mark figma-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>Figma</li>
             <li class="tool-pill"><span class="tool-mark flora-mark" aria-hidden="true"><img src="uploads/flora-ai-logo.webp" alt=""></span>Flora</li>
-            <li class="tool-pill"><span class="tool-mark adobe-mark" aria-hidden="true">CC</span>Adobe Creative Studio</li>
+            <li class="tool-pill"><span class="tool-mark adobe-mark" aria-hidden="true"><img src="uploads/adobe-creative-cloud-logo.png" alt=""></span>Adobe Creative Studio</li>
             <li class="tool-pill"><span class="tool-mark illustrator-mark" aria-hidden="true">Ai</span>Adobe Illustrator</li>
             <li class="tool-pill"><span class="tool-mark photoshop-mark" aria-hidden="true">Ps</span>Adobe Photoshop</li>
-            <li class="tool-pill"><span class="tool-mark codex-mark" aria-hidden="true">Cx</span>Codex</li>
-            <li class="tool-pill"><span class="tool-mark claude-code-mark" aria-hidden="true">Cc</span>Claude Code</li>
-            <li class="tool-pill"><span class="tool-mark claude-design-mark" aria-hidden="true">Cd</span>Claude Design</li>
+            <li class="tool-pill"><span class="tool-mark codex-mark" aria-hidden="true"><img src="uploads/codex-logo.png" alt=""></span>Codex</li>
+            <li class="tool-pill"><span class="tool-mark claude-code-mark" aria-hidden="true"><img src="uploads/claude-code-logo.png" alt=""></span>Claude Code</li>
+            <li class="tool-pill"><span class="tool-mark claude-design-mark" aria-hidden="true"><img src="uploads/claude-design-logo.png" alt=""></span>Claude Design</li>
             <li class="tool-pill"><span class="tool-mark lovable-mark" aria-hidden="true"><img src="uploads/lovable-logo.jpeg" alt=""></span>Lovable</li>
             <li class="tool-pill"><span class="tool-mark framer-mark" aria-hidden="true"><img src="uploads/framer-logo.webp" alt=""></span>Framer</li>
             <li class="tool-pill"><span class="tool-mark weavy-mark" aria-hidden="true"><img src="uploads/weavy-logo.avif" alt=""></span>Weavy</li>
@@ -404,12 +408,12 @@
           <ul class="stack-list" aria-hidden="true">
             <li class="tool-pill"><span class="tool-mark figma-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>Figma</li>
             <li class="tool-pill"><span class="tool-mark flora-mark" aria-hidden="true"><img src="uploads/flora-ai-logo.webp" alt=""></span>Flora</li>
-            <li class="tool-pill"><span class="tool-mark adobe-mark" aria-hidden="true">CC</span>Adobe Creative Studio</li>
+            <li class="tool-pill"><span class="tool-mark adobe-mark" aria-hidden="true"><img src="uploads/adobe-creative-cloud-logo.png" alt=""></span>Adobe Creative Studio</li>
             <li class="tool-pill"><span class="tool-mark illustrator-mark" aria-hidden="true">Ai</span>Adobe Illustrator</li>
             <li class="tool-pill"><span class="tool-mark photoshop-mark" aria-hidden="true">Ps</span>Adobe Photoshop</li>
-            <li class="tool-pill"><span class="tool-mark codex-mark" aria-hidden="true">Cx</span>Codex</li>
-            <li class="tool-pill"><span class="tool-mark claude-code-mark" aria-hidden="true">Cc</span>Claude Code</li>
-            <li class="tool-pill"><span class="tool-mark claude-design-mark" aria-hidden="true">Cd</span>Claude Design</li>
+            <li class="tool-pill"><span class="tool-mark codex-mark" aria-hidden="true"><img src="uploads/codex-logo.png" alt=""></span>Codex</li>
+            <li class="tool-pill"><span class="tool-mark claude-code-mark" aria-hidden="true"><img src="uploads/claude-code-logo.png" alt=""></span>Claude Code</li>
+            <li class="tool-pill"><span class="tool-mark claude-design-mark" aria-hidden="true"><img src="uploads/claude-design-logo.png" alt=""></span>Claude Design</li>
             <li class="tool-pill"><span class="tool-mark lovable-mark" aria-hidden="true"><img src="uploads/lovable-logo.jpeg" alt=""></span>Lovable</li>
             <li class="tool-pill"><span class="tool-mark framer-mark" aria-hidden="true"><img src="uploads/framer-logo.webp" alt=""></span>Framer</li>
             <li class="tool-pill"><span class="tool-mark weavy-mark" aria-hidden="true"><img src="uploads/weavy-logo.avif" alt=""></span>Weavy</li>
