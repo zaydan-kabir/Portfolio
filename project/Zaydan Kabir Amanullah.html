@@ -942,16 +942,13 @@ const zaydanAnimationReady = (() => {
   }
   window.addEventListener('resize', resizeHorizontalRange);
 
-  // Normalize wheel deltas across browsers/devices so big mouse-wheel
-  // notches don't cause large jumps while trackpad pixels stay responsive.
+  // Normalize wheel deltas across input devices. Mouse wheels report in
+  // "lines" or "pages"; trackpads report in pixels. Convert everything to
+  // pixels so the same per-event motion feels consistent across devices.
   function normalizeWheelDelta(e) {
-    let d = e.deltaY + e.deltaX;
-    if (e.deltaMode === 1) d *= 16;        // lines → px
-    else if (e.deltaMode === 2) d *= window.innerHeight; // pages → px
-    // Soft-clamp huge ticks (some mice fire 100+ per notch) to keep motion graceful
-    const MAX_STEP = 80;
-    if (d > MAX_STEP) d = MAX_STEP;
-    else if (d < -MAX_STEP) d = -MAX_STEP;
+    let d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    if (e.deltaMode === 1) d *= 16;
+    else if (e.deltaMode === 2) d *= window.innerHeight;
     return d;
   }
 
@@ -962,17 +959,18 @@ const zaydanAnimationReady = (() => {
     if (currentX >= maxX * 0.95) {
       const inner = document.getElementById('panel-2-inner');
       if (inner && inner.scrollHeight > inner.clientHeight) {
-        const rawDelta = e.deltaY + e.deltaX;
-        const atBottom = rawDelta > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
-        const atTop    = rawDelta < 0 && inner.scrollTop <= 0;
-        if (!atBottom && !atTop) { inner.scrollBy(0, rawDelta); return; }
+        const atBottom = delta > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
+        const atTop    = delta < 0 && inner.scrollTop <= 0;
+        if (!atBottom && !atTop) { inner.scrollBy(0, delta); return; }
       }
     }
     moveHorizontal(delta);
   }
 
-  scrollCapture.addEventListener('wheel', handleWheel, { passive: false });
-  document.addEventListener('wheel', handleWheel, { passive: false });
+  // Single listener on window (capture phase) — previously the same handler
+  // was bound to both #scroll-capture and document, causing every wheel event
+  // to fire twice and double-feed the smoothing target.
+  window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
 
   // Touch: direct finger tracking + velocity snap on release
   let isDragging = false;
@@ -1017,20 +1015,30 @@ const zaydanAnimationReady = (() => {
     }
   }, { passive: true });
 
-  // Frame-rate independent smoothing: a fixed time-constant gives the same
-  // visual feel on 60Hz, 120Hz and high-refresh displays. Higher τ → smoother
-  // & more graceful; lower τ → snappier. ~140ms reads as fluid but immediate.
-  const SMOOTH_TAU_MS = 140;
+  // Frame-rate independent critically-damped smoothing.
+  // τ controls how long it takes to "catch up" to target (~3·τ to settle).
+  // 90ms feels immediate but still glides — lower felt twitchy, higher felt floaty.
+  const SMOOTH_TAU_MS = 90;
   let lastFrameTs = 0;
+  let lastWritingActive = false;
   function renderHorizontalTrack(ts) {
     if (!lastFrameTs) lastFrameTs = ts;
-    const dt = Math.min(64, ts - lastFrameTs); // cap dt so a tab-switch doesn't snap
+    const dt = Math.min(64, ts - lastFrameTs);
     lastFrameTs = ts;
-    const k = isDragging ? 1 : 1 - Math.exp(-dt / SMOOTH_TAU_MS);
-    currentX += (targetX - currentX) * k;
-    if (Math.abs(targetX - currentX) < 0.05) currentX = targetX;
-    track.style.transform = `translate3d(${(-currentX).toFixed(2)}px,0,0)`;
-    panel2.classList.toggle('writing-active', currentX > maxX * 0.45);
+
+    if (currentX !== targetX) {
+      const k = isDragging ? 1 : 1 - Math.exp(-dt / SMOOTH_TAU_MS);
+      currentX += (targetX - currentX) * k;
+      if (Math.abs(targetX - currentX) < 0.05) currentX = targetX;
+      // Round to whole pixels — sub-pixel updates force extra compositor
+      // work without changing what the user sees.
+      track.style.transform = `translate3d(${(-currentX) | 0}px,0,0)`;
+      const writing = currentX > maxX * 0.45;
+      if (writing !== lastWritingActive) {
+        panel2.classList.toggle('writing-active', writing);
+        lastWritingActive = writing;
+      }
+    }
     requestAnimationFrame(renderHorizontalTrack);
   }
   requestAnimationFrame(renderHorizontalTrack);
