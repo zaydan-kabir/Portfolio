@@ -1,12 +1,12 @@
 ## Style Prompt
-A hidden type specimen sheet — large serif letterforms drift into place on a quiet dark page, and heavy ink-black redaction bars sweep across to censor the title. The mood is a print proof under embargo: archival, deliberate, slightly playful. Motion should feel like printer's blocks settling, not like a digital UI animation.
+A hidden type specimen sheet — large serif letterforms drift into place on a bright paper page, and heavy ink-black redaction bars sweep across to censor the title. The mood is a print proof under embargo: archival, deliberate, slightly playful. Motion should feel like printer's blocks settling, not like a digital UI animation.
 
 ## Colors
-- Paper void: #0a0a0a
-- Manuscript ink: #f0f0f0
-- Muted ink: rgba(240,240,240,0.42)
+- Paper: #f0f0f0
+- Manuscript ink: #0a0a0a
+- Muted ink: rgba(10,10,10,0.55)
 - Redaction bar: #050505
-- Margin rule: rgba(240,240,240,0.18)
+- Margin rule: rgba(10,10,10,0.2)
 
 ## Typography
 - Lora, Georgia, serif for specimen letterforms (large, generous tracking).

@@ -12,14 +12,14 @@
       src: url('../uploads/VT323-Regular.ttf') format('truetype');
       font-display: swap;
     }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #0a0a0a; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #f0f0f0; }
     [data-composition-id="redacted-typeface-preview"] {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: #0a0a0a;
-      color: #f0f0f0;
+      background: #f0f0f0;
+      color: #0a0a0a;
       font-family: 'Lora', Georgia, serif;
       isolation: isolate;
     }
@@ -32,7 +32,7 @@
 
     .margin-rule {
       position: absolute;
-      background: rgba(240,240,240,.16);
+      background: rgba(10,10,10,.2);
       pointer-events: none;
     }
     .margin-rule.top    { left: 7.5%; right: 7.5%; top: 6.5%;    height: 1px; }
@@ -44,7 +44,7 @@
       position: absolute;
       width: 14px;
       height: 14px;
-      border: 1px solid rgba(240,240,240,.3);
+      border: 1px solid rgba(10,10,10,.34);
     }
     .corner-mark.tl { left: 7.5%;  top: 6.5%;    transform: translate(-50%, -50%); border-right: none; border-bottom: none; }
     .corner-mark.tr { right: 7.5%; top: 6.5%;    transform: translate( 50%, -50%); border-left: none;  border-bottom: none; }
@@ -63,7 +63,7 @@
       font-size: clamp(10px, 1vw, 14px);
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: rgba(240,240,240,.42);
+      color: rgba(10,10,10,.55);
       z-index: 4;
     }
     .header-row .embargo {
@@ -76,7 +76,7 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #f0f0f0;
+      background: #0a0a0a;
     }
 
     .specimen {
@@ -100,11 +100,11 @@
       font-weight: 500;
       letter-spacing: -0.02em;
       line-height: 1;
-      color: #f0f0f0;
+      color: #0a0a0a;
     }
     .glyph-row .g { display: inline-block; }
     .glyph-row.row-1 { font-size: clamp(54px, 13vw, 188px); font-style: normal; }
-    .glyph-row.row-2 { font-size: clamp(44px, 10vw, 142px); font-style: italic; color: rgba(240,240,240,.78); }
+    .glyph-row.row-2 { font-size: clamp(44px, 10vw, 142px); font-style: italic; color: rgba(10,10,10,.78); }
     .glyph-row.row-3 { font-size: clamp(38px, 8.4vw, 116px); font-weight: 600; }
 
     .row-label {
@@ -114,14 +114,14 @@
       font-family: 'VT323', monospace;
       font-size: clamp(9px, 0.78vw, 12px);
       letter-spacing: 0.2em;
-      color: rgba(240,240,240,.32);
+      color: rgba(10,10,10,.42);
       text-transform: uppercase;
     }
 
     .redaction {
       position: absolute;
       background: #050505;
-      box-shadow: 0 0 0 1px rgba(0,0,0,.9), 0 6px 14px rgba(0,0,0,.4);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.9), 0 8px 18px rgba(0,0,0,.22);
       transform-origin: left center;
       z-index: 6;
     }
@@ -135,14 +135,14 @@
       top: 73%;
       transform: translate(-50%, -50%) rotate(-3deg);
       padding: 12px 26px 14px;
-      border: 2px solid rgba(240,240,240,.92);
-      color: #f0f0f0;
+      border: 2px solid rgba(10,10,10,.92);
+      color: #0a0a0a;
       font-family: 'VT323', monospace;
       font-size: clamp(14px, 1.6vw, 22px);
       letter-spacing: 0.32em;
       text-transform: uppercase;
-      background: rgba(10,10,10,.7);
-      box-shadow: 0 0 0 1px rgba(0,0,0,.9);
+      background: rgba(240,240,240,.78);
+      box-shadow: 0 4px 12px rgba(0,0,0,.18);
       z-index: 8;
       white-space: nowrap;
     }
@@ -150,7 +150,7 @@
       content: '';
       position: absolute;
       inset: 4px;
-      border: 1px solid rgba(240,240,240,.42);
+      border: 1px solid rgba(10,10,10,.42);
       pointer-events: none;
     }
 
@@ -166,7 +166,7 @@
       font-size: clamp(10px, 1vw, 14px);
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: rgba(240,240,240,.42);
+      color: rgba(10,10,10,.55);
       z-index: 4;
     }
     .footer-row .title-fragment {
@@ -175,7 +175,7 @@
       letter-spacing: 0.04em;
       text-transform: none;
       font-size: clamp(11px, 1.1vw, 16px);
-      color: rgba(240,240,240,.62);
+      color: rgba(10,10,10,.7);
     }
 
     .grain {
@@ -183,8 +183,8 @@
       inset: 0;
       z-index: 12;
       pointer-events: none;
-      opacity: 0.06;
-      mix-blend-mode: overlay;
+      opacity: 0.08;
+      mix-blend-mode: multiply;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 160px 160px;
     }
@@ -194,7 +194,7 @@
       inset: 0;
       z-index: 11;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.5) 100%);
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(10,10,10,.18) 100%);
     }
 
     @media (max-aspect-ratio: 1/1) {
