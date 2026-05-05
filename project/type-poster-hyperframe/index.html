@@ -4,211 +4,127 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Type Poster HyperFrame Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    @font-face {
-      font-family: 'VT323';
-      src: url('../uploads/VT323-Regular.ttf') format('truetype');
-      font-display: swap;
-    }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #ece6d8; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #1d3eb5; }
+
     [data-composition-id="type-poster-preview"] {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: #ece6d8;
-      color: #0a0a0a;
-      font-family: 'Lora', Georgia, serif;
+      background: #1d3eb5;
+      color: #050505;
+      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
       isolation: isolate;
     }
 
-    .crop-mark {
+    .burst {
       position: absolute;
-      width: 18px;
-      height: 18px;
-      pointer-events: none;
-      z-index: 4;
-    }
-    .crop-mark::before, .crop-mark::after {
-      content: '';
-      position: absolute;
-      background: #0a0a0a;
-    }
-    .crop-mark::before { left: 0; right: 0; top: 50%; height: 1px; transform: translateY(-50%); }
-    .crop-mark::after  { top: 0; bottom: 0; left: 50%; width: 1px;  transform: translateX(-50%); }
-    .crop-mark.tl { left: 4.6%;  top: 5%;    }
-    .crop-mark.tr { right: 4.6%; top: 5%;    }
-    .crop-mark.bl { left: 4.6%;  bottom: 5%; }
-    .crop-mark.br { right: 4.6%; bottom: 5%; }
-
-    .grid-overlay-lines {
-      position: absolute;
-      inset: 8% 7.5%;
-      z-index: 1;
-      pointer-events: none;
-    }
-    .gridline {
-      position: absolute;
-      background: rgba(10,10,10,.18);
-      transform-origin: left top;
-    }
-    .gridline.v { width: 1px; top: 0; bottom: 0; }
-    .gridline.h { height: 1px; left: 0; right: 0; }
-    .gridline.v.v1 { left: 25%; }
-    .gridline.v.v2 { left: 50%; }
-    .gridline.v.v3 { left: 75%; }
-    .gridline.h.h1 { top: 28%; }
-    .gridline.h.h2 { top: 64%; }
-
-    .header-bar {
-      position: absolute;
-      left: 8.5%;
-      right: 8.5%;
-      top: 8%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: 'VT323', monospace;
-      font-size: clamp(10px, 1vw, 14px);
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: rgba(10,10,10,.72);
-      z-index: 5;
-    }
-
-    .header-bar .registration {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .reg-mark {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      border: 1px solid #0a0a0a;
-      position: relative;
-    }
-    .reg-mark::before, .reg-mark::after {
-      content: '';
-      position: absolute;
-      background: #0a0a0a;
-    }
-    .reg-mark::before { left: -3px; right: -3px; top: 50%; height: 1px; transform: translateY(-50%); }
-    .reg-mark::after  { top: -3px; bottom: -3px; left: 50%; width: 1px; transform: translateX(-50%); }
-
-    .ink-block {
-      position: absolute;
-      left: 8.5%;
-      top: 16%;
-      width: 0;
-      height: 11%;
-      background: #a8201a;
-      box-shadow: 2px 3px 0 rgba(10,10,10,.16);
-      transform: rotate(-0.5deg);
-      transform-origin: left center;
+      left: 50%;
+      top: 50%;
+      width: 78%;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) rotate(0deg);
+      transform-origin: 50% 50%;
+      background: #ff3914;
+      clip-path: polygon(
+        50% 0%,
+        55.36% 37.07%,
+        85.36% 14.64%,
+        62.93% 44.64%,
+        100% 50%,
+        62.93% 55.36%,
+        85.36% 85.36%,
+        55.36% 62.93%,
+        50% 100%,
+        44.64% 62.93%,
+        14.64% 85.36%,
+        37.07% 55.36%,
+        0% 50%,
+        37.07% 44.64%,
+        14.64% 14.64%,
+        44.64% 37.07%
+      );
       z-index: 2;
+      will-change: transform;
     }
 
-    .ink-label {
+    .display {
       position: absolute;
-      left: 8.5%;
-      top: 28.4%;
-      font-family: 'VT323', monospace;
-      font-size: clamp(9px, 0.85vw, 12px);
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: rgba(10,10,10,.62);
-      z-index: 3;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      z-index: 4;
+      pointer-events: none;
     }
-
-    .display-word {
-      position: absolute;
-      left: 8.5%;
-      right: 8.5%;
-      top: 32%;
-      font-family: 'Lora', Georgia, serif;
-      font-weight: 700;
-      font-size: clamp(72px, 16vw, 240px);
-      line-height: 0.84;
+    .display .line {
+      position: relative;
+      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
+      font-weight: 900;
+      font-size: clamp(70px, 17vw, 220px);
+      line-height: 0.86;
       letter-spacing: -0.045em;
-      color: #0a0a0a;
-      z-index: 4;
+      color: #050505;
+      text-align: center;
+      white-space: nowrap;
+      text-shadow: 0 1px 0 rgba(5,5,5,.12);
     }
-    .display-word .word {
-      display: block;
-      overflow: hidden;
-      padding-right: 0.05em;
-    }
-    .display-word .word .letter {
+    .display .line .l {
       display: inline-block;
+      will-change: transform, opacity;
     }
-    .display-word .word.w-2 {
-      font-style: italic;
-      font-weight: 400;
-      color: rgba(10,10,10,.78);
-    }
+    .display .line.line-2 { color: #050505; }
+    .display .line.line-3 { color: #050505; }
 
-    .specimen-strip {
+    .credit {
       position: absolute;
-      left: 8.5%;
-      right: 8.5%;
-      bottom: 16%;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      font-family: 'Lora', Georgia, serif;
-      font-size: clamp(28px, 5vw, 64px);
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: clamp(8px, 0.78vw, 11px);
       letter-spacing: 0.04em;
-      color: #0a0a0a;
-      z-index: 4;
+      line-height: 1.4;
+      color: rgba(255,255,255,.92);
+      z-index: 6;
+      max-width: 26%;
     }
-    .specimen-strip .gly {
-      display: inline-block;
+    .credit.tl { left: 5%;  top: 6.5%; }
+    .credit.tr { right: 5%; top: 6.5%; text-align: right; }
+    .credit.center-l {
+      left: 5%;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: 22%;
     }
-    .specimen-strip .gly.italic { font-style: italic; }
-    .specimen-strip .gly.bold { font-weight: 700; }
-    .specimen-strip .gly.muted { color: rgba(10,10,10,.42); }
-
-    .footer-bar {
-      position: absolute;
-      left: 8.5%;
-      right: 8.5%;
-      bottom: 8%;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      font-family: 'VT323', monospace;
-      font-size: clamp(10px, 1vw, 14px);
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: rgba(10,10,10,.62);
-      z-index: 5;
+    .credit.center-r {
+      right: 5%;
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: right;
+      max-width: 22%;
     }
-    .footer-bar .label-italic {
-      font-family: 'Lora', Georgia, serif;
-      font-style: italic;
-      letter-spacing: 0.04em;
-      text-transform: none;
-      font-size: clamp(11px, 1.05vw, 16px);
-      color: rgba(10,10,10,.78);
-    }
+    .credit.bl { left: 5%;  bottom: 6.5%; }
+    .credit.br { right: 5%; bottom: 6.5%; text-align: right; }
+    .credit .em { color: #ffffff; font-weight: 500; }
 
     .stamp {
       position: absolute;
-      right: 8.5%;
-      top: 17.5%;
-      transform: rotate(7deg);
-      padding: 9px 18px 11px;
-      border: 2px solid #a8201a;
-      color: #a8201a;
-      font-family: 'VT323', monospace;
-      font-size: clamp(13px, 1.3vw, 18px);
-      letter-spacing: 0.3em;
+      right: 6%;
+      bottom: 18%;
+      transform: rotate(-7deg);
+      padding: 7px 14px 9px;
+      border: 2px solid #ffffff;
+      color: #ffffff;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-weight: 500;
+      font-size: clamp(10px, 1.05vw, 14px);
+      letter-spacing: 0.32em;
       text-transform: uppercase;
-      background: rgba(236,230,216,.6);
-      box-shadow: 1px 2px 0 rgba(10,10,10,.16);
+      background: rgba(29,62,181,.4);
+      box-shadow: 1px 2px 0 rgba(5,5,5,.24);
       z-index: 8;
       white-space: nowrap;
     }
@@ -216,7 +132,7 @@
       content: '';
       position: absolute;
       inset: 3px;
-      border: 1px solid rgba(168,32,26,.45);
+      border: 1px solid rgba(255,255,255,.45);
       pointer-events: none;
     }
 
@@ -225,7 +141,7 @@
       inset: 0;
       z-index: 12;
       pointer-events: none;
-      opacity: 0.085;
+      opacity: 0.07;
       mix-blend-mode: multiply;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 160px 160px;
@@ -236,60 +152,63 @@
       inset: 0;
       z-index: 11;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 60%, rgba(10,10,10,.16) 100%);
+      background: radial-gradient(ellipse at center, transparent 62%, rgba(5,5,5,.22) 100%);
     }
 
     @media (max-aspect-ratio: 1/1) {
-      .header-bar, .footer-bar { font-size: 10px; letter-spacing: 0.16em; }
-      .display-word { font-size: clamp(56px, 14vw, 180px); }
-      .specimen-strip { font-size: clamp(22px, 4.4vw, 52px); }
+      .display .line { font-size: clamp(60px, 19vw, 200px); }
+      .credit { font-size: 9px; max-width: 32%; }
+      .credit.center-l, .credit.center-r { display: none; }
+      .stamp { font-size: 10px; padding: 6px 12px; letter-spacing: 0.26em; }
     }
   </style>
 </head>
 <body>
   <div data-composition-id="type-poster-preview" data-width="1280" data-height="982" data-duration="11" data-start="0" data-track-index="0">
-    <div class="crop-mark tl"></div>
-    <div class="crop-mark tr"></div>
-    <div class="crop-mark bl"></div>
-    <div class="crop-mark br"></div>
+    <div class="burst"></div>
 
-    <div class="grid-overlay-lines">
-      <span class="gridline v v1"></span>
-      <span class="gridline v v2"></span>
-      <span class="gridline v v3"></span>
-      <span class="gridline h h1"></span>
-      <span class="gridline h h2"></span>
+    <div class="display">
+      <div class="line line-1">
+        <span class="l">T</span><span class="l">Y</span><span class="l">P</span><span class="l">E</span>
+      </div>
+      <div class="line line-2">
+        <span class="l">D</span><span class="l">E</span><span class="l">S</span><span class="l">I</span><span class="l">G</span><span class="l">N</span>
+      </div>
+      <div class="line line-3">
+        <span class="l">P</span><span class="l">O</span><span class="l">S</span><span class="l">T</span><span class="l">E</span><span class="l">R</span>
+      </div>
     </div>
 
-    <div class="header-bar">
-      <span>Plate 02 / Sheet 04</span>
-      <span class="registration"><span class="reg-mark"></span>Registration</span>
+    <div class="credit tl">
+      Specimen 04 / Plate 02<br>
+      <span class="em">A type-design poster</span>
     </div>
 
-    <div class="ink-block"></div>
-    <div class="ink-label">Ink — Hot Vermillion / 100%</div>
-
-    <div class="display-word">
-      <span class="word w-1">
-        <span class="letter">T</span><span class="letter">y</span><span class="letter">p</span><span class="letter">e</span>
-      </span>
-      <span class="word w-2">
-        <span class="letter">p</span><span class="letter">o</span><span class="letter">s</span><span class="letter">t</span><span class="letter">e</span><span class="letter">r</span>
-      </span>
+    <div class="credit tr">
+      Free-to-View Preview<br>
+      <span class="em">©2026 ZKA Studio</span>
     </div>
 
-    <div class="specimen-strip">
-      <span class="gly">A</span>
-      <span class="gly italic">a</span>
-      <span class="gly bold">G</span>
-      <span class="gly muted">g</span>
-      <span class="gly">&amp;</span>
-      <span class="gly italic muted">Æ</span>
+    <div class="credit center-l">
+      Cobalt &amp; vermilion edition.<br>
+      Set in Archivo Black, locked<br>
+      to a single ink-burst behind.
     </div>
 
-    <div class="footer-bar">
-      <span class="label-italic">Coming soon — Type Design Poster</span>
-      <span>Type / Print / Graphic</span>
+    <div class="credit center-r">
+      Type / Print / Graphic.<br>
+      Released this fall.<br>
+      <span class="em">— more soon.</span>
+    </div>
+
+    <div class="credit bl">
+      Coming Soon — Type Design Poster<br>
+      <span class="em">type design · print · graphic</span>
+    </div>
+
+    <div class="credit br">
+      Sheet 982×1280<br>
+      <span class="em">Edition / Open</span>
     </div>
 
     <div class="stamp">Coming Soon</div>
@@ -302,56 +221,68 @@
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      tl.from('.crop-mark', { opacity: 0, scale: 0.5, duration: 0.4, ease: 'back.out(2)', stagger: 0.06 }, 0)
-        .from('.gridline.v', { scaleY: 0, duration: 0.6, ease: 'power3.out', stagger: 0.06, transformOrigin: 'top center' }, 0.25)
-        .from('.gridline.h', { scaleX: 0, duration: 0.6, ease: 'power3.out', stagger: 0.06, transformOrigin: 'left center' }, 0.4)
-        .from('.header-bar > *', { opacity: 0, y: -8, duration: 0.5, ease: 'power2.out', stagger: 0.08 }, 0.55)
-        .from('.footer-bar > *', { opacity: 0, y: 8, duration: 0.5, ease: 'power2.out', stagger: 0.08 }, 0.6);
+      tl.from('.burst', {
+        scale: 0,
+        rotation: -45,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'expo.out',
+        transformOrigin: '50% 50%'
+      }, 0.1);
 
-      tl.to('.ink-block', {
-        width: '34%',
-        duration: 0.45,
-        ease: 'expo.out'
-      }, 0.85)
-      .from('.ink-label', { opacity: 0, x: -10, duration: 0.5, ease: 'power2.out' }, 1.15);
-
-      tl.from('.display-word .w-1 .letter', {
-        y: 60,
+      tl.from('.line-1 .l', {
+        y: -120,
         opacity: 0,
         duration: 0.55,
         ease: 'expo.out',
-        stagger: 0.05
-      }, 1.25);
+        stagger: 0.045
+      }, 0.5);
 
-      tl.from('.display-word .w-2 .letter', {
-        y: 40,
+      tl.from('.line-2 .l', {
+        y: -90,
         opacity: 0,
         duration: 0.5,
-        ease: 'power3.out',
+        ease: 'expo.out',
         stagger: 0.04
-      }, 1.7);
+      }, 0.85);
 
-      tl.from('.specimen-strip .gly', {
-        y: 28,
+      tl.from('.line-3 .l', {
+        y: 90,
         opacity: 0,
         duration: 0.5,
-        ease: 'power3.out',
-        stagger: 0.06
-      }, 2.05);
+        ease: 'expo.out',
+        stagger: 0.04
+      }, 1.2);
+
+      tl.from('.credit.tl', { x: -16, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.55)
+        .from('.credit.tr', { x: 16, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.62)
+        .from('.credit.center-l', { x: -12, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.7)
+        .from('.credit.center-r', { x: 12, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.78)
+        .from('.credit.bl', { y: 12, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.85)
+        .from('.credit.br', { y: 12, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.92);
 
       tl.from('.stamp', {
         opacity: 0,
         scale: 0.4,
-        rotation: 28,
+        rotation: 22,
         duration: 0.55,
         ease: 'back.out(2.4)'
-      }, 2.55);
+      }, 2.2);
 
-      tl.to('.stamp', { rotation: 6, duration: 0.18, ease: 'sine.inOut' }, 3.1)
-        .to('.stamp', { rotation: 7, duration: 0.22, ease: 'sine.inOut' }, 3.28);
+      tl.to('.stamp', { rotation: -9, duration: 0.18, ease: 'sine.inOut' }, 2.75)
+        .to('.stamp', { rotation: -7, duration: 0.22, ease: 'sine.inOut' }, 2.93);
 
-      tl.to('.ink-block', { x: 4, duration: 1.6, ease: 'sine.inOut', yoyo: true, repeat: 2 }, 3.6)
-        .to('.stamp', { y: -2, duration: 1.4, ease: 'sine.inOut', yoyo: true, repeat: 2 }, 3.7);
+      tl.to('.burst', {
+        rotation: 8,
+        duration: 6.0,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: 1,
+        transformOrigin: '50% 50%'
+      }, 2.6);
+
+      tl.to('.line-1', { y: 4, duration: 4.0, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.6)
+        .to('.line-3', { y: -4, duration: 4.0, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.6);
 
       window.__timelines['type-poster-preview'] = tl;
 

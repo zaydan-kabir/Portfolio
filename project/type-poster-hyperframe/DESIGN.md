@@ -1,19 +1,19 @@
 ## Style Prompt
-A type-design poster being composed in real time on a cream paper sheet. Crop marks anchor the corners, a tight grid fades in, then large display letterforms drop into place against a single hot-ink accent block. The mood is letterpress + Swiss poster: silent, deliberate, slightly inky. Motion should feel like type pieces being set, not like a digital UI.
+A bold contemporary type-specimen poster in the spirit of Pangram Pangram's "VERY MORI" sheet — a saturated cobalt-blue field, a hot vermilion star-burst flaring behind heavy black display type. Three stacked words ("TYPE / DESIGN / POSTER") in a geometric black sans dominate the canvas; tiny technical credits flank the center in white mono type. The mood is loud, considered, and graphic — a poster that wants to be pinned on a studio wall.
 
 ## Colors
-- Cream paper: #ece6d8
-- Deep ink: #0a0a0a
-- Faint rule: rgba(10,10,10,0.18)
-- Hot ink accent: #a8201a
-- Soft shadow: rgba(10,10,10,0.16)
+- Cobalt field: #1d3eb5
+- Hot vermilion (accent burst): #ff3914
+- Display ink: #050505
+- Credit ink: rgba(255,255,255,0.9)
+- Soft underlay: rgba(5,5,5,0.18)
 
 ## Typography
-- Lora, Georgia, serif for the display word.
-- VT323 / monospace for technical labels (size, plate code, coming-soon tag).
+- Archivo Black (single weight 900, geometric heavy sans) for the stacked display words.
+- JetBrains Mono / VT323 for credits and the coming-soon tag.
 
 ## What NOT to Do
-- Do not use multiple bright colors — only one hot-ink accent.
-- Do not animate glitch/scanline effects.
-- Do not show fake font-management UI.
-- Do not let the composition feel digitally clean — keep faint print misalignment in the accent block and stamps.
+- Do not introduce a third hue. Cobalt + vermilion + black + white is the entire palette.
+- Do not animate flashy lens flares, particle bursts, or scanlines.
+- Do not rotate or skew the display type — the words sit upright and dense.
+- Do not thin the burst into a starfield — it should read as one bold ink shape.
