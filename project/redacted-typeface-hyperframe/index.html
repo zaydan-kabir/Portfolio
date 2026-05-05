@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redacted Typeface HyperFrame Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    @font-face {
+      font-family: 'VT323';
+      src: url('../uploads/VT323-Regular.ttf') format('truetype');
+      font-display: swap;
+    }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #0a0a0a; }
+    [data-composition-id="redacted-typeface-preview"] {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #0a0a0a;
+      color: #f0f0f0;
+      font-family: 'Lora', Georgia, serif;
+      isolation: isolate;
+    }
+
+    .sheet {
+      position: absolute;
+      inset: 0;
+      padding: 6.5% 7.5%;
+    }
+
+    .margin-rule {
+      position: absolute;
+      background: rgba(240,240,240,.16);
+      pointer-events: none;
+    }
+    .margin-rule.top    { left: 7.5%; right: 7.5%; top: 6.5%;    height: 1px; }
+    .margin-rule.bottom { left: 7.5%; right: 7.5%; bottom: 6.5%; height: 1px; }
+    .margin-rule.left   { top: 6.5%; bottom: 6.5%; left: 7.5%;   width: 1px; }
+    .margin-rule.right  { top: 6.5%; bottom: 6.5%; right: 7.5%;  width: 1px; }
+
+    .corner-mark {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border: 1px solid rgba(240,240,240,.3);
+    }
+    .corner-mark.tl { left: 7.5%;  top: 6.5%;    transform: translate(-50%, -50%); border-right: none; border-bottom: none; }
+    .corner-mark.tr { right: 7.5%; top: 6.5%;    transform: translate( 50%, -50%); border-left: none;  border-bottom: none; }
+    .corner-mark.bl { left: 7.5%;  bottom: 6.5%; transform: translate(-50%,  50%); border-right: none; border-top: none; }
+    .corner-mark.br { right: 7.5%; bottom: 6.5%; transform: translate( 50%,  50%); border-left: none;  border-top: none; }
+
+    .header-row {
+      position: absolute;
+      left: 9%;
+      right: 9%;
+      top: 8.6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'VT323', monospace;
+      font-size: clamp(10px, 1vw, 14px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(240,240,240,.42);
+      z-index: 4;
+    }
+    .header-row .embargo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .embargo-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f0f0f0;
+    }
+
+    .specimen {
+      position: absolute;
+      left: 9%;
+      right: 9%;
+      top: 16%;
+      bottom: 30%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0;
+    }
+
+    .glyph-row {
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      font-family: 'Lora', Georgia, serif;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      color: #f0f0f0;
+    }
+    .glyph-row .g { display: inline-block; }
+    .glyph-row.row-1 { font-size: clamp(54px, 13vw, 188px); font-style: normal; }
+    .glyph-row.row-2 { font-size: clamp(44px, 10vw, 142px); font-style: italic; color: rgba(240,240,240,.78); }
+    .glyph-row.row-3 { font-size: clamp(38px, 8.4vw, 116px); font-weight: 600; }
+
+    .row-label {
+      position: absolute;
+      right: 0;
+      top: 6%;
+      font-family: 'VT323', monospace;
+      font-size: clamp(9px, 0.78vw, 12px);
+      letter-spacing: 0.2em;
+      color: rgba(240,240,240,.32);
+      text-transform: uppercase;
+    }
+
+    .redaction {
+      position: absolute;
+      background: #050505;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.9), 0 6px 14px rgba(0,0,0,.4);
+      transform-origin: left center;
+      z-index: 6;
+    }
+    .redaction.r-1 { left: 9%;   top: 19%;   width: 0;     height: 12.5%; transform: rotate(-0.6deg); }
+    .redaction.r-2 { left: 9%;   top: 36.5%; width: 0;     height: 10.4%; transform: rotate(0.4deg); }
+    .redaction.r-3 { left: 9%;   top: 53%;   width: 0;     height: 9%;    transform: rotate(-0.3deg); }
+
+    .stamp {
+      position: absolute;
+      left: 50%;
+      top: 73%;
+      transform: translate(-50%, -50%) rotate(-3deg);
+      padding: 12px 26px 14px;
+      border: 2px solid rgba(240,240,240,.92);
+      color: #f0f0f0;
+      font-family: 'VT323', monospace;
+      font-size: clamp(14px, 1.6vw, 22px);
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      background: rgba(10,10,10,.7);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.9);
+      z-index: 8;
+      white-space: nowrap;
+    }
+    .stamp::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(240,240,240,.42);
+      pointer-events: none;
+    }
+
+    .footer-row {
+      position: absolute;
+      left: 9%;
+      right: 9%;
+      bottom: 8.6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: 'VT323', monospace;
+      font-size: clamp(10px, 1vw, 14px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(240,240,240,.42);
+      z-index: 4;
+    }
+    .footer-row .title-fragment {
+      font-family: 'Lora', Georgia, serif;
+      font-style: italic;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      font-size: clamp(11px, 1.1vw, 16px);
+      color: rgba(240,240,240,.62);
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      pointer-events: none;
+      opacity: 0.06;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+    }
+
+    .vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 11;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.5) 100%);
+    }
+
+    @media (max-aspect-ratio: 1/1) {
+      .header-row, .footer-row { font-size: 10px; letter-spacing: 0.14em; }
+      .stamp { font-size: 12px; padding: 10px 18px; letter-spacing: 0.26em; }
+    }
+  </style>
+</head>
+<body>
+  <div data-composition-id="redacted-typeface-preview" data-width="982" data-height="1280" data-duration="11" data-start="0" data-track-index="0">
+    <div class="sheet"></div>
+    <div class="margin-rule top"></div>
+    <div class="margin-rule bottom"></div>
+    <div class="margin-rule left"></div>
+    <div class="margin-rule right"></div>
+    <div class="corner-mark tl"></div>
+    <div class="corner-mark tr"></div>
+    <div class="corner-mark bl"></div>
+    <div class="corner-mark br"></div>
+
+    <div class="header-row">
+      <span>Specimen / Draft 03</span>
+      <span class="embargo"><span class="embargo-dot"></span>Embargoed</span>
+    </div>
+
+    <div class="specimen">
+      <div class="glyph-row row-1">
+        <span class="g">A</span><span class="g">a</span><span class="g">G</span><span class="g">g</span>
+        <span class="row-label">Roman</span>
+      </div>
+      <div class="glyph-row row-2">
+        <span class="g">R</span><span class="g">e</span><span class="g">d</span><span class="g">a</span><span class="g">k</span>
+        <span class="row-label">Italic</span>
+      </div>
+      <div class="glyph-row row-3">
+        <span class="g">&amp;</span><span class="g">Æ</span><span class="g">ß</span><span class="g">@</span>
+        <span class="row-label">Display</span>
+      </div>
+    </div>
+
+    <div class="redaction r-1"></div>
+    <div class="redaction r-2"></div>
+    <div class="redaction r-3"></div>
+
+    <div class="stamp">Coming Soon</div>
+
+    <div class="footer-row">
+      <span class="title-fragment">[redacted] typeface</span>
+      <span>Type Design / Web</span>
+    </div>
+
+    <div class="vignette"></div>
+    <div class="grain"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      tl.from('.margin-rule', { opacity: 0, duration: 0.7, ease: 'sine.out', stagger: 0.06 }, 0)
+        .from('.corner-mark', { opacity: 0, scale: 0.6, duration: 0.45, ease: 'back.out(2)', stagger: 0.05 }, 0.18)
+        .from('.header-row > *', { opacity: 0, y: -8, duration: 0.55, ease: 'power2.out', stagger: 0.08 }, 0.35)
+        .from('.footer-row > *', { opacity: 0, y: 8, duration: 0.55, ease: 'power2.out', stagger: 0.08 }, 0.4)
+        .from('.row-1 .g', { y: 32, opacity: 0, duration: 0.6, ease: 'expo.out', stagger: 0.06 }, 0.55)
+        .from('.row-2 .g', { y: 28, opacity: 0, duration: 0.6, ease: 'power3.out', stagger: 0.05 }, 0.95)
+        .from('.row-3 .g', { y: 24, opacity: 0, duration: 0.55, ease: 'power3.out', stagger: 0.05 }, 1.35)
+        .from('.row-label', { opacity: 0, x: 14, duration: 0.55, ease: 'sine.out', stagger: 0.1 }, 0.85);
+
+      tl.to('.embargo-dot', { opacity: 0.32, duration: 0.7, repeat: 9, yoyo: true, ease: 'sine.inOut' }, 1.2);
+
+      tl.to('.r-1', { width: '82%', duration: 0.32, ease: 'expo.out' }, 2.4)
+        .to('.r-2', { width: '82%', duration: 0.36, ease: 'expo.out' }, 2.65)
+        .to('.r-3', { width: '82%', duration: 0.32, ease: 'expo.out' }, 2.9);
+
+      tl.from('.stamp', {
+        opacity: 0,
+        scale: 0.4,
+        rotation: 18,
+        duration: 0.55,
+        ease: 'back.out(2.4)'
+      }, 3.05);
+
+      tl.to('.stamp', { rotation: -3.6, duration: 0.18, ease: 'sine.inOut' }, 3.6)
+        .to('.stamp', { rotation: -3,   duration: 0.22, ease: 'sine.inOut' }, 3.78);
+
+      tl.to('.r-1', { x: 4, duration: 1.3, ease: 'sine.inOut', yoyo: true, repeat: 2 }, 4.2)
+        .to('.r-2', { x: -3, duration: 1.5, ease: 'sine.inOut', yoyo: true, repeat: 2 }, 4.3)
+        .to('.r-3', { x: 5, duration: 1.4, ease: 'sine.inOut', yoyo: true, repeat: 2 }, 4.4);
+
+      window.__timelines['redacted-typeface-preview'] = tl;
+
+      if (!window.__hyperframes) {
+        tl.eventCallback('onComplete', () => tl.restart());
+        tl.play(0);
+      }
+    </script>
+  </div>
+</body>
+</html>
