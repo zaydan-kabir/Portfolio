@@ -570,14 +570,19 @@
       pointer-events: none;
       user-select: none;
       opacity: 0;
-      transform: rotate(-3deg) translateY(8px);
+      transform: translateZ(0) rotate(-3deg) translateY(8px);
       transition: opacity 0.25s ease, transform 0.25s ease;
+      /* Pre-promote so the entrance transition doesn't allocate a new
+         layer mid-slide (allocation = paint stall). */
+      will-change: transform, opacity;
+      backface-visibility: hidden;
     }
     #panel-2.writing-active #panel-2-writing {
       opacity: 1;
-      transform: rotate(-3deg) translateY(0);
+      transform: translateZ(0) rotate(-3deg) translateY(0);
     }
     .p2-writing-line {
+      position: relative;
       display: inline-block;
       max-width: 100%;
       overflow: hidden;
@@ -587,11 +592,26 @@
       font-weight: 700;
       line-height: 1.05;
       letter-spacing: 0.01em;
-      filter: drop-shadow(0 0 1px currentColor);
-      clip-path: inset(0 100% 0 0);
+      /* text-shadow paints with the glyphs (single rasterization),
+         whereas filter: drop-shadow created a separate filter region
+         that re-rasterized every frame the panel moved. */
+      text-shadow: 0 0 1px currentColor, 0 0 1px currentColor;
     }
-    #panel-2.writing-active .p2-writing-line {
-      animation: p2-write-text 1.8s steps(26, end) 0.55s forwards;
+    /* Reveal the line via a cover element animating transform: scaleX
+       instead of animating clip-path. Transform-only animations run on
+       the compositor — no per-frame paint of the text region. */
+    .p2-writing-line::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      transform-origin: right center;
+      transform: scaleX(1);
+      pointer-events: none;
+      will-change: transform;
+    }
+    #panel-2.writing-active .p2-writing-line::after {
+      animation: p2-write-cover 1.8s steps(26, end) 0.55s forwards;
     }
     .p2-writing-arrow {
       display: block;
@@ -599,6 +619,8 @@
       height: clamp(62px, 6.8vw, 104px);
       margin: clamp(2px, 0.4vw, 6px) 28% 0 auto;
       overflow: visible;
+      transform: translateZ(0);
+      will-change: transform;
     }
     .p2-writing-arrow path {
       fill: none;
@@ -627,8 +649,8 @@
       from { opacity: 0; transform: scale(0.6); }
       to { opacity: 1; transform: scale(1); }
     }
-    @keyframes p2-write-text {
-      to { clip-path: inset(0 0 0 0); }
+    @keyframes p2-write-cover {
+      to { transform: scaleX(0); }
     }
     .p2-quote-wrap {
       max-width: 680px;
@@ -1101,11 +1123,10 @@ const zaydanAnimationReady = (() => {
         track.style.transform = `translate3d(${rounded}px,0,0)`;
         renderedX = rounded;
       }
-      // Defer the writing-active animations (clip-path text reveal, SVG
-      // stroke-dashoffset, drop-shadowed handwriting) until the slide is
-      // mostly complete. Kicking these off at the midpoint of the scroll
-      // forced layout/paint mid-motion and was the source of panel-2 lag.
-      const writing = targetX >= maxX * 0.5 && currentX > maxX * 0.9;
+      // Original midpoint trigger — restored now that the animations
+      // themselves are compositor-only (transform/opacity, no clip-path
+      // or drop-shadow filter), so they no longer fight the slide.
+      const writing = currentX > maxX * 0.45;
       if (writing !== lastWritingActive) {
         panel2.classList.toggle('writing-active', writing);
         lastWritingActive = writing;
