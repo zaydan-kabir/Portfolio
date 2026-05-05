@@ -217,15 +217,12 @@
     function buildTextLayout() {
       var size = panelSize();
       var isMobile = window.innerWidth < 600;
-      var figRect = cornerFig.getBoundingClientRect();
-      var panelRect = panel.getBoundingClientRect();
-      var figTop = figRect.height ? figRect.top - panelRect.top : size.height;
       var boxWidth = isMobile ? size.width - 34 : Math.min(1000, size.width * 0.78);
       var fontSize = isMobile ? Math.max(10.5, Math.min(12.8, boxWidth * 0.033)) : Math.max(12.5, Math.min(16.8, boxWidth * 0.0158));
       var lineHeight = fontSize * (isMobile ? 1.36 : 1.48);
       var font = 'italic 400 ' + fontSize + 'px Lora, Georgia, serif';
       var lines = buildLines(font, boxWidth);
-      var maxHeight = Math.min(size.height * (isMobile ? 0.78 : 0.72), Math.max(260, figTop - 72));
+      var maxHeight = size.height * (isMobile ? 0.78 : 0.72);
 
       while (fontSize > 10 && lines.length * lineHeight > maxHeight) {
         fontSize -= 0.5;
@@ -237,15 +234,13 @@
       var attrSize = Math.max(10.5, fontSize * 0.78);
       var attrFont = '400 ' + attrSize + 'px VT323, monospace';
       var textHeight = lines.length * lineHeight + lineHeight * 1.35;
-      var availableBottom = Math.min(size.height - 42, figTop - 34);
-      var startY = Math.max(58, (availableBottom - textHeight) / 2 + 24);
+      var startY = Math.max(58, (size.height - textHeight) / 2);
       var boxStart = Math.max(16, (size.width - boxWidth) / 2);
       var layoutKey = [
         Math.round(size.width),
         Math.round(size.height),
         Math.round(boxWidth),
         Math.round(fontSize * 10),
-        Math.round(figTop),
         root.dataset.theme || ''
       ].join(':');
 
