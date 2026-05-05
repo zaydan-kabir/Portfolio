@@ -282,45 +282,45 @@
     #stage {
       position: fixed;
       inset: 0;
-      overflow: hidden;
+      /* Native horizontal scroll container. The browser's compositor
+         scroll thread runs independently of the main thread, so JS work
+         can never make this lag. Snap-to-panel is also native. */
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      overscroll-behavior: contain;
     }
+    #stage::-webkit-scrollbar { display: none; width: 0; height: 0; }
     #scroll-capture {
-      position: fixed;
-      inset: 70px 0 0;
-      z-index: 70;
-      background: transparent;
-      cursor: none;
-      touch-action: none;
+      /* Native scroll on #stage handles input now; this overlay must
+         not intercept pointer/touch events. */
+      display: none;
     }
 
-    /* ── Track: 2 panels wide ─────────────────────────────── */
+    /* ── Track: 2 panels wide, laid out as a flex row inside the
+       native scroll container. No JS transform — the browser scrolls. */
     #track {
-      position: absolute;
-      /* sit below header */
+      position: relative;
       top: 0; left: 0;
       height: 100%;
       width: 200vw;
-      will-change: transform;
+      display: flex;
     }
 
     .panel {
-      position: absolute;
-      top: 0; bottom: 0;
+      position: relative;
+      flex: 0 0 100vw;
+      height: 100%;
       width: 100vw;
       background: var(--bg);
       overflow: hidden;
-      /* Promote each panel to its own compositor layer so transforming
-         #track just translates two prebuilt layers instead of forcing a
-         full re-rasterization of their contents every frame. */
-      transform: translateZ(0);
-      will-change: transform;
-      backface-visibility: hidden;
-      /* Isolate paint/layout so panel-2 entering the viewport doesn't
-         invalidate panel-1 and vice-versa. */
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
       contain: layout paint style;
     }
-    #panel-1 { left: 0; }
-    #panel-2 { left: 100vw; }
 
     /* While the track is in motion, disable effects that force per-frame
        full-viewport re-rasterization. The grain's mix-blend-mode and the
@@ -966,188 +966,68 @@ const zaydanAnimationReady = (() => {
     });
   });
 
-  // ── Down-scroll → horizontal movement ────────────────────────────
-  const track = document.getElementById('track');
+  // ── Down-scroll → native horizontal scroll ───────────────────────
+  // The horizontal track is a real native scroll container (#stage), so
+  // motion runs on the browser's compositor scroll thread and cannot be
+  // blocked by main-thread JS work. We only:
+  //   1. translate vertical wheel/keyboard input to horizontal scroll,
+  //   2. read scroll position to toggle .writing-active and .is-scrolling.
+  const stage = document.getElementById('stage');
   const panel2 = document.getElementById('panel-2');
-  const scrollCapture = document.getElementById('scroll-capture');
-  let targetX = 0;
-  let currentX = 0;
+  const bodyEl = document.body;
   let maxX = window.innerWidth;
 
-  function clampX(value) {
-    return Math.max(0, Math.min(maxX, value));
-  }
-
-  function snapToNearest() {
-    targetX = targetX > maxX / 2 ? maxX : 0;
-  }
-
   function moveHorizontal(delta) {
-    targetX = clampX(targetX + delta);
+    stage.scrollLeft = Math.max(0, Math.min(maxX, stage.scrollLeft + delta));
   }
 
-  function resizeHorizontalRange() {
-    maxX = window.innerWidth;
-    targetX = targetX > 0 ? maxX : 0;
-    currentX = clampX(currentX);
-  }
-  window.addEventListener('resize', resizeHorizontalRange);
+  window.addEventListener('resize', () => { maxX = window.innerWidth; });
 
-  // Normalize wheel deltas across input devices. Mouse wheels report in
-  // "lines" or "pages"; trackpads report in pixels. Convert everything to
-  // pixels so the same per-event motion feels consistent across devices.
-  function normalizeWheelDelta(e) {
-    let d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-    if (e.deltaMode === 1) d *= 16;
-    else if (e.deltaMode === 2) d *= window.innerHeight;
-    return d;
-  }
-
-  // Tracked input velocity (px/ms), exponentially decayed in the RAF loop.
-  let inputVelocity = 0;
-  let lastWheelTs = 0;
-  // Wheel events fire at up to ~120Hz on Mac trackpads. We accumulate the
-  // delta synchronously (so preventDefault works) but defer all of the
-  // clamp/velocity math to the next animation frame — the wheel handler
-  // itself is reduced to a few field writes so it can never block.
-  let pendingWheelDelta = 0;
-  let pendingInnerScroll = 0;
-
+  // Vertical wheel → horizontal scrollLeft. The browser's own scroll
+  // thread does the actual painting; we just nudge the position.
   function handleWheel(e) {
     if (e.ctrlKey) return;
-    e.preventDefault();
-    const delta = normalizeWheelDelta(e);
-    if (currentX >= maxX * 0.95) {
+    let dy = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    if (e.deltaMode === 1) dy *= 16;
+    else if (e.deltaMode === 2) dy *= window.innerHeight;
+
+    // If we're on panel 2 and its inner column can scroll, send the
+    // delta there instead.
+    if (stage.scrollLeft >= maxX * 0.95) {
       const inner = document.getElementById('panel-2-inner');
       if (inner && inner.scrollHeight > inner.clientHeight) {
-        const atBottom = delta > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
-        const atTop    = delta < 0 && inner.scrollTop <= 0;
-        if (!atBottom && !atTop) { pendingInnerScroll += delta; return; }
+        const atBottom = dy > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
+        const atTop    = dy < 0 && inner.scrollTop <= 0;
+        if (!atBottom && !atTop) {
+          e.preventDefault();
+          inner.scrollTop += dy;
+          return;
+        }
       }
     }
-    pendingWheelDelta += delta;
-    // Velocity tracking, kept here because it needs the inter-event timing.
-    const now = e.timeStamp || performance.now();
-    const dtw = lastWheelTs ? Math.max(1, now - lastWheelTs) : 16;
-    lastWheelTs = now;
-    const instant = Math.abs(delta) / dtw;
-    inputVelocity = inputVelocity * 0.6 + instant * 0.4;
-  }
-
-  // Single listener on window (capture phase) — previously the same handler
-  // was bound to both #scroll-capture and document, causing every wheel event
-  // to fire twice and double-feed the smoothing target.
-  window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
-
-  // Touch: direct finger tracking + velocity snap on release
-  let isDragging = false;
-  let dragStartClientX = 0;
-  let dragStartTargetX = 0;
-  let swipeVelocity = 0;
-  let lastClientX = 0;
-  let lastClientTime = 0;
-
-  scrollCapture.addEventListener('touchstart', e => {
-    isDragging = true;
-    dragStartClientX = e.touches[0].clientX;
-    dragStartTargetX = targetX;
-    lastClientX = dragStartClientX;
-    lastClientTime = Date.now();
-    swipeVelocity = 0;
-  }, { passive: true });
-
-  scrollCapture.addEventListener('touchmove', e => {
-    if (!isDragging) return;
     e.preventDefault();
-    const x = e.touches[0].clientX;
-    const now = Date.now();
-    const dt = now - lastClientTime;
-    if (dt > 0) swipeVelocity = (x - lastClientX) / dt;
-    lastClientX = x;
-    lastClientTime = now;
-    // swipe right (x > start) → targetX increases → moves toward panel 2
-    targetX = clampX(dragStartTargetX + (x - dragStartClientX));
-  }, { passive: false });
-
-  scrollCapture.addEventListener('touchend', () => {
-    if (!isDragging) return;
-    isDragging = false;
-    const SNAP_VEL = 0.25; // px/ms threshold for flick
-    if (swipeVelocity > SNAP_VEL) {
-      targetX = maxX; // flick right → panel 2
-    } else if (swipeVelocity < -SNAP_VEL) {
-      targetX = 0;    // flick left → panel 1
-    } else {
-      snapToNearest();
-    }
-  }, { passive: true });
-
-  // Two-mode tracker:
-  //   ACTIVE INPUT  → currentX = targetX every frame (1:1, zero lag).
-  //   POST-RELEASE  → ease the remainder with a short τ so the track
-  //                   settles on a panel without snapping.
-  // Smoothing during active input was the lag the user kept feeling: any
-  // exponential lerp, no matter how tight, leaves currentX behind targetX
-  // while the wheel is still spinning.
-  const RELEASE_TAU_MS = 65;
-  const INPUT_RECENT_MS = 90;
-  let lastFrameTs = 0;
-  let lastWritingActive = false;
-  let renderedX = -1;
-  let isScrollingClass = false;
-  const bodyEl = document.body;
-
-  function renderHorizontalTrack(ts) {
-    if (!lastFrameTs) lastFrameTs = ts;
-    const dt = Math.min(64, ts - lastFrameTs);
-    lastFrameTs = ts;
-
-    if (pendingInnerScroll !== 0) {
-      const inner = document.getElementById('panel-2-inner');
-      if (inner) inner.scrollBy(0, pendingInnerScroll);
-      pendingInnerScroll = 0;
-    }
-    if (pendingWheelDelta !== 0) {
-      moveHorizontal(pendingWheelDelta);
-      pendingWheelDelta = 0;
-    }
-
-    const moving = currentX !== targetX;
-    if (moving !== isScrollingClass) {
-      bodyEl.classList.toggle('is-scrolling', moving);
-      isScrollingClass = moving;
-    }
-
-    if (moving) {
-      const sinceInput = lastWheelTs ? (ts - lastWheelTs) : Infinity;
-      const activeInput = sinceInput < INPUT_RECENT_MS;
-
-      if (activeInput || isDragging) {
-        // Direct mode: track input 1:1. No catch-up gap to perceive.
-        currentX = targetX;
-      } else {
-        // Release ease: glide the leftover gap to rest.
-        const k = 1 - Math.exp(-dt / RELEASE_TAU_MS);
-        currentX += (targetX - currentX) * k;
-        if (Math.abs(targetX - currentX) < 0.5) currentX = targetX;
-      }
-
-      const rounded = (-currentX) | 0;
-      if (rounded !== renderedX) {
-        track.style.transform = `translate3d(${rounded}px,0,0)`;
-        renderedX = rounded;
-      }
-      const writing = currentX > maxX * 0.45;
-      if (writing !== lastWritingActive) {
-        panel2.classList.toggle('writing-active', writing);
-        lastWritingActive = writing;
-      }
-    }
-
-    inputVelocity *= Math.exp(-dt / 120);
-    requestAnimationFrame(renderHorizontalTrack);
+    stage.scrollLeft += dy;
   }
-  requestAnimationFrame(renderHorizontalTrack);
+  window.addEventListener('wheel', handleWheel, { passive: false });
+
+  // Read scroll position to drive .writing-active and .is-scrolling.
+  // No RAF loop — the scroll event already fires on each compositor
+  // frame the scroll moves.
+  let lastWritingActive = false;
+  let scrollIdleTimer = 0;
+  stage.addEventListener('scroll', () => {
+    const x = stage.scrollLeft;
+    const writing = x > maxX * 0.45;
+    if (writing !== lastWritingActive) {
+      panel2.classList.toggle('writing-active', writing);
+      lastWritingActive = writing;
+    }
+    if (!bodyEl.classList.contains('is-scrolling')) {
+      bodyEl.classList.add('is-scrolling');
+    }
+    clearTimeout(scrollIdleTimer);
+    scrollIdleTimer = setTimeout(() => bodyEl.classList.remove('is-scrolling'), 120);
+  }, { passive: true });
 
   // ── ASCII ramp ────────────────────────────────────────────────────
   const RAMP = " .'`,:;iltfcj-+!rILvzsx=*eaounCVZSX%mwdbpqMWDB#&@";
@@ -1297,7 +1177,7 @@ const zaydanAnimationReady = (() => {
     animTime += dt;
     lastTs = ts;
 
-    const scrolling = currentX !== targetX;
+    const scrolling = bodyEl.classList.contains('is-scrolling');
     if (!scrolling) {
       if (ts - lastAsciiTs >= ASCII_FRAME_MS) {
         if (horseGrid)    renderGrid(hCtx, horseGrid, H_CW, H_CH, animTime);
@@ -1431,7 +1311,7 @@ const zaydanAnimationReady = (() => {
     // Skip all cursor + trail work while the track is moving — the
     // canvas is hidden via CSS anyway and getImageData calls inside
     // cursorColorAt are sync GPU readbacks that stall the pipeline.
-    if (currentX !== targetX) {
+    if (bodyEl.classList.contains('is-scrolling')) {
       requestAnimationFrame(drawTrail);
       return;
     }
