@@ -9,8 +9,8 @@ A sharp editorial book-cover redesign preview: classical sculpture treated like 
 - Muted shadow: rgba(5,5,5,0.42)
 
 ## Typography
-- Archivo Black for large title and author typography.
-- Libre Baskerville for small literary cover details.
+- Archivo Black for large anonymous cover-study typography.
+- Libre Baskerville for small literary cover details and edition notes.
 
 ## What NOT to Do
 - Do not make it look like a generic product mockup.
