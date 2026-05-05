@@ -650,9 +650,9 @@
         overflow-y: auto;
       }
       #panel-2-fig {
-        right: 14px;
-        bottom: 96px;
-        width: min(18vw, 64px);
+        right: clamp(20px, 6vw, 28px);
+        bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+        width: clamp(58px, 19vw, 76px);
       }
       #panel-2-writing {
         right: 12px;
@@ -666,7 +666,7 @@
       }
     }
   </style>
-  <script src="theme.js?v=20260505-panel-text-sync"></script>
+  <script src="theme.js?v=20260505-mobile-fig-balance"></script>
   <link rel="stylesheet" href="theme.css?v=20260501-light-first-all">
   <style>
     html[data-theme="light"] #masthead-guide,

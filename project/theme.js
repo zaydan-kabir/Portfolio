@@ -1,7 +1,7 @@
 (function () {
   var storageKey = 'zaydan-theme';
   var root = document.documentElement;
-  var panelTwoVersion = '20260505-panel-text-sync';
+  var panelTwoVersion = '20260505-mobile-fig-balance';
 
   function getDefaultTheme() {
     return 'light';
@@ -126,7 +126,7 @@
       'html[data-theme="light"] #panel-2-flow span{color:rgba(10,10,10,.94);}',
       '#panel-2-flow .p2-flow-attr{font-family:VT323,monospace;font-style:normal;letter-spacing:.08em;color:rgba(240,240,240,.5);}',
       'html[data-theme="light"] #panel-2-flow .p2-flow-attr{color:rgba(10,10,10,.58);}',
-      '@media(max-width:600px){#panel-2-uncut-fig{right:14px!important;bottom:96px!important;width:min(18vw,64px)!important;}#panel-2-flow span{white-space:pre;}}'
+      '@media(max-width:600px){#panel-2-uncut-fig{right:clamp(20px,6vw,28px)!important;bottom:calc(74px + env(safe-area-inset-bottom, 0px))!important;width:clamp(58px,19vw,76px)!important;}#panel-2-flow span{white-space:pre;}}'
     ].join('\n');
     document.head.appendChild(style);
 
