@@ -309,9 +309,23 @@
       width: 100vw;
       background: var(--bg);
       overflow: hidden;
+      /* Promote each panel to its own compositor layer so transforming
+         #track just translates two prebuilt layers instead of forcing a
+         full re-rasterization of their contents every frame. */
+      transform: translateZ(0);
+      will-change: transform;
+      backface-visibility: hidden;
     }
     #panel-1 { left: 0; }
     #panel-2 { left: 100vw; }
+
+    /* While the track is in motion, disable effects that force per-frame
+       full-viewport re-rasterization. The grain's mix-blend-mode and the
+       wordmark's drop-shadow filter are the two biggest offenders — the
+       browser cannot cache them when anything beneath moves. */
+    body.is-scrolling::after { mix-blend-mode: normal; opacity: 0.04; }
+    body.is-scrolling #masthead-reference { filter: none; }
+    body.is-scrolling #trail-canvas { visibility: hidden; }
 
     /* ── ZAYDAN masthead — pinned to first horizontal panel ─── */
     #masthead {
@@ -1038,13 +1052,21 @@ const zaydanAnimationReady = (() => {
   let lastFrameTs = 0;
   let lastWritingActive = false;
   let renderedX = -1;
+  let isScrollingClass = false;
+  const bodyEl = document.body;
 
   function renderHorizontalTrack(ts) {
     if (!lastFrameTs) lastFrameTs = ts;
     const dt = Math.min(64, ts - lastFrameTs);
     lastFrameTs = ts;
 
-    if (currentX !== targetX) {
+    const moving = currentX !== targetX;
+    if (moving !== isScrollingClass) {
+      bodyEl.classList.toggle('is-scrolling', moving);
+      isScrollingClass = moving;
+    }
+
+    if (moving) {
       const gap = targetX - currentX;
       const absGap = gap < 0 ? -gap : gap;
       // gap-proportional τ: at gap = 35% of viewport or more, drop to τ_min.
