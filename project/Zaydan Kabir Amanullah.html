@@ -328,28 +328,19 @@
        browser cannot cache them when anything beneath moves. */
     body.is-scrolling::after { display: none; }
     body.is-scrolling #masthead-reference { filter: none; }
-    body.is-scrolling #trail-canvas,
-    body.is-scrolling #cursor { visibility: hidden; }
-    body.is-scrolling .p2-writing-line { filter: none; }
-    body.is-scrolling #panel-2-writing { transition: none; }
-    /* Hard freeze: no element on the page may run a CSS animation or
-       transition while the track is in motion. Anything that animates
-       costs paint and steals from the slide. Resumes the moment scroll
-       settles. */
-    body.is-scrolling *,
-    body.is-scrolling *::before,
-    body.is-scrolling *::after {
+    body.is-scrolling #trail-canvas { visibility: hidden; }
+    /* Pause only the specific elements that actually animate. Using a
+       universal selector (* / ::before / ::after) here forced the
+       browser to re-evaluate styles for every element on the page each
+       time .is-scrolling toggled — that toggle alone caused a visible
+       frame stall at the start of every scroll. */
+    body.is-scrolling .upcoming-track,
+    body.is-scrolling .p2-writing-line::after,
+    body.is-scrolling .p2-writing-arrow path,
+    body.is-scrolling .p2-writing-arrow polygon {
       animation-play-state: paused !important;
-      transition: none !important;
     }
-    /* Decorative items inside the track are hidden during motion — the
-       compositor only has to translate the panel layers, not re-rasterize
-       drop-shadowed images and faux-italic text. They reappear instantly
-       once the slide lands. */
-    body.is-scrolling #upcoming-ticker,
-    body.is-scrolling #horse-canvas,
-    body.is-scrolling #panel-2-fig,
-    body.is-scrolling #panel-2-writing { visibility: hidden; }
+    body.is-scrolling #panel-2-writing { transition: none; }
 
     /* ── ZAYDAN masthead — pinned to first horizontal panel ─── */
     #masthead {
@@ -1091,13 +1082,15 @@ const zaydanAnimationReady = (() => {
     }
   }, { passive: true });
 
-  // Adaptive smoothing: τ shrinks with gap size and recent input velocity.
-  // - Slow precise scroll: small gap, low velocity → τ ≈ τ_max → graceful.
-  // - Fast spin / flick:   large gap, high velocity → τ → τ_min → snappy.
-  // Plus a per-frame minimum closing speed proportional to input velocity
-  // so a hard wheel-spin never feels like the page is "catching up".
-  const TAU_MAX = 110;
-  const TAU_MIN = 28;
+  // Two-mode tracker:
+  //   ACTIVE INPUT  → currentX = targetX every frame (1:1, zero lag).
+  //   POST-RELEASE  → ease the remainder with a short τ so the track
+  //                   settles on a panel without snapping.
+  // Smoothing during active input was the lag the user kept feeling: any
+  // exponential lerp, no matter how tight, leaves currentX behind targetX
+  // while the wheel is still spinning.
+  const RELEASE_TAU_MS = 65;
+  const INPUT_RECENT_MS = 90;
   let lastFrameTs = 0;
   let lastWritingActive = false;
   let renderedX = -1;
@@ -1109,7 +1102,6 @@ const zaydanAnimationReady = (() => {
     const dt = Math.min(64, ts - lastFrameTs);
     lastFrameTs = ts;
 
-    // Flush deferred wheel input once per frame instead of per event.
     if (pendingInnerScroll !== 0) {
       const inner = document.getElementById('panel-2-inner');
       if (inner) inner.scrollBy(0, pendingInnerScroll);
@@ -1127,35 +1119,24 @@ const zaydanAnimationReady = (() => {
     }
 
     if (moving) {
-      const gap = targetX - currentX;
-      const absGap = gap < 0 ? -gap : gap;
-      // gap-proportional τ: at gap = 35% of viewport or more, drop to τ_min.
-      const gapRatio = Math.min(1, absGap / (maxX * 0.35));
-      // velocity-proportional τ: recent fast input → snappier.
-      const velRatio = Math.min(1, inputVelocity / 4); // px/ms
-      const blend = Math.max(gapRatio, velRatio);
-      const tau = TAU_MAX + (TAU_MIN - TAU_MAX) * blend;
+      const sinceInput = lastWheelTs ? (ts - lastWheelTs) : Infinity;
+      const activeInput = sinceInput < INPUT_RECENT_MS;
 
-      const k = isDragging ? 1 : 1 - Math.exp(-dt / tau);
-      let next = currentX + gap * k;
-
-      // Floor on closing speed: keep up with input rate (px per ms × dt).
-      // Stops the smoother from looking laggy after a hard wheel-spin.
-      const minStep = inputVelocity * dt * 0.85;
-      if (gap > 0 && next - currentX < minStep) next = currentX + Math.min(gap, minStep);
-      else if (gap < 0 && currentX - next < minStep) next = currentX - Math.min(-gap, minStep);
-
-      currentX = next;
-      if (Math.abs(targetX - currentX) < 0.05) currentX = targetX;
+      if (activeInput || isDragging) {
+        // Direct mode: track input 1:1. No catch-up gap to perceive.
+        currentX = targetX;
+      } else {
+        // Release ease: glide the leftover gap to rest.
+        const k = 1 - Math.exp(-dt / RELEASE_TAU_MS);
+        currentX += (targetX - currentX) * k;
+        if (Math.abs(targetX - currentX) < 0.5) currentX = targetX;
+      }
 
       const rounded = (-currentX) | 0;
       if (rounded !== renderedX) {
         track.style.transform = `translate3d(${rounded}px,0,0)`;
         renderedX = rounded;
       }
-      // Original midpoint trigger — restored now that the animations
-      // themselves are compositor-only (transform/opacity, no clip-path
-      // or drop-shadow filter), so they no longer fight the slide.
       const writing = currentX > maxX * 0.45;
       if (writing !== lastWritingActive) {
         panel2.classList.toggle('writing-active', writing);
@@ -1163,9 +1144,7 @@ const zaydanAnimationReady = (() => {
       }
     }
 
-    // Decay input velocity each frame so the snappy-mode releases gracefully.
     inputVelocity *= Math.exp(-dt / 120);
-
     requestAnimationFrame(renderHorizontalTrack);
   }
   requestAnimationFrame(renderHorizontalTrack);
