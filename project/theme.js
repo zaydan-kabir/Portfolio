@@ -1,7 +1,7 @@
 (function () {
   var storageKey = 'zaydan-theme';
   var root = document.documentElement;
-  var panelTwoVersion = '20260505-canvas-mouse-displacement';
+  var panelTwoVersion = '20260505-panel-text-sync';
 
   function getDefaultTheme() {
     return 'light';
@@ -92,7 +92,11 @@
     if (!panel || !inner) return;
     panel.dataset.panelTwoVersion = panelTwoVersion;
 
-    var manifestoText = 'During my years at Stanford, I often thought of Sylvia Plath\u2019s The Bell Jar. Most of the time, I saw my life branching out before me like that fig tree in the story, each fig a beautiful future, beckoning and winking. One is a humanitarian, changing the world one person at a time. Another one was a businessman, with a loving family. Another, a storm chaser with his horse in rural America, working the land and living authentically, and another, a man stuck in a town which slowly drains him of life until he concedes to whatever is demanded of him, coddled by a suffocating comfort. But as I sat at the crotch of that fig tree, starving, each of these figs fell to the ground, rotting at my feet. The words of Marguerite Duras often echoed through my being: \u201cthat very early in my life it was too late.\u201d Studying abroad at the University of Oxford, and then another semester in Washington, changed all of that. I realized that Politics, Philosophy, and Art were my interests. But Design. Design was what I wanted to do for the rest of my life. A search for meaning and inspiration in everything. To create, and not just consume. To put beauty and love back into the world that has given me so much.';
+    var manifestoText = [
+      'During my years at Stanford, I often returned to Sylvia Plath\u2019s The Bell Jar. I imagined my life much like that fig tree in the novel, each fig hanging before me as a different future. There was the life spent in service of others, trying in some small way to lessen injustice. There was the life of stability, success, and family. There was the fantasy of retreat, of distance from ambition and noise. And there was, too, the far less visible danger of drifting into a life that was comfortable enough to remain in, but not alive enough to feel proud of. For a long time, I found myself suspended between these possibilities, unable to commit to any one of them without feeling I was betraying the others. In moments like that, I often thought of Marguerite Duras\u2019s line: \u201cthat very early in my life it was too late.\u201d',
+      'My semester at the University of Oxford, followed by another in Washington, altered something fundamental in me. Distance has a way of clarifying what familiarity obscures. Removed from the habits and rhythms of Stanford, I began to understand that politics, philosophy, and art were not simply subjects I loved, but different vocabularies through which I had always tried to make sense of the world. Design, however, emerged as something more than an interest. It felt like a mode of attention, a way of looking closely enough at people, systems, and objects to imagine how they might be made better. For the first time, I had found not just what compelled me, but the form through which that compulsion could become real.',
+      'Since then, design has come to represent for me a search for meaning in the everyday: the possibility of creating rather than merely consuming, of shaping experiences rather than simply moving through them, and of returning something thoughtful, useful, and beautiful to a world that has given me so much.'
+    ].join(' ');
 
     var oldFig = document.getElementById('panel-2-fig');
     var oldSwordWrap = document.getElementById('panel-2-sword-wrap');
@@ -116,13 +120,13 @@
       '#panel-2-manuscript{display:none!important;}',
       '#panel-2 .p2-quote-wrap{display:none!important;}',
       '#panel-2-fig,#panel-2-sword-wrap{display:none!important;}',
-      '#panel-2-uncut-fig{display:block!important;position:absolute!important;right:clamp(20px,4.2vw,66px)!important;bottom:clamp(22px,5vh,70px)!important;left:auto!important;width:clamp(96px,12.5vw,196px)!important;height:auto!important;z-index:4!important;pointer-events:none!important;user-select:none!important;filter:drop-shadow(0 12px 24px rgba(0,0,0,.3));}',
+      '#panel-2-uncut-fig{display:block!important;position:absolute!important;right:clamp(18px,4vw,64px)!important;bottom:clamp(104px,9vw,150px)!important;left:auto!important;width:clamp(54px,7vw,96px)!important;height:auto!important;z-index:4!important;pointer-events:none!important;user-select:none!important;filter:drop-shadow(0 12px 24px rgba(0,0,0,.3));}',
       '#panel-2-flow{position:absolute;inset:0;z-index:5;pointer-events:none;}',
       '#panel-2-flow span{position:absolute;white-space:pre;font-family:Lora,Georgia,serif;font-style:italic;font-weight:400;line-height:1;color:rgba(240,240,240,.92);will-change:transform;}',
       'html[data-theme="light"] #panel-2-flow span{color:rgba(10,10,10,.94);}',
       '#panel-2-flow .p2-flow-attr{font-family:VT323,monospace;font-style:normal;letter-spacing:.08em;color:rgba(240,240,240,.5);}',
       'html[data-theme="light"] #panel-2-flow .p2-flow-attr{color:rgba(10,10,10,.58);}',
-      '@media(max-width:600px){#panel-2-uncut-fig{right:18px!important;bottom:24px!important;width:clamp(78px,24vw,118px)!important;}#panel-2-flow span{white-space:pre;}}'
+      '@media(max-width:600px){#panel-2-uncut-fig{right:14px!important;bottom:96px!important;width:min(18vw,64px)!important;}#panel-2-flow span{white-space:pre;}}'
     ].join('\n');
     document.head.appendChild(style);
 
