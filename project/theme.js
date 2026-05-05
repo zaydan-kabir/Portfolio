@@ -1,6 +1,7 @@
 (function () {
   var storageKey = 'zaydan-theme';
   var root = document.documentElement;
+  var panelTwoVersion = '20260505-pretext-mouse-displacement';
 
   function getDefaultTheme() {
     return 'light';
@@ -89,6 +90,7 @@
     var panel = document.getElementById('panel-2');
     var inner = document.getElementById('panel-2-inner');
     if (!panel || !inner) return;
+    panel.dataset.panelTwoVersion = panelTwoVersion;
 
     var manifestoText = 'During my years at Stanford, I often thought of Sylvia Plath\u2019s The Bell Jar. Most of the time, I saw my life branching out before me like that fig tree in the story, each fig a beautiful future, beckoning and winking. One is a humanitarian, changing the world one person at a time. Another one was a businessman, with a loving family. Another, a storm chaser with his horse in rural America, working the land and living authentically, and another, a man stuck in a town which slowly drains him of life until he concedes to whatever is demanded of him, coddled by a suffocating comfort. But as I sat at the crotch of that fig tree, starving, each of these figs fell to the ground, rotting at my feet. The words of Marguerite Duras often echoed through my being: \u201cthat very early in my life it was too late.\u201d Studying abroad at the University of Oxford, and then another semester in Washington, changed all of that. I realized that Politics, Philosophy, and Art were my interests. But Design. Design was what I wanted to do for the rest of my life. A search for meaning and inspiration in everything. To create, and not just consume. To put beauty and love back into the world that has given me so much.';
 
@@ -115,10 +117,10 @@
       '#panel-2 .p2-quote-wrap{display:none!important;}',
       '#panel-2-fig,#panel-2-sword-wrap{display:none!important;}',
       '#panel-2-uncut-fig{display:block!important;position:absolute!important;right:clamp(20px,4.2vw,66px)!important;bottom:clamp(22px,5vh,70px)!important;left:auto!important;width:clamp(96px,12.5vw,196px)!important;height:auto!important;z-index:4!important;pointer-events:none!important;user-select:none!important;filter:drop-shadow(0 12px 24px rgba(0,0,0,.3));}',
-      '#panel-2-flow{position:absolute;inset:0;z-index:2;pointer-events:none;}',
-      '#panel-2-flow span{position:absolute;white-space:pre;font-family:Lora,Georgia,serif;font-style:italic;font-weight:400;line-height:1;color:rgba(240,240,240,.9);will-change:transform,opacity;}',
-      'html[data-theme="light"] #panel-2-flow span{color:rgba(10,10,10,.93);}',
-      '#panel-2-flow .p2-flow-attr{font-family:VT323,monospace;font-style:normal;letter-spacing:.08em;color:rgba(240,240,240,.5);will-change:auto;}',
+      '#panel-2-flow{position:absolute;inset:0;z-index:5;pointer-events:none;}',
+      '#panel-2-flow span{position:absolute;white-space:pre;font-family:Lora,Georgia,serif;font-style:italic;font-weight:400;line-height:1;color:rgba(240,240,240,.92);will-change:transform;}',
+      'html[data-theme="light"] #panel-2-flow span{color:rgba(10,10,10,.94);}',
+      '#panel-2-flow .p2-flow-attr{font-family:VT323,monospace;font-style:normal;letter-spacing:.08em;color:rgba(240,240,240,.5);}',
       'html[data-theme="light"] #panel-2-flow .p2-flow-attr{color:rgba(10,10,10,.58);}',
       '@media(max-width:600px){#panel-2-uncut-fig{right:18px!important;bottom:24px!important;width:clamp(78px,24vw,118px)!important;}#panel-2-flow span{white-space:pre;}}'
     ].join('\n');
@@ -134,6 +136,7 @@
 
     var measureCanvas = document.createElement('canvas');
     var ctx = measureCanvas.getContext('2d');
+    var prepareWithSegments = null;
     var words = manifestoText.split(/\s+/);
     var attribution = 'Design Manifesto';
     var lastLayoutKey = '';
@@ -146,21 +149,39 @@
     var fieldX = 0;
     var fieldY = 0;
 
+    import('./node_modules/@chenglou/pretext/dist/layout.js')
+      .then(function (mod) {
+        prepareWithSegments = mod.prepareWithSegments || null;
+        lastLayoutKey = '';
+      })
+      .catch(function () {
+        prepareWithSegments = null;
+      });
+
     function clamp(value, min, max) {
       return Math.max(min, Math.min(max, value));
     }
 
-    function textWidth(value, font) {
+    function pretextWidth(value, font) {
+      if (prepareWithSegments) {
+        try {
+          var prepared = prepareWithSegments(value, font);
+          if (prepared && prepared.widths && prepared.widths.length) {
+            return prepared.widths.reduce(function (sum, width) { return sum + width; }, 0);
+          }
+        } catch (err) {}
+      }
       ctx.font = font;
       return ctx.measureText(value).width;
     }
 
     function charWidth(ch, font) {
-      if (font !== widthCacheKey) {
-        widthCacheKey = font;
+      var cacheKey = font + '|' + (prepareWithSegments ? 'pretext' : 'canvas');
+      if (cacheKey !== widthCacheKey) {
+        widthCacheKey = cacheKey;
         widthCache = Object.create(null);
       }
-      if (widthCache[ch] == null) widthCache[ch] = textWidth(ch, font);
+      if (widthCache[ch] == null) widthCache[ch] = pretextWidth(ch, font);
       return widthCache[ch];
     }
 
@@ -201,46 +222,48 @@
     function buildLines(font, boxWidth) {
       var lines = [];
       var line = '';
-      words.forEach(function (word) {
-        var proposed = line ? line + ' ' + word : word;
-        if (line && textWidth(proposed, font) > boxWidth) {
-          lines.push(line);
-          line = word;
+      words.forEach(function (word, index) {
+        var token = index === words.length - 1 ? word : word + ' ';
+        var proposed = line + token;
+        if (line && pretextWidth(proposed, font) > boxWidth) {
+          lines.push(line.trimEnd());
+          line = token;
         } else {
           line = proposed;
         }
       });
-      if (line) lines.push(line);
+      if (line) lines.push(line.trimEnd());
       return lines;
     }
 
     function buildTextLayout() {
       var size = panelSize();
       var isMobile = window.innerWidth < 600;
-      var boxWidth = isMobile ? size.width - 34 : Math.min(1000, size.width * 0.78);
-      var fontSize = isMobile ? Math.max(10.5, Math.min(12.8, boxWidth * 0.033)) : Math.max(12.5, Math.min(16.8, boxWidth * 0.0158));
-      var lineHeight = fontSize * (isMobile ? 1.36 : 1.48);
+      var boxWidth = isMobile ? size.width - 32 : Math.min(1040, size.width * 0.8);
+      var fontSize = isMobile ? Math.max(10, Math.min(12.4, boxWidth * 0.032)) : Math.max(12, Math.min(16.4, boxWidth * 0.0156));
+      var lineHeight = fontSize * (isMobile ? 1.34 : 1.46);
       var font = 'italic 400 ' + fontSize + 'px Lora, Georgia, serif';
       var lines = buildLines(font, boxWidth);
-      var maxHeight = size.height * (isMobile ? 0.78 : 0.72);
+      var maxHeight = size.height * (isMobile ? 0.76 : 0.68);
 
-      while (fontSize > 10 && lines.length * lineHeight > maxHeight) {
-        fontSize -= 0.5;
-        lineHeight = fontSize * (isMobile ? 1.34 : 1.46);
+      while (fontSize > 9.5 && lines.length * lineHeight > maxHeight) {
+        fontSize -= 0.45;
+        lineHeight = fontSize * (isMobile ? 1.32 : 1.44);
         font = 'italic 400 ' + fontSize + 'px Lora, Georgia, serif';
         lines = buildLines(font, boxWidth);
       }
 
-      var attrSize = Math.max(10.5, fontSize * 0.78);
+      var attrSize = Math.max(10, fontSize * 0.78);
       var attrFont = '400 ' + attrSize + 'px VT323, monospace';
       var textHeight = lines.length * lineHeight + lineHeight * 1.35;
-      var startY = Math.max(58, (size.height - textHeight) / 2);
+      var startY = (size.height - textHeight) / 2;
       var boxStart = Math.max(16, (size.width - boxWidth) / 2);
       var layoutKey = [
         Math.round(size.width),
         Math.round(size.height),
         Math.round(boxWidth),
         Math.round(fontSize * 10),
+        prepareWithSegments ? 'pretext' : 'canvas',
         root.dataset.theme || ''
       ].join(':');
 
@@ -254,48 +277,47 @@
       flow.style.height = size.height + 'px';
 
       lines.forEach(function (lineText, lineIndex) {
-        var lineWidth = textWidth(lineText, font);
+        var lineWidth = pretextWidth(lineText, font);
         var x = boxStart + Math.max(0, (boxWidth - lineWidth) / 2);
         var y = startY + lineIndex * lineHeight;
         for (var i = 0; i < lineText.length; i += 1) {
           var ch = lineText[i];
-          var w = charWidth(ch, font);
+          var width = charWidth(ch, font);
           var span = document.createElement('span');
           span.textContent = ch;
           span.style.left = x.toFixed(1) + 'px';
           span.style.top = y.toFixed(1) + 'px';
           span.style.fontSize = fontSize.toFixed(1) + 'px';
+          span.style.opacity = '1';
           frag.appendChild(span);
-          letters.push({ el: span, x: x, y: y, width: w, height: lineHeight, ox: 0, oy: 0, opacity: 1 });
-          x += w;
+          letters.push({ el: span, x: x, y: y, width: width, height: lineHeight, ox: 0, oy: 0 });
+          x += width;
         }
       });
 
       var attrSpan = document.createElement('span');
-      var attrWidth = textWidth(attribution, attrFont);
+      var attrWidth = pretextWidth(attribution, attrFont);
       attrSpan.className = 'p2-flow-attr';
       attrSpan.textContent = attribution;
       attrSpan.style.left = Math.max(0, (size.width - attrWidth) / 2).toFixed(1) + 'px';
-      attrSpan.style.top = (startY + lines.length * lineHeight + lineHeight * 0.5).toFixed(1) + 'px';
+      attrSpan.style.top = (startY + lines.length * lineHeight + lineHeight * 0.52).toFixed(1) + 'px';
       attrSpan.style.fontSize = attrSize.toFixed(1) + 'px';
       frag.appendChild(attrSpan);
 
       flow.appendChild(frag);
     }
 
-    function shapeTextAroundPointer() {
-      var radius = window.innerWidth < 600 ? 64 : 92;
-      var core = window.innerWidth < 600 ? 16 : 24;
-      var pushMax = window.innerWidth < 600 ? 24 : 38;
+    function moveLettersAwayFromPointer() {
+      var radius = window.innerWidth < 600 ? 58 : 86;
+      var pushMax = window.innerWidth < 600 ? 34 : 52;
       if (pointerActive) {
-        fieldX += (targetX - fieldX) * 0.2;
-        fieldY += (targetY - fieldY) * 0.2;
+        fieldX += (targetX - fieldX) * 0.34;
+        fieldY += (targetY - fieldY) * 0.34;
       }
 
       letters.forEach(function (item) {
         var nextX = 0;
         var nextY = 0;
-        var nextOpacity = 1;
         if (pointerActive) {
           var cx = item.x + item.width * 0.5;
           var cy = item.y + item.height * 0.48;
@@ -304,26 +326,23 @@
           var distance = Math.sqrt(dx * dx + dy * dy);
           if (distance < radius) {
             var strength = 1 - distance / radius;
-            var unitX = distance > 0.001 ? dx / distance : 0;
-            var unitY = distance > 0.001 ? dy / distance : -1;
+            var angle = distance > 0.001 ? Math.atan2(dy, dx) : -Math.PI / 2;
             var push = strength * strength * pushMax;
-            nextX = unitX * push;
-            nextY = unitY * push;
-            nextOpacity = distance < core ? 0.22 : clamp(0.46 + distance / radius * 0.54, 0.46, 1);
+            nextX = Math.cos(angle) * push;
+            nextY = Math.sin(angle) * push;
           }
         }
 
-        item.ox += (nextX - item.ox) * 0.26;
-        item.oy += (nextY - item.oy) * 0.26;
-        item.opacity += (nextOpacity - item.opacity) * 0.22;
-        item.el.style.transform = 'translate(' + item.ox.toFixed(2) + 'px,' + item.oy.toFixed(2) + 'px)';
-        item.el.style.opacity = item.opacity.toFixed(3);
+        item.ox += (nextX - item.ox) * 0.32;
+        item.oy += (nextY - item.oy) * 0.32;
+        item.el.style.transform = 'translate3d(' + item.ox.toFixed(2) + 'px,' + item.oy.toFixed(2) + 'px,0)';
+        item.el.style.opacity = '1';
       });
     }
 
     function animate() {
       buildTextLayout();
-      shapeTextAroundPointer();
+      moveLettersAwayFromPointer();
       requestAnimationFrame(animate);
     }
 
