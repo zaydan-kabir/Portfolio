@@ -73,6 +73,10 @@
       pointer-events: none; transform: translate(-50%, -50%); z-index: 9999;
     }
     #trail-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9997; }
+    html[data-theme="light"] body #trail-canvas,
+    html[data-theme="dark"] body #trail-canvas {
+      filter: none !important;
+    }
     #page-out {
       position: fixed; inset: 0; background: var(--ink); z-index: 8888; transform: scaleY(0); transform-origin: bottom;
       transition: transform 0.45s cubic-bezier(.76,0,.24,1);
