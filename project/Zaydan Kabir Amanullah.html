@@ -315,6 +315,9 @@
       transform: translateZ(0);
       will-change: transform;
       backface-visibility: hidden;
+      /* Isolate paint/layout so panel-2 entering the viewport doesn't
+         invalidate panel-1 and vice-versa. */
+      contain: layout paint style;
     }
     #panel-1 { left: 0; }
     #panel-2 { left: 100vw; }
@@ -326,6 +329,11 @@
     body.is-scrolling::after { mix-blend-mode: normal; opacity: 0.04; }
     body.is-scrolling #masthead-reference { filter: none; }
     body.is-scrolling #trail-canvas { visibility: hidden; }
+    /* The handwriting drop-shadow on panel-2 forces a filter region to
+       re-rasterize each frame the panel slides in. Drop it during motion;
+       it returns once the panel is settled. */
+    body.is-scrolling .p2-writing-line { filter: none; }
+    body.is-scrolling #panel-2-writing { transition: none; }
 
     /* ── ZAYDAN masthead — pinned to first horizontal panel ─── */
     #masthead {
@@ -1093,7 +1101,11 @@ const zaydanAnimationReady = (() => {
         track.style.transform = `translate3d(${rounded}px,0,0)`;
         renderedX = rounded;
       }
-      const writing = currentX > maxX * 0.45;
+      // Defer the writing-active animations (clip-path text reveal, SVG
+      // stroke-dashoffset, drop-shadowed handwriting) until the slide is
+      // mostly complete. Kicking these off at the midpoint of the scroll
+      // forced layout/paint mid-motion and was the source of panel-2 lag.
+      const writing = targetX >= maxX * 0.5 && currentX > maxX * 0.9;
       if (writing !== lastWritingActive) {
         panel2.classList.toggle('writing-active', writing);
         lastWritingActive = writing;
