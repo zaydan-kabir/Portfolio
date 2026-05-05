@@ -1,10 +1,10 @@
 ## Style Prompt
-A sharp editorial book-cover redesign preview for "My Year of Rest and Relaxation": classical sculpture treated like a scanned plate, brutal hot-pink type, black negative space, and a muted olive/charcoal paper field. The animation should feel like a cover being assembled on a light table: image exposure, type lockup, registration marks, and small print details. Clean, graphic, and bookish rather than decorative.
+A sharp editorial book-cover redesign preview: classical sculpture treated like a scanned plate, brutal hot-pink type, black negative space, and a sleek graphite field. The animation should feel like a cover being assembled on a light table: image exposure, type lockup, registration marks, and small print details. Clean, graphic, and bookish rather than decorative.
 
 ## Colors
 - Hot pink: #ff00b8
 - Black ink: #050505
-- Paper olive: #5d5b4a
+- Graphite field: #111318
 - Marble white: #f2eee6
 - Muted shadow: rgba(5,5,5,0.42)
 

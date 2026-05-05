@@ -17,8 +17,9 @@
       color: #ff00b8;
       font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
       background:
-        radial-gradient(circle at 78% 22%, rgba(255,0,184,.12), transparent 20%),
-        linear-gradient(135deg, #050505 0%, #181713 45%, #5d5b4a 100%);
+        radial-gradient(circle at 82% 16%, rgba(255,0,184,.16), transparent 18%),
+        radial-gradient(circle at 18% 84%, rgba(242,238,230,.06), transparent 24%),
+        linear-gradient(135deg, #020204 0%, #090a0e 44%, #171922 100%);
       isolation: isolate;
     }
 
@@ -36,11 +37,13 @@
       width: min(72vh, 78vw, 440px);
       aspect-ratio: 662 / 1000;
       overflow: hidden;
-      background: #5d5b4a;
+      background:
+        linear-gradient(135deg, rgba(255,0,184,.08), transparent 24%),
+        linear-gradient(180deg, #191b22 0%, #0b0c10 52%, #030304 100%);
       box-shadow:
-        0 28px 58px rgba(0,0,0,.48),
+        0 34px 72px rgba(0,0,0,.58),
         0 0 0 1px rgba(242,238,230,.18),
-        inset 0 0 0 7px rgba(5,5,5,.18);
+        inset 0 0 0 7px rgba(255,0,184,.055);
       transform-origin: 50% 58%;
       will-change: transform, opacity;
     }
@@ -51,25 +54,41 @@
       inset: 0;
       z-index: 1;
       background:
-        linear-gradient(180deg, rgba(5,5,5,.05), transparent 42%, rgba(5,5,5,.34)),
-        radial-gradient(circle at 42% 38%, rgba(242,238,230,.18), transparent 34%);
+        linear-gradient(180deg, rgba(255,255,255,.04), transparent 42%, rgba(5,5,5,.5)),
+        linear-gradient(90deg, rgba(255,0,184,.14) 0 1px, transparent 1px 100%),
+        linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 100%),
+        radial-gradient(circle at 42% 38%, rgba(242,238,230,.12), transparent 34%);
+      background-size: auto, 34px 34px, 34px 34px, auto;
       pointer-events: none;
     }
 
-    .source-cover {
+    .source-swatch {
       position: absolute;
       left: 5.2%;
       top: 7%;
       width: min(20vw, 176px);
       aspect-ratio: 662 / 1000;
-      object-fit: cover;
       z-index: 1;
-      opacity: .28;
-      filter: grayscale(1) contrast(.88) saturate(.2);
+      opacity: .66;
+      background:
+        linear-gradient(180deg, #252832 0%, #111318 58%, #050505 100%),
+        linear-gradient(90deg, transparent 0 18%, rgba(255,0,184,.72) 18% 22%, transparent 22% 100%);
       transform: rotate(-7deg);
-      box-shadow: 0 18px 34px rgba(0,0,0,.38);
+      box-shadow: 0 18px 34px rgba(0,0,0,.48), inset 0 0 0 1px rgba(255,0,184,.32);
       will-change: transform, opacity;
     }
+    .source-swatch::before,
+    .source-swatch::after {
+      content: '';
+      position: absolute;
+      left: 13%;
+      right: 13%;
+      height: 8%;
+      background: #ff00b8;
+      opacity: .95;
+    }
+    .source-swatch::before { top: 11%; box-shadow: 0 17px 0 rgba(255,0,184,.95); }
+    .source-swatch::after { bottom: 12%; height: 10%; box-shadow: 0 -20px 0 rgba(255,0,184,.95); }
 
     .reference-strip {
       position: absolute;
@@ -110,7 +129,7 @@
       transform: rotate(-3deg);
     }
 
-    .title,
+    .cover-label,
     .author {
       position: absolute;
       left: 6%;
@@ -125,9 +144,9 @@
       text-shadow: 0 1px 0 rgba(5,5,5,.34);
     }
 
-    .title {
+    .cover-label {
       top: 4.4%;
-      font-size: clamp(25px, 3.85vw, 54px);
+      font-size: clamp(29px, 4.4vw, 62px);
     }
 
     .author {
@@ -135,7 +154,7 @@
       font-size: clamp(37px, 5.8vw, 78px);
     }
 
-    .title span,
+    .cover-label span,
     .author span {
       display: block;
       will-change: transform, opacity;
@@ -235,9 +254,9 @@
 
     @media (max-aspect-ratio: 1/1) {
       .cover { width: min(78vw, 430px); }
-      .source-cover { width: 24vw; opacity: .2; }
+      .source-swatch { width: 24vw; opacity: .42; }
       .reference-strip { width: 42vw; }
-      .title { font-size: clamp(25px, 7.4vw, 48px); }
+      .cover-label { font-size: clamp(29px, 8vw, 54px); }
       .author { font-size: clamp(38px, 11vw, 72px); }
       .caption { display: none; }
     }
@@ -245,7 +264,7 @@
 </head>
 <body>
   <div data-composition-id="book-cover-redesign-preview" data-width="1280" data-height="982" data-duration="11" data-start="0" data-track-index="0">
-    <img class="source-cover" src="../uploads/book-cover-rest-reference.jpg" alt="" />
+    <div class="source-swatch" aria-hidden="true"></div>
     <img class="reference-strip" src="../uploads/sleeping-hermaphrodite-reference.jpg" alt="" />
 
     <main class="light-table">
@@ -254,12 +273,12 @@
         <img class="figure" src="../uploads/folded-arm-fix.png" alt="" />
         <div class="pink-wash"></div>
 
-        <h1 class="title">
-          <span>My Year of Rest</span>
-          <span>and Relaxation</span>
+        <h1 class="cover-label">
+          <span>Cover Study</span>
+          <span>Re-Design</span>
         </h1>
 
-        <p class="side-note">a novel<br>by the author<br>of <em>Eileen</em></p>
+        <p class="side-note">classical<br>figure plate<br>edition</p>
         <p class="plate-code">plate study / folded arm</p>
 
         <h2 class="author">
@@ -284,7 +303,7 @@
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      tl.from('.source-cover', {
+      tl.from('.source-swatch', {
         opacity: 0,
         x: -34,
         rotation: -11,
@@ -316,7 +335,7 @@
         ease: 'power3.out'
       }, 0.62);
 
-      tl.from('.title span', {
+      tl.from('.cover-label span', {
         opacity: 0,
         y: -28,
         duration: 0.62,
@@ -367,7 +386,7 @@
         repeat: 2
       }, 2.05);
 
-      tl.to('.title span, .author span', {
+      tl.to('.cover-label span, .author span', {
         y: -3,
         duration: 2.1,
         ease: 'sine.inOut',
