@@ -942,16 +942,30 @@ const zaydanAnimationReady = (() => {
   }
   window.addEventListener('resize', resizeHorizontalRange);
 
+  // Normalize wheel deltas across browsers/devices so big mouse-wheel
+  // notches don't cause large jumps while trackpad pixels stay responsive.
+  function normalizeWheelDelta(e) {
+    let d = e.deltaY + e.deltaX;
+    if (e.deltaMode === 1) d *= 16;        // lines → px
+    else if (e.deltaMode === 2) d *= window.innerHeight; // pages → px
+    // Soft-clamp huge ticks (some mice fire 100+ per notch) to keep motion graceful
+    const MAX_STEP = 80;
+    if (d > MAX_STEP) d = MAX_STEP;
+    else if (d < -MAX_STEP) d = -MAX_STEP;
+    return d;
+  }
+
   function handleWheel(e) {
     if (e.ctrlKey) return;
     e.preventDefault();
-    const delta = e.deltaY + e.deltaX;
+    const delta = normalizeWheelDelta(e);
     if (currentX >= maxX * 0.95) {
       const inner = document.getElementById('panel-2-inner');
       if (inner && inner.scrollHeight > inner.clientHeight) {
-        const atBottom = delta > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
-        const atTop    = delta < 0 && inner.scrollTop <= 0;
-        if (!atBottom && !atTop) { inner.scrollBy(0, delta); return; }
+        const rawDelta = e.deltaY + e.deltaX;
+        const atBottom = rawDelta > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
+        const atTop    = rawDelta < 0 && inner.scrollTop <= 0;
+        if (!atBottom && !atTop) { inner.scrollBy(0, rawDelta); return; }
       }
     }
     moveHorizontal(delta);
@@ -1003,11 +1017,19 @@ const zaydanAnimationReady = (() => {
     }
   }, { passive: true });
 
-  function renderHorizontalTrack() {
-    const lerpFactor = isDragging ? 1 : 0.12;
-    currentX += (targetX - currentX) * lerpFactor;
-    if (Math.abs(targetX - currentX) < 0.5) currentX = targetX;
-    track.style.transform = `translate3d(-${currentX.toFixed(2)}px,0,0)`;
+  // Frame-rate independent smoothing: a fixed time-constant gives the same
+  // visual feel on 60Hz, 120Hz and high-refresh displays. Higher τ → smoother
+  // & more graceful; lower τ → snappier. ~140ms reads as fluid but immediate.
+  const SMOOTH_TAU_MS = 140;
+  let lastFrameTs = 0;
+  function renderHorizontalTrack(ts) {
+    if (!lastFrameTs) lastFrameTs = ts;
+    const dt = Math.min(64, ts - lastFrameTs); // cap dt so a tab-switch doesn't snap
+    lastFrameTs = ts;
+    const k = isDragging ? 1 : 1 - Math.exp(-dt / SMOOTH_TAU_MS);
+    currentX += (targetX - currentX) * k;
+    if (Math.abs(targetX - currentX) < 0.05) currentX = targetX;
+    track.style.transform = `translate3d(${(-currentX).toFixed(2)}px,0,0)`;
     panel2.classList.toggle('writing-active', currentX > maxX * 0.45);
     requestAnimationFrame(renderHorizontalTrack);
   }
