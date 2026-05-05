@@ -88,30 +88,16 @@
   function initPanel2Manuscript() {
     var panel = document.getElementById('panel-2');
     var inner = document.getElementById('panel-2-inner');
-    var sword = document.getElementById('panel-2-fig');
-    if (!panel || !inner || !sword) return;
+    if (!panel || !inner) return;
 
     var manifestoText = 'During my years at Stanford, I often thought of Sylvia Plath\u2019s The Bell Jar. Most of the time, I saw my life branching out before me like that fig tree in the story, each fig a beautiful future, beckoning and winking. One is a humanitarian, changing the world one person at a time. Another one was a businessman, with a loving family. Another, a storm chaser with his horse in rural America, working the land and living authentically, and another, a man stuck in a town which slowly drains him of life until he concedes to whatever is demanded of him, coddled by a suffocating comfort. But as I sat at the crotch of that fig tree, starving, each of these figs fell to the ground, rotting at my feet. The words of Marguerite Duras often echoed through my being: \u201cthat very early in my life it was too late.\u201d Studying abroad at the University of Oxford, and then another semester in Washington, changed all of that. I realized that Politics, Philosophy, and Art were my interests. But Design. Design was what I wanted to do for the rest of my life. A search for meaning and inspiration in everything. To create, and not just consume. To put beauty and love back into the world that has given me so much.';
 
-    var stuckFig = document.getElementById('panel-2-uncut-fig');
-    if (!stuckFig) {
-      stuckFig = document.createElement('img');
-      stuckFig.id = 'panel-2-uncut-fig';
-      stuckFig.setAttribute('aria-hidden', 'true');
-      stuckFig.alt = '';
-      panel.insertBefore(stuckFig, panel.firstChild);
-    }
-    stuckFig.src = 'uploads/Uncut%20Fig%201.png';
-
-    var swordWrap = document.getElementById('panel-2-sword-wrap');
-    if (!swordWrap) {
-      swordWrap = document.createElement('div');
-      swordWrap.id = 'panel-2-sword-wrap';
-      panel.appendChild(swordWrap);
-    }
-    if (sword.parentNode !== swordWrap) swordWrap.appendChild(sword);
-    sword.src = 'uploads/Hilt%20Modification%201.png';
-    sword.alt = 'Sword hilt modification';
+    var oldFig = document.getElementById('panel-2-fig');
+    var oldUncut = document.getElementById('panel-2-uncut-fig');
+    var oldSwordWrap = document.getElementById('panel-2-sword-wrap');
+    if (oldFig) oldFig.style.setProperty('display', 'none', 'important');
+    if (oldUncut && oldUncut.parentNode) oldUncut.parentNode.removeChild(oldUncut);
+    if (oldSwordWrap && oldSwordWrap.parentNode) oldSwordWrap.parentNode.removeChild(oldSwordWrap);
 
     var style = document.createElement('style');
     style.textContent = [
@@ -119,16 +105,13 @@
       '#panel-2-manifesto{display:none!important;}',
       '#panel-2-manuscript{display:none!important;}',
       '#panel-2 .p2-quote-wrap{display:none!important;}',
+      '#panel-2-fig,#panel-2-uncut-fig,#panel-2-sword-wrap{display:none!important;}',
       '#panel-2-flow{position:absolute;inset:0;z-index:2;pointer-events:none;}',
       '#panel-2-flow span{position:absolute;white-space:pre;font-family:Lora,Georgia,serif;font-style:italic;font-weight:400;line-height:1;color:rgba(240,240,240,.9);will-change:transform,opacity;}',
       'html[data-theme="light"] #panel-2-flow span{color:rgba(10,10,10,.93);}',
       '#panel-2-flow .p2-flow-attr{font-family:VT323,monospace;font-style:normal;letter-spacing:.08em;color:rgba(240,240,240,.5);will-change:auto;}',
       'html[data-theme="light"] #panel-2-flow .p2-flow-attr{color:rgba(10,10,10,.58);}',
-      '#panel-2-uncut-fig{position:absolute!important;right:clamp(20px,4.2vw,66px)!important;bottom:clamp(22px,5vh,70px)!important;left:auto!important;width:clamp(96px,12.5vw,196px)!important;height:auto!important;z-index:4!important;pointer-events:none!important;user-select:none!important;filter:drop-shadow(0 12px 24px rgba(0,0,0,.3));}',
-      '#panel-2-sword-wrap{position:absolute!important;left:0;top:0;z-index:6!important;pointer-events:none!important;transform-origin:0 50%;will-change:left,top,transform;}',
-      '#panel-2-sword-wrap #panel-2-fig{position:absolute!important;left:0!important;top:50%!important;right:auto!important;bottom:auto!important;width:100%!important;height:auto!important;z-index:1!important;pointer-events:none!important;user-select:none!important;transform:translate(-7%,-50%)!important;transform-origin:7% 52%!important;filter:drop-shadow(0 7px 14px rgba(0,0,0,.24));will-change:transform;}',
-      'body.panel-2-pointer-active #trail-canvas{display:none!important;opacity:0!important;}',
-      '@media(max-width:600px){#panel-2-uncut-fig{right:18px!important;bottom:24px!important;width:clamp(78px,24vw,118px)!important;}#panel-2-flow span{white-space:pre;}}'
+      '@media(max-width:600px){#panel-2-flow span{white-space:pre;}}'
     ].join('\n');
     document.head.appendChild(style);
 
@@ -144,28 +127,18 @@
     var ctx = measureCanvas.getContext('2d');
     var words = manifestoText.split(/\s+/);
     var attribution = 'Design Manifesto';
-    var pointerHasMoved = false;
-    var releaseStarted = false;
-    var releaseDone = false;
-    var releaseStart = 0;
-    var visibleInPanel = false;
     var lastLayoutKey = '';
     var widthCacheKey = '';
     var widthCache = Object.create(null);
-    var flowLetters = [];
-    var anchorX = 0;
-    var anchorY = 0;
-    var tipX = 0;
-    var tipY = 0;
-    var targetTipX = 0;
-    var targetTipY = 0;
+    var letters = [];
+    var pointerActive = false;
+    var targetX = 0;
+    var targetY = 0;
+    var fieldX = 0;
+    var fieldY = 0;
 
     function clamp(value, min, max) {
       return Math.max(min, Math.min(max, value));
-    }
-
-    function easeOutCubic(t) {
-      return 1 - Math.pow(1 - t, 3);
     }
 
     function textWidth(value, font) {
@@ -189,94 +162,32 @@
       };
     }
 
-    function getFigRectInPanel() {
-      var panelRect = panel.getBoundingClientRect();
-      var figRect = stuckFig.getBoundingClientRect();
-      var fallbackWidth = clamp((panel.clientWidth || window.innerWidth) * 0.125, 96, 196);
-      var width = figRect.width || fallbackWidth;
-      var height = figRect.height || width * 0.88;
-      var right = figRect.width
-        ? (panelRect.right - figRect.right)
-        : Math.max(20, (panel.clientWidth || window.innerWidth) * 0.042);
-      var bottom = figRect.height
-        ? (panelRect.bottom - figRect.bottom)
-        : Math.max(22, (panel.clientHeight || window.innerHeight) * 0.05);
-      var left = (panel.clientWidth || window.innerWidth) - right - width;
-      var top = (panel.clientHeight || window.innerHeight) - bottom - height;
-      return { left: left, top: top, width: width, height: height, right: left + width, bottom: top + height };
-    }
-
-    function updateAnchor() {
-      var figRect = getFigRectInPanel();
-      anchorX = figRect.left + figRect.width * 0.42;
-      anchorY = figRect.top + figRect.height * 0.43;
-      return figRect;
-    }
-
-    function defaultTip() {
-      var size = panelSize();
-      var target = {
-        x: anchorX - size.width * (window.innerWidth < 600 ? 0.46 : 0.42),
-        y: anchorY - size.height * (window.innerWidth < 600 ? 0.34 : 0.38)
-      };
-      return clampTip(target.x, target.y);
-    }
-
-    function clampTip(x, y) {
-      var size = panelSize();
-      var margin = window.innerWidth < 600 ? 26 : 44;
-      return {
-        x: clamp(x, margin, size.width - margin),
-        y: clamp(y, margin + 56, size.height - margin)
-      };
-    }
-
-    function resetSword() {
-      updateAnchor();
-      var target = defaultTip();
-      targetTipX = target.x;
-      targetTipY = target.y;
-      tipX = anchorX + (target.x - anchorX) * 0.12;
-      tipY = anchorY + (target.y - anchorY) * 0.12;
-    }
-
-    function beginRelease() {
-      if (releaseStarted) return;
-      releaseStarted = true;
-      releaseDone = false;
-      releaseStart = performance.now();
-      resetSword();
-    }
-
-    function setPanelPointerState(clientX, clientY) {
+    function setPointer(clientX, clientY) {
       var rect = panel.getBoundingClientRect();
       var active = clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom;
-      document.body.classList.toggle('panel-2-pointer-active', active);
-      if (active) {
-        var trail = document.getElementById('trail-canvas');
-        if (trail && trail.getContext) trail.getContext('2d').clearRect(0, 0, trail.width, trail.height);
+      pointerActive = active;
+      if (!active) return;
+      var size = panelSize();
+      targetX = clamp(clientX - rect.left, 0, size.width);
+      targetY = clamp(clientY - rect.top, 0, size.height);
+      if (!fieldX && !fieldY) {
+        fieldX = targetX;
+        fieldY = targetY;
       }
-      return active;
-    }
-
-    function setTarget(clientX, clientY) {
-      if (!setPanelPointerState(clientX, clientY)) return;
-      var rect = panel.getBoundingClientRect();
-      var point = clampTip(clientX - rect.left, clientY - rect.top);
-      pointerHasMoved = true;
-      targetTipX = point.x;
-      targetTipY = point.y;
-      if (!releaseStarted && visibleInPanel) beginRelease();
     }
 
     document.addEventListener('mousemove', function (event) {
-      setTarget(event.clientX, event.clientY);
+      setPointer(event.clientX, event.clientY);
     });
 
     document.addEventListener('touchmove', function (event) {
       if (!event.touches.length) return;
-      setTarget(event.touches[0].clientX, event.touches[0].clientY);
+      setPointer(event.touches[0].clientX, event.touches[0].clientY);
     }, { passive: true });
+
+    document.addEventListener('mouseleave', function () {
+      pointerActive = false;
+    });
 
     function buildLines(font, boxWidth) {
       var lines = [];
@@ -326,7 +237,7 @@
 
       if (layoutKey === lastLayoutKey) return;
       lastLayoutKey = layoutKey;
-      flowLetters = [];
+      letters = [];
 
       var frag = document.createDocumentFragment();
       flow.replaceChildren();
@@ -346,7 +257,7 @@
           span.style.top = y.toFixed(1) + 'px';
           span.style.fontSize = fontSize.toFixed(1) + 'px';
           frag.appendChild(span);
-          flowLetters.push({ el: span, x: x, y: y, width: w, height: lineHeight });
+          letters.push({ el: span, x: x, y: y, width: w, height: lineHeight, ox: 0, oy: 0, opacity: 1 });
           x += w;
         }
       });
@@ -363,133 +274,54 @@
       flow.appendChild(frag);
     }
 
-    function shapeTextAroundSword() {
-      var dx = tipX - anchorX;
-      var dy = tipY - anchorY;
-      var len = Math.max(1, Math.sqrt(dx * dx + dy * dy));
-      var nx = -dy / len;
-      var ny = dx / len;
-      var radius = window.innerWidth < 600 ? 17 : 23;
-      var core = window.innerWidth < 600 ? 4 : 6;
-      var pushMax = window.innerWidth < 600 ? 14 : 24;
-      var figRect = getFigRectInPanel();
-      var figPad = Math.max(8, figRect.width * 0.04);
+    function shapeTextAroundPointer() {
+      var radius = window.innerWidth < 600 ? 64 : 92;
+      var core = window.innerWidth < 600 ? 16 : 24;
+      var pushMax = window.innerWidth < 600 ? 24 : 38;
+      if (pointerActive) {
+        fieldX += (targetX - fieldX) * 0.2;
+        fieldY += (targetY - fieldY) * 0.2;
+      }
 
-      flowLetters.forEach(function (item) {
-        var cx = item.x + item.width * 0.5;
-        var cy = item.y + item.height * 0.48;
-        var t = ((cx - anchorX) * dx + (cy - anchorY) * dy) / (len * len);
-        t = clamp(t, 0, 1);
-        var px = anchorX + dx * t;
-        var py = anchorY + dy * t;
-        var signed = (cx - px) * nx + (cy - py) * ny;
-        var distance = Math.abs(signed);
-        var effect = clamp(1 - distance / radius, 0, 1);
-        var side = signed < 0 ? -1 : 1;
-        var push = effect * effect * pushMax * side;
-        var opacity = distance < core ? 0.16 : clamp(0.38 + (distance / radius) * 0.62, 0.38, 1);
-
-        var figEffect = 0;
-        if (cx > figRect.left - figPad && cx < figRect.right + figPad && cy > figRect.top - figPad && cy < figRect.bottom + figPad) {
-          figEffect = 1;
+      letters.forEach(function (item) {
+        var nextX = 0;
+        var nextY = 0;
+        var nextOpacity = 1;
+        if (pointerActive) {
+          var cx = item.x + item.width * 0.5;
+          var cy = item.y + item.height * 0.48;
+          var dx = cx - fieldX;
+          var dy = cy - fieldY;
+          var distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < radius) {
+            var strength = 1 - distance / radius;
+            var unitX = distance > 0.001 ? dx / distance : 0;
+            var unitY = distance > 0.001 ? dy / distance : -1;
+            var push = strength * strength * pushMax;
+            nextX = unitX * push;
+            nextY = unitY * push;
+            nextOpacity = distance < core ? 0.22 : clamp(0.46 + distance / radius * 0.54, 0.46, 1);
+          }
         }
 
-        if (effect > 0.01) {
-          item.el.style.transform = 'translate(' + (nx * push).toFixed(2) + 'px,' + (ny * push).toFixed(2) + 'px)';
-          item.el.style.opacity = opacity.toFixed(3);
-        } else if (figEffect) {
-          item.el.style.transform = 'translate(-10px,-4px)';
-          item.el.style.opacity = '0.24';
-        } else {
-          item.el.style.transform = 'translate(0px,0px)';
-          item.el.style.opacity = '1';
-        }
+        item.ox += (nextX - item.ox) * 0.26;
+        item.oy += (nextY - item.oy) * 0.26;
+        item.opacity += (nextOpacity - item.opacity) * 0.22;
+        item.el.style.transform = 'translate(' + item.ox.toFixed(2) + 'px,' + item.oy.toFixed(2) + 'px)';
+        item.el.style.opacity = item.opacity.toFixed(3);
       });
     }
 
-    function checkPanelVisible() {
-      var rect = panel.getBoundingClientRect();
-      var visibleX = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
-      var visibleY = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
-      var ratio = (visibleX * visibleY) / Math.max(1, rect.width * rect.height);
-      visibleInPanel = ratio > 0.14;
-      if (visibleInPanel) beginRelease();
-    }
-
-    function renderSword() {
-      updateAnchor();
-      if (!releaseStarted) {
-        resetSword();
-      } else if (!releaseDone) {
-        var target = pointerHasMoved ? { x: targetTipX, y: targetTipY } : defaultTip();
-        var elapsed = performance.now() - releaseStart;
-        var t = Math.min(1, elapsed / 1100);
-        var eased = easeOutCubic(t);
-        var wiggle = Math.sin(t * Math.PI * 9) * (1 - t);
-        tipX = anchorX + (target.x - anchorX) * (0.1 + eased * 0.9) + wiggle * 8;
-        tipY = anchorY + (target.y - anchorY) * (0.1 + eased * 0.9) + Math.cos(t * Math.PI * 8) * (1 - t) * 7;
-        if (t >= 1) releaseDone = true;
-      } else {
-        if (!pointerHasMoved) {
-          var fallback = defaultTip();
-          targetTipX = fallback.x;
-          targetTipY = fallback.y;
-        }
-        tipX += (targetTipX - tipX) * 0.22;
-        tipY += (targetTipY - tipY) * 0.22;
-      }
-
-      var dx = tipX - anchorX;
-      var dy = tipY - anchorY;
-      var distance = Math.max(58, Math.sqrt(dx * dx + dy * dy));
-      var angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      var size = panelSize();
-      var baseWidth = clamp(size.width * (window.innerWidth < 600 ? 0.44 : 0.34), 170, 430);
-      var baseHeight = clamp(size.width * (window.innerWidth < 600 ? 0.095 : 0.055), 38, 78);
-      var baseReach = baseWidth * 0.86;
-      var scaleX = clamp(distance / baseReach, 0.48, 1.62);
-
-      swordWrap.style.width = baseWidth.toFixed(1) + 'px';
-      swordWrap.style.height = baseHeight.toFixed(1) + 'px';
-      swordWrap.style.left = anchorX.toFixed(1) + 'px';
-      swordWrap.style.top = (anchorY - baseHeight * 0.5).toFixed(1) + 'px';
-      swordWrap.style.transform = 'rotate(' + angle.toFixed(2) + 'deg) scaleX(' + scaleX.toFixed(3) + ')';
-    }
-
     function animate() {
-      renderSword();
       buildTextLayout();
-      shapeTextAroundSword();
+      shapeTextAroundPointer();
       requestAnimationFrame(animate);
     }
 
-    stuckFig.addEventListener('load', function () {
-      lastLayoutKey = '';
-      resetSword();
-    });
-    sword.addEventListener('load', function () {
-      lastLayoutKey = '';
-    });
-
     window.addEventListener('resize', function () {
       lastLayoutKey = '';
-      resetSword();
-      checkPanelVisible();
     });
-    window.addEventListener('scroll', checkPanelVisible, { passive: true });
 
-    if ('IntersectionObserver' in window) {
-      var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          visibleInPanel = entry.isIntersecting && entry.intersectionRatio > 0.14;
-          if (visibleInPanel) beginRelease();
-        });
-      }, { threshold: [0, 0.14, 0.28] });
-      observer.observe(panel);
-    }
-
-    resetSword();
-    checkPanelVisible();
     requestAnimationFrame(animate);
   }
 
