@@ -93,11 +93,19 @@
     var manifestoText = 'During my years at Stanford, I often thought of Sylvia Plath\u2019s The Bell Jar. Most of the time, I saw my life branching out before me like that fig tree in the story, each fig a beautiful future, beckoning and winking. One is a humanitarian, changing the world one person at a time. Another one was a businessman, with a loving family. Another, a storm chaser with his horse in rural America, working the land and living authentically, and another, a man stuck in a town which slowly drains him of life until he concedes to whatever is demanded of him, coddled by a suffocating comfort. But as I sat at the crotch of that fig tree, starving, each of these figs fell to the ground, rotting at my feet. The words of Marguerite Duras often echoed through my being: \u201cthat very early in my life it was too late.\u201d Studying abroad at the University of Oxford, and then another semester in Washington, changed all of that. I realized that Politics, Philosophy, and Art were my interests. But Design. Design was what I wanted to do for the rest of my life. A search for meaning and inspiration in everything. To create, and not just consume. To put beauty and love back into the world that has given me so much.';
 
     var oldFig = document.getElementById('panel-2-fig');
-    var oldUncut = document.getElementById('panel-2-uncut-fig');
     var oldSwordWrap = document.getElementById('panel-2-sword-wrap');
     if (oldFig) oldFig.style.setProperty('display', 'none', 'important');
-    if (oldUncut && oldUncut.parentNode) oldUncut.parentNode.removeChild(oldUncut);
     if (oldSwordWrap && oldSwordWrap.parentNode) oldSwordWrap.parentNode.removeChild(oldSwordWrap);
+
+    var cornerFig = document.getElementById('panel-2-uncut-fig');
+    if (!cornerFig) {
+      cornerFig = document.createElement('img');
+      cornerFig.id = 'panel-2-uncut-fig';
+      cornerFig.alt = '';
+      cornerFig.setAttribute('aria-hidden', 'true');
+      panel.appendChild(cornerFig);
+    }
+    cornerFig.src = 'uploads/Uncut%20Fig%201.png';
 
     var style = document.createElement('style');
     style.textContent = [
@@ -105,13 +113,14 @@
       '#panel-2-manifesto{display:none!important;}',
       '#panel-2-manuscript{display:none!important;}',
       '#panel-2 .p2-quote-wrap{display:none!important;}',
-      '#panel-2-fig,#panel-2-uncut-fig,#panel-2-sword-wrap{display:none!important;}',
+      '#panel-2-fig,#panel-2-sword-wrap{display:none!important;}',
+      '#panel-2-uncut-fig{display:block!important;position:absolute!important;right:clamp(20px,4.2vw,66px)!important;bottom:clamp(22px,5vh,70px)!important;left:auto!important;width:clamp(96px,12.5vw,196px)!important;height:auto!important;z-index:4!important;pointer-events:none!important;user-select:none!important;filter:drop-shadow(0 12px 24px rgba(0,0,0,.3));}',
       '#panel-2-flow{position:absolute;inset:0;z-index:2;pointer-events:none;}',
       '#panel-2-flow span{position:absolute;white-space:pre;font-family:Lora,Georgia,serif;font-style:italic;font-weight:400;line-height:1;color:rgba(240,240,240,.9);will-change:transform,opacity;}',
       'html[data-theme="light"] #panel-2-flow span{color:rgba(10,10,10,.93);}',
       '#panel-2-flow .p2-flow-attr{font-family:VT323,monospace;font-style:normal;letter-spacing:.08em;color:rgba(240,240,240,.5);will-change:auto;}',
       'html[data-theme="light"] #panel-2-flow .p2-flow-attr{color:rgba(10,10,10,.58);}',
-      '@media(max-width:600px){#panel-2-flow span{white-space:pre;}}'
+      '@media(max-width:600px){#panel-2-uncut-fig{right:18px!important;bottom:24px!important;width:clamp(78px,24vw,118px)!important;}#panel-2-flow span{white-space:pre;}}'
     ].join('\n');
     document.head.appendChild(style);
 
@@ -208,12 +217,15 @@
     function buildTextLayout() {
       var size = panelSize();
       var isMobile = window.innerWidth < 600;
+      var figRect = cornerFig.getBoundingClientRect();
+      var panelRect = panel.getBoundingClientRect();
+      var figTop = figRect.height ? figRect.top - panelRect.top : size.height;
       var boxWidth = isMobile ? size.width - 34 : Math.min(1000, size.width * 0.78);
       var fontSize = isMobile ? Math.max(10.5, Math.min(12.8, boxWidth * 0.033)) : Math.max(12.5, Math.min(16.8, boxWidth * 0.0158));
       var lineHeight = fontSize * (isMobile ? 1.36 : 1.48);
       var font = 'italic 400 ' + fontSize + 'px Lora, Georgia, serif';
       var lines = buildLines(font, boxWidth);
-      var maxHeight = size.height * (isMobile ? 0.78 : 0.72);
+      var maxHeight = Math.min(size.height * (isMobile ? 0.78 : 0.72), Math.max(260, figTop - 72));
 
       while (fontSize > 10 && lines.length * lineHeight > maxHeight) {
         fontSize -= 0.5;
@@ -225,13 +237,15 @@
       var attrSize = Math.max(10.5, fontSize * 0.78);
       var attrFont = '400 ' + attrSize + 'px VT323, monospace';
       var textHeight = lines.length * lineHeight + lineHeight * 1.35;
-      var startY = Math.max(58, (size.height - textHeight) / 2);
+      var availableBottom = Math.min(size.height - 42, figTop - 34);
+      var startY = Math.max(58, (availableBottom - textHeight) / 2 + 24);
       var boxStart = Math.max(16, (size.width - boxWidth) / 2);
       var layoutKey = [
         Math.round(size.width),
         Math.round(size.height),
         Math.round(boxWidth),
         Math.round(fontSize * 10),
+        Math.round(figTop),
         root.dataset.theme || ''
       ].join(':');
 
@@ -317,6 +331,10 @@
       shapeTextAroundPointer();
       requestAnimationFrame(animate);
     }
+
+    cornerFig.addEventListener('load', function () {
+      lastLayoutKey = '';
+    });
 
     window.addEventListener('resize', function () {
       lastLayoutKey = '';
