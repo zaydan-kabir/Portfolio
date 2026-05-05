@@ -4,450 +4,400 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Book Cover Re-Design HyperFrame Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #050505; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #0a0d12; }
 
     [data-composition-id="book-cover-redesign-preview"] {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      color: #ff00b8;
-      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
+      color: #ece6d8;
+      font-family: 'Libre Baskerville', Georgia, serif;
       background:
-        radial-gradient(circle at 82% 16%, rgba(255,0,184,.16), transparent 18%),
-        radial-gradient(circle at 18% 84%, rgba(242,238,230,.06), transparent 24%),
-        linear-gradient(135deg, #020204 0%, #090a0e 44%, #171922 100%);
+        radial-gradient(ellipse at 50% 38%, #14181f 0%, #0a0d12 56%, #04060a 100%);
       isolation: isolate;
     }
 
-    .light-table {
+    .stage {
       position: absolute;
       inset: 0;
       display: grid;
       place-items: center;
-      padding: clamp(18px, 3vw, 42px);
-      z-index: 2;
-    }
-
-    .cover {
-      position: relative;
-      width: min(72vh, 78vw, 440px);
-      aspect-ratio: 662 / 1000;
-      overflow: hidden;
-      z-index: 4;
-      background:
-        linear-gradient(135deg, rgba(255,0,184,.13), transparent 25%),
-        linear-gradient(180deg, #222532 0%, #101219 52%, #050507 100%);
-      box-shadow:
-        0 36px 82px rgba(0,0,0,.66),
-        0 0 0 1px rgba(255,0,184,.28),
-        0 0 46px rgba(255,0,184,.07),
-        inset 0 0 0 7px rgba(255,0,184,.07);
-      transform-origin: 50% 58%;
-      will-change: transform, opacity;
-    }
-
-    .cover::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.04), transparent 42%, rgba(5,5,5,.5)),
-        linear-gradient(90deg, rgba(255,0,184,.14) 0 1px, transparent 1px 100%),
-        linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 100%),
-        radial-gradient(circle at 42% 38%, rgba(242,238,230,.12), transparent 34%);
-      background-size: auto, 34px 34px, 34px 34px, auto;
-      pointer-events: none;
-    }
-
-    .source-swatch {
-      position: absolute;
-      left: 5.2%;
-      top: 7%;
-      width: min(20vw, 176px);
-      aspect-ratio: 662 / 1000;
-      z-index: 1;
-      opacity: .66;
-      background:
-        linear-gradient(180deg, #252832 0%, #111318 58%, #050505 100%),
-        linear-gradient(90deg, transparent 0 18%, rgba(255,0,184,.72) 18% 22%, transparent 22% 100%);
-      transform: rotate(-7deg);
-      box-shadow: 0 18px 34px rgba(0,0,0,.48), inset 0 0 0 1px rgba(255,0,184,.32);
-      will-change: transform, opacity;
-    }
-    .source-swatch::before,
-    .source-swatch::after {
-      content: '';
-      position: absolute;
-      left: 13%;
-      right: 13%;
-      height: 8%;
-      background: #ff00b8;
-      opacity: .95;
-    }
-    .source-swatch::before { top: 11%; box-shadow: 0 17px 0 rgba(255,0,184,.95); }
-    .source-swatch::after { bottom: 12%; height: 10%; box-shadow: 0 -20px 0 rgba(255,0,184,.95); }
-
-    .reference-strip {
-      position: absolute;
-      right: 4.6%;
-      bottom: 9%;
-      width: min(31vw, 370px);
-      height: clamp(80px, 15vw, 160px);
-      object-fit: cover;
-      z-index: 1;
-      opacity: .38;
-      filter: grayscale(1) contrast(1.18) brightness(.78);
-      mix-blend-mode: screen;
-      transform: rotate(3deg);
-      will-change: transform, opacity;
-    }
-
-    .figure {
-      position: absolute;
-      left: -17%;
-      top: 32%;
-      width: 134%;
       z-index: 3;
-      filter: grayscale(1) contrast(1.3) brightness(1.06);
-      mix-blend-mode: screen;
-      opacity: .94;
-      transform-origin: 50% 55%;
+    }
+
+    .book {
+      position: relative;
+      width: min(56vh, 62vw, 360px);
+      aspect-ratio: 0.66;
+      background: #ece6d8;
+      box-shadow:
+        0 26px 60px rgba(0,0,0,0.62),
+        0 0 0 1px rgba(193,40,29,0.18),
+        inset 0 0 0 1px rgba(10,10,10,0.08);
+      transform-origin: 50% 70%;
       will-change: transform, opacity;
     }
 
-    .figure-shadow {
+    .book::before {
+      content: '';
       position: absolute;
-      left: -9%;
-      top: 49%;
-      width: 118%;
-      height: 18%;
-      z-index: 2;
-      background: radial-gradient(ellipse at center, rgba(5,5,5,.62), transparent 68%);
-      transform: rotate(-3deg);
-    }
-
-    .cover-label,
-    .study-lockup {
-      position: absolute;
-      left: 6%;
-      right: 6%;
-      z-index: 5;
-      color: #ff00b8;
-      text-transform: uppercase;
-      letter-spacing: -.025em;
-      line-height: .9;
-      text-shadow: 0 1px 0 rgba(5,5,5,.34);
-    }
-
-    .cover-label {
-      top: 4.4%;
-      display: grid;
-      gap: .02em;
-      font-size: clamp(29px, 4.4vw, 62px);
-    }
-
-    .study-lockup {
-      bottom: 5.4%;
-      display: grid;
-      gap: clamp(7px, 1vw, 12px);
-      align-items: end;
-    }
-
-    .study-rule {
-      display: block;
-      width: 100%;
-      height: 2px;
-      background: #ff00b8;
-      transform-origin: left center;
-      opacity: .9;
-      will-change: transform, opacity;
-    }
-
-    .study-kicker {
-      color: rgba(242,238,230,.76);
-      font-family: 'Libre Baskerville', Georgia, serif;
-      font-size: clamp(8px, .85vw, 12px);
-      letter-spacing: .2em;
-      line-height: 1.3;
-      text-transform: uppercase;
-      will-change: transform, opacity;
-    }
-
-    .study-title {
-      display: grid;
-      gap: .02em;
-      font-size: clamp(34px, 5.35vw, 74px);
-      letter-spacing: -.035em;
-      line-height: .86;
-    }
-
-    .cover-label span,
-    .study-title span {
-      display: block;
-      will-change: transform, opacity;
-    }
-
-    .side-note {
-      position: absolute;
-      right: 7%;
-      top: 52%;
-      z-index: 6;
-      width: 30%;
-      color: #ff00b8;
-      font-family: 'Libre Baskerville', Georgia, serif;
-      font-size: clamp(10px, 1.05vw, 14px);
-      line-height: 1.25;
-      text-align: right;
-      will-change: transform, opacity;
-    }
-
-    .plate-code {
-      position: absolute;
-      left: 7%;
-      bottom: 28%;
-      z-index: 6;
-      color: rgba(242,238,230,.7);
-      font-family: 'Libre Baskerville', Georgia, serif;
-      font-size: clamp(8px, .78vw, 11px);
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      will-change: transform, opacity;
-    }
-
-    .crop-mark {
-      position: absolute;
-      width: clamp(16px, 2vw, 28px);
-      height: clamp(16px, 2vw, 28px);
-      z-index: 7;
-      border-color: rgba(255,0,184,.78);
-      will-change: transform, opacity;
-    }
-    .crop-mark.tl { left: 4%; top: 3%; border-left: 2px solid; border-top: 2px solid; }
-    .crop-mark.tr { right: 4%; top: 3%; border-right: 2px solid; border-top: 2px solid; }
-    .crop-mark.bl { left: 4%; bottom: 3%; border-left: 2px solid; border-bottom: 2px solid; }
-    .crop-mark.br { right: 4%; bottom: 3%; border-right: 2px solid; border-bottom: 2px solid; }
-
-    .caption {
-      position: absolute;
-      left: clamp(18px, 3vw, 42px);
-      bottom: clamp(16px, 2.8vw, 36px);
-      z-index: 8;
-      color: rgba(242,238,230,.7);
-      font-family: 'Libre Baskerville', Georgia, serif;
-      font-size: clamp(9px, .88vw, 12px);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-
-    .pink-wash,
-    .grain,
-    .halftone,
-    .vignette {
-      position: absolute;
-      inset: 0;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: linear-gradient(90deg, rgba(10,10,10,0.42), rgba(10,10,10,0));
       pointer-events: none;
     }
 
-    .pink-wash {
-      z-index: 4;
-      opacity: .16;
-      mix-blend-mode: screen;
-      background:
-        linear-gradient(90deg, transparent 0 24%, rgba(255,0,184,.45) 24% 26%, transparent 26% 100%),
-        linear-gradient(180deg, transparent 0 71%, rgba(255,0,184,.42) 71% 73%, transparent 73% 100%);
+    .book::after {
+      content: '';
+      position: absolute;
+      left: 8.5%;
+      right: 8.5%;
+      top: 8.5%;
+      bottom: 8.5%;
+      border: 1px solid rgba(10,10,10,0.18);
+      pointer-events: none;
+    }
+
+    .cover-eyebrow {
+      position: absolute;
+      left: 12%;
+      right: 12%;
+      top: 11%;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(8px, 1.05vw, 13px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(10,10,10,0.62);
+      text-align: center;
+      will-change: transform, opacity;
+    }
+
+    .cover-title {
+      position: absolute;
+      left: 9%;
+      right: 9%;
+      top: 26%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: clamp(2px, 0.35vw, 6px);
+      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
+      color: #0a0a0a;
+      text-align: center;
+      line-height: 0.86;
+      letter-spacing: -0.025em;
+      text-transform: uppercase;
+    }
+    .cover-title .ln {
+      font-size: clamp(28px, 5.6vw, 76px);
+      overflow: hidden;
+    }
+    .cover-title .ln span {
+      display: block;
+      will-change: transform, opacity;
+    }
+
+    .cover-rule {
+      position: absolute;
+      left: 14%;
+      right: 14%;
+      top: 66%;
+      height: 2px;
+      background: #c1281d;
+      transform-origin: left center;
+      will-change: transform, opacity;
+    }
+
+    .cover-credit {
+      position: absolute;
+      left: 12%;
+      right: 12%;
+      top: 70%;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(10px, 1.25vw, 16px);
+      letter-spacing: 0.04em;
+      color: rgba(10,10,10,0.78);
+      text-align: center;
+      line-height: 1.35;
+      will-change: transform, opacity;
+    }
+    .cover-credit .key {
+      display: block;
+      font-style: normal;
+      font-size: clamp(8px, 0.92vw, 11px);
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(10,10,10,0.5);
+      margin-bottom: 4px;
+    }
+
+    .cover-foot {
+      position: absolute;
+      left: 14%;
+      right: 14%;
+      bottom: 8.5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: clamp(8px, 0.85vw, 11px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(10,10,10,0.55);
+      will-change: transform, opacity;
+    }
+
+    .stamp-wrap {
+      position: absolute;
+      right: 14%;
+      top: 9%;
+      transform: rotate(11deg);
+      z-index: 8;
+      pointer-events: none;
+      will-change: transform;
+    }
+    .stamp {
+      padding: 5px 11px 6px;
+      border: 2px solid #c1281d;
+      box-shadow: inset 0 0 0 2px rgba(236,230,216,0.94), inset 0 0 0 3px #c1281d;
+      color: #c1281d;
+      font-family: 'Special Elite', 'Courier Prime', monospace;
+      font-size: clamp(8px, 0.85vw, 11px);
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      background: rgba(236,230,216,0.4);
+      white-space: nowrap;
+    }
+
+    .scene-meta {
+      position: absolute;
+      left: 5%;
+      right: 5%;
+      top: 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: clamp(9px, 0.95vw, 12px);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(236,230,216,0.5);
+      z-index: 6;
+      will-change: opacity;
+    }
+
+    .scene-foot {
+      position: absolute;
+      left: 5%;
+      right: 5%;
+      bottom: 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(9px, 0.95vw, 12px);
+      letter-spacing: 0.04em;
+      color: rgba(236,230,216,0.55);
+      z-index: 6;
+      will-change: opacity;
+    }
+    .scene-foot .key {
+      font-style: normal;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(236,230,216,0.42);
+      margin-right: 0.6em;
+    }
+
+    .desk-shadow {
+      position: absolute;
+      left: 50%;
+      top: 76%;
+      width: min(70vw, 460px);
+      height: 30px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.55), transparent 68%);
+      transform: translateX(-50%);
+      z-index: 2;
+      filter: blur(6px);
+      pointer-events: none;
     }
 
     .grain {
+      position: absolute;
+      inset: 0;
       z-index: 12;
-      opacity: .14;
-      mix-blend-mode: multiply;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
-      background-size: 170px 170px;
-    }
-
-    .halftone {
-      z-index: 11;
-      opacity: .16;
-      mix-blend-mode: multiply;
-      background-image: radial-gradient(circle at center, rgba(5,5,5,.5) 0 1px, transparent 1.4px);
-      background-size: 12px 12px;
+      pointer-events: none;
+      opacity: 0.16;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
     }
 
     .vignette {
-      z-index: 13;
-      box-shadow: inset 0 0 85px rgba(0,0,0,.44);
-      background: radial-gradient(ellipse at center, transparent 58%, rgba(5,5,5,.44) 100%);
+      position: absolute;
+      inset: 0;
+      z-index: 11;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 58%, rgba(0,0,0,0.55) 100%);
     }
 
     @media (max-aspect-ratio: 1/1) {
-      .cover { width: min(78vw, 430px); }
-      .source-swatch { width: 24vw; opacity: .42; }
-      .reference-strip { width: 42vw; }
-      .cover-label { font-size: clamp(29px, 8vw, 54px); }
-      .study-title { font-size: clamp(34px, 10vw, 68px); }
-      .caption { display: none; }
+      .book { width: min(72vw, 320px); }
+      .scene-meta, .scene-foot { font-size: 9px; letter-spacing: 0.14em; }
+      .stamp { font-size: 8px; letter-spacing: 0.22em; padding: 4px 9px 5px; }
     }
   </style>
 </head>
 <body>
-  <div data-composition-id="book-cover-redesign-preview" data-width="1280" data-height="982" data-duration="11" data-start="0" data-track-index="0">
-    <div class="source-swatch" aria-hidden="true"></div>
-    <img class="reference-strip" src="../uploads/sleeping-hermaphrodite-reference.jpg" alt="" />
+  <div data-composition-id="book-cover-redesign-preview" data-width="982" data-height="982" data-duration="11" data-start="0" data-track-index="0">
+    <div class="scene-meta">
+      <span>Cover · Proof 03</span>
+      <span>06 / Spring Edition</span>
+    </div>
 
-    <main class="light-table">
-      <section class="cover" aria-label="Animated book cover redesign preview">
-        <div class="figure-shadow"></div>
-        <img class="figure" src="../uploads/folded-arm-fix.png" alt="" />
-        <div class="pink-wash"></div>
+    <div class="stage">
+      <div class="book">
+        <p class="cover-eyebrow">— a paperback —</p>
 
-        <h1 class="cover-label">
-          <span>Cover Study</span>
-          <span>Re-Design</span>
-        </h1>
-
-        <p class="side-note">classical<br>figure plate<br>redrawn</p>
-        <p class="plate-code">plate study / folded arm</p>
-
-        <div class="study-lockup">
-          <span class="study-rule"></span>
-          <span class="study-kicker">digital design / type study</span>
-          <h2 class="study-title">
-            <span>Figure</span>
-            <span>Study</span>
-          </h2>
+        <div class="cover-title">
+          <div class="ln"><span>Book</span></div>
+          <div class="ln"><span>Cover</span></div>
+          <div class="ln"><span>Redesign</span></div>
         </div>
 
-        <i class="crop-mark tl"></i>
-        <i class="crop-mark tr"></i>
-        <i class="crop-mark bl"></i>
-        <i class="crop-mark br"></i>
-      </section>
-    </main>
+        <span class="cover-rule"></span>
 
-    <div class="caption">Book cover re-design / digital / graphic / type</div>
-    <div class="halftone"></div>
-    <div class="grain"></div>
+        <div class="cover-credit">
+          <span class="key">a study by</span>
+          Zaydan Kabir Amanullah
+        </div>
+
+        <div class="cover-foot">
+          <span>No. 06</span>
+          <span>Coming Soon</span>
+        </div>
+
+        <div class="stamp-wrap">
+          <div class="stamp">Coming Soon</div>
+        </div>
+      </div>
+      <div class="desk-shadow"></div>
+    </div>
+
+    <div class="scene-foot">
+      <span><span class="key">Disciplines</span>Digital · Graphic · Type</span>
+      <span>Edition 06</span>
+    </div>
+
     <div class="vignette"></div>
+    <div class="grain"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      tl.from('.source-swatch', {
+      tl.from('.scene-meta', { opacity: 0, y: -8, duration: 0.55, ease: 'power2.out' }, 0)
+        .from('.scene-foot', { opacity: 0, y: 8,  duration: 0.55, ease: 'power2.out' }, 0.08);
+
+      tl.from('.book', {
+        y: 36,
+        scale: 0.92,
         opacity: 0,
-        x: -34,
-        rotation: -11,
-        duration: 0.72,
-        ease: 'power3.out'
-      }, 0.05);
-
-      tl.from('.reference-strip', {
-        opacity: 0,
-        x: 42,
-        rotation: 6,
-        duration: 0.72,
-        ease: 'power3.out'
-      }, 0.12);
-
-      tl.from('.cover', {
-        y: 24,
-        scale: 0.965,
-        duration: 0.84,
-        ease: 'power3.out'
-      }, 0.24);
-
-      tl.from('.figure', {
-        x: -64,
-        scale: 1.04,
         duration: 0.95,
         ease: 'power3.out'
-      }, 0.62);
+      }, 0.25);
 
-      tl.from('.cover-label span', {
-        y: -28,
-        duration: 0.62,
-        ease: 'power3.out',
-        stagger: 0.08
-      }, 0.96);
+      tl.from('.desk-shadow', {
+        opacity: 0,
+        scaleX: 0.4,
+        duration: 0.7,
+        ease: 'power2.out',
+        transformOrigin: '50% 50%'
+      }, 0.35);
 
-      tl.from('.study-rule', {
+      tl.from('.cover-eyebrow', {
+        opacity: 0,
+        y: -8,
+        duration: 0.55,
+        ease: 'power2.out'
+      }, 0.85);
+
+      tl.from('.cover-title .ln span', {
+        y: '110%',
+        duration: 0.7,
+        ease: 'expo.out',
+        stagger: 0.18
+      }, 1.0);
+
+      tl.from('.cover-rule', {
         scaleX: 0,
         opacity: 0,
-        duration: 0.58,
-        ease: 'power2.out'
-      }, 1.12);
-
-      tl.from('.study-kicker', {
-        opacity: 0,
-        y: 10,
-        duration: 0.48,
-        ease: 'power2.out'
-      }, 1.2);
-
-      tl.from('.study-title span', {
-        y: 32,
-        duration: 0.68,
+        duration: 0.55,
         ease: 'power3.out',
-        stagger: 0.08
-      }, 1.15);
+        transformOrigin: 'left center'
+      }, 1.85);
 
-      tl.from('.side-note, .plate-code, .caption', {
+      tl.from('.cover-credit', {
         opacity: 0,
         y: 10,
-        duration: 0.48,
+        duration: 0.55,
+        ease: 'power2.out'
+      }, 2.0);
+
+      tl.from('.cover-foot > *', {
+        opacity: 0,
+        y: 8,
+        duration: 0.5,
         ease: 'power2.out',
         stagger: 0.08
-      }, 1.55);
+      }, 2.2);
 
-      tl.from('.crop-mark', {
+      tl.from('.stamp-wrap', {
+        scale: 2.4,
         opacity: 0,
-        scale: 0.65,
-        duration: 0.38,
-        ease: 'power2.out',
-        stagger: 0.05
-      }, 1.72);
+        rotation: 32,
+        duration: 0.32,
+        ease: 'power4.in'
+      }, 2.5);
 
-      tl.to('.figure', {
-        x: 18,
-        y: -5,
-        scale: 1.01,
+      tl.fromTo('.stamp-wrap', { scale: 1.2 }, {
+        scale: 1,
+        rotation: 11,
+        duration: 0.22,
+        ease: 'back.out(2.4)'
+      }, 2.82);
+
+      tl.to('.stamp-wrap', { rotation: 9.5, duration: 0.16, ease: 'sine.inOut' }, 3.06)
+        .to('.stamp-wrap', { rotation: 11,  duration: 0.18, ease: 'sine.inOut' }, 3.22);
+
+      tl.to('.book', {
+        y: -4,
+        rotation: 0.6,
+        duration: 3.4,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: 1,
+        transformOrigin: '50% 70%'
+      }, 3.4);
+
+      tl.to('.cover-rule', {
+        scaleX: 1.04,
         duration: 2.6,
         ease: 'sine.inOut',
         yoyo: true,
-        repeat: 2
-      }, 2.15);
-
-      tl.to('.cover', {
-        rotation: -0.7,
-        y: -5,
-        duration: 2.8,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 2
-      }, 2.05);
-
-      tl.to('.cover-label span, .study-title span', {
-        y: -3,
-        duration: 2.1,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 2,
-        stagger: 0.03
-      }, 2.35);
-
-      tl.to('.pink-wash', {
-        opacity: .28,
-        duration: 1.45,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 3
-      }, 2.4);
+        repeat: 1,
+        transformOrigin: 'left center'
+      }, 3.5);
 
       window.__timelines['book-cover-redesign-preview'] = tl;
 
