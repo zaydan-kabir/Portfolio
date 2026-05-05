@@ -4,99 +4,92 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Book Cover Re-Design HyperFrame Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #0a0d12; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #050505; }
 
     [data-composition-id="book-cover-redesign-preview"] {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      color: #ece6d8;
-      font-family: 'Libre Baskerville', Georgia, serif;
+      color: #ff00b8;
+      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
       background:
-        radial-gradient(ellipse at 50% 38%, #14181f 0%, #0a0d12 56%, #04060a 100%);
+        radial-gradient(ellipse at 50% 38%, #14161b 0%, #08090d 56%, #050505 100%);
       isolation: isolate;
     }
 
-    .stage {
+    .cover {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(70vh, 80vw, 460px);
+      aspect-ratio: 0.66;
+      background:
+        linear-gradient(180deg, #14161b 0%, #08090d 56%, #050505 100%);
+      box-shadow:
+        0 36px 78px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(255,0,184,0.18),
+        inset 0 0 0 6px rgba(255,0,184,0.05);
+      overflow: hidden;
+      will-change: transform, opacity;
+    }
+
+    .cover::before {
+      content: '';
       position: absolute;
       inset: 0;
-      display: grid;
-      place-items: center;
-      z-index: 3;
+      background:
+        linear-gradient(180deg, rgba(255,0,184,0.06) 0%, transparent 24%, transparent 76%, rgba(0,0,0,0.55) 100%);
+      pointer-events: none;
+      z-index: 4;
     }
 
-    .book {
-      position: relative;
-      width: min(56vh, 62vw, 360px);
-      aspect-ratio: 0.66;
-      background: #ece6d8;
-      box-shadow:
-        0 26px 60px rgba(0,0,0,0.62),
-        0 0 0 1px rgba(193,40,29,0.18),
-        inset 0 0 0 1px rgba(10,10,10,0.08);
-      transform-origin: 50% 70%;
+    .figure {
+      position: absolute;
+      left: 50%;
+      top: 56%;
+      width: 132%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      opacity: 0.92;
+      mix-blend-mode: screen;
+      filter: contrast(1.18) brightness(1.06);
       will-change: transform, opacity;
     }
 
-    .book::before {
-      content: '';
+    .figure-shadow {
       position: absolute;
       left: 0;
-      top: 0;
-      bottom: 0;
-      width: 6px;
-      background: linear-gradient(90deg, rgba(10,10,10,0.42), rgba(10,10,10,0));
+      right: 0;
+      top: 56%;
+      height: 36%;
+      transform: translateY(-50%);
+      z-index: 1;
+      background: radial-gradient(ellipse at center, rgba(255,0,184,0.12) 0%, transparent 64%);
       pointer-events: none;
-    }
-
-    .book::after {
-      content: '';
-      position: absolute;
-      left: 8.5%;
-      right: 8.5%;
-      top: 8.5%;
-      bottom: 8.5%;
-      border: 1px solid rgba(10,10,10,0.18);
-      pointer-events: none;
-    }
-
-    .cover-eyebrow {
-      position: absolute;
-      left: 12%;
-      right: 12%;
-      top: 11%;
-      font-family: 'Libre Baskerville', Georgia, serif;
-      font-style: italic;
-      font-size: clamp(8px, 1.05vw, 13px);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(10,10,10,0.62);
-      text-align: center;
-      will-change: transform, opacity;
     }
 
     .cover-title {
       position: absolute;
-      left: 9%;
-      right: 9%;
-      top: 26%;
+      left: 7%;
+      right: 7%;
+      top: 6%;
       display: flex;
       flex-direction: column;
-      align-items: stretch;
-      gap: clamp(2px, 0.35vw, 6px);
+      gap: clamp(2px, 0.4vw, 6px);
+      z-index: 6;
+      color: #ff00b8;
       font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
-      color: #0a0a0a;
-      text-align: center;
       line-height: 0.86;
-      letter-spacing: -0.025em;
+      letter-spacing: -0.04em;
       text-transform: uppercase;
     }
     .cover-title .ln {
-      font-size: clamp(28px, 5.6vw, 76px);
+      font-size: clamp(34px, 6.4vw, 90px);
       overflow: hidden;
     }
     .cover-title .ln span {
@@ -104,131 +97,61 @@
       will-change: transform, opacity;
     }
 
-    .cover-rule {
-      position: absolute;
-      left: 14%;
-      right: 14%;
-      top: 66%;
-      height: 2px;
-      background: #c1281d;
-      transform-origin: left center;
-      will-change: transform, opacity;
-    }
-
-    .cover-credit {
-      position: absolute;
-      left: 12%;
-      right: 12%;
-      top: 70%;
-      font-family: 'Libre Baskerville', Georgia, serif;
-      font-style: italic;
-      font-size: clamp(10px, 1.25vw, 16px);
-      letter-spacing: 0.04em;
-      color: rgba(10,10,10,0.78);
-      text-align: center;
-      line-height: 1.35;
-      will-change: transform, opacity;
-    }
-    .cover-credit .key {
-      display: block;
-      font-style: normal;
-      font-size: clamp(8px, 0.92vw, 11px);
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
-      color: rgba(10,10,10,0.5);
-      margin-bottom: 4px;
-    }
-
     .cover-foot {
       position: absolute;
-      left: 14%;
-      right: 14%;
-      bottom: 8.5%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: 'Libre Baskerville', Georgia, serif;
-      font-size: clamp(8px, 0.85vw, 11px);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(10,10,10,0.55);
-      will-change: transform, opacity;
-    }
-
-    .stamp-wrap {
-      position: absolute;
-      right: 14%;
-      top: 9%;
-      transform: rotate(11deg);
-      z-index: 8;
-      pointer-events: none;
-      will-change: transform;
-    }
-    .stamp {
-      padding: 5px 11px 6px;
-      border: 2px solid #c1281d;
-      box-shadow: inset 0 0 0 2px rgba(236,230,216,0.94), inset 0 0 0 3px #c1281d;
-      color: #c1281d;
-      font-family: 'Special Elite', 'Courier Prime', monospace;
-      font-size: clamp(8px, 0.85vw, 11px);
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      background: rgba(236,230,216,0.4);
-      white-space: nowrap;
-    }
-
-    .scene-meta {
-      position: absolute;
-      left: 5%;
-      right: 5%;
-      top: 5%;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      font-family: 'Libre Baskerville', Georgia, serif;
-      font-size: clamp(9px, 0.95vw, 12px);
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(236,230,216,0.5);
+      left: 7%;
+      right: 7%;
+      bottom: 6.5%;
       z-index: 6;
-      will-change: opacity;
+      color: #ff00b8;
+      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
+      font-size: clamp(11px, 1.4vw, 18px);
+      letter-spacing: 0.18em;
+      line-height: 1;
+      text-transform: uppercase;
+      text-align: left;
+      will-change: opacity, transform;
+    }
+    .cover-foot .mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6em;
+    }
+    .cover-foot .dot {
+      display: inline-block;
+      width: 0.55em;
+      height: 0.55em;
+      border-radius: 50%;
+      background: #ff00b8;
     }
 
-    .scene-foot {
+    .side-tag {
       position: absolute;
-      left: 5%;
-      right: 5%;
-      bottom: 5%;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
+      right: 7%;
+      top: 56%;
+      transform: translateY(-50%) rotate(90deg);
+      transform-origin: right center;
+      z-index: 6;
+      color: rgba(255,0,184,0.78);
       font-family: 'Libre Baskerville', Georgia, serif;
       font-style: italic;
-      font-size: clamp(9px, 0.95vw, 12px);
-      letter-spacing: 0.04em;
-      color: rgba(236,230,216,0.55);
-      z-index: 6;
-      will-change: opacity;
-    }
-    .scene-foot .key {
-      font-style: normal;
-      letter-spacing: 0.2em;
+      font-size: clamp(8px, 0.95vw, 12px);
+      letter-spacing: 0.32em;
       text-transform: uppercase;
-      color: rgba(236,230,216,0.42);
-      margin-right: 0.6em;
+      white-space: nowrap;
+      will-change: opacity, transform;
     }
 
-    .desk-shadow {
+    .pink-rule {
       position: absolute;
-      left: 50%;
-      top: 76%;
-      width: min(70vw, 460px);
-      height: 30px;
-      background: radial-gradient(ellipse at center, rgba(0,0,0,0.55), transparent 68%);
-      transform: translateX(-50%);
-      z-index: 2;
-      filter: blur(6px);
-      pointer-events: none;
+      left: 7%;
+      right: 7%;
+      bottom: 14%;
+      height: 2px;
+      background: #ff00b8;
+      transform-origin: left center;
+      z-index: 6;
+      will-change: transform, opacity;
     }
 
     .grain {
@@ -247,55 +170,35 @@
       inset: 0;
       z-index: 11;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 58%, rgba(0,0,0,0.55) 100%);
+      background: radial-gradient(ellipse at center, transparent 56%, rgba(0,0,0,0.6) 100%);
     }
 
     @media (max-aspect-ratio: 1/1) {
-      .book { width: min(72vw, 320px); }
-      .scene-meta, .scene-foot { font-size: 9px; letter-spacing: 0.14em; }
-      .stamp { font-size: 8px; letter-spacing: 0.22em; padding: 4px 9px 5px; }
+      .cover { width: min(82vw, 380px); }
+      .cover-title .ln { font-size: clamp(34px, 8.8vw, 76px); }
+      .side-tag { display: none; }
     }
   </style>
 </head>
 <body>
-  <div data-composition-id="book-cover-redesign-preview" data-width="982" data-height="982" data-duration="11" data-start="0" data-track-index="0">
-    <div class="scene-meta">
-      <span>Cover · Proof 03</span>
-      <span>06 / Spring Edition</span>
-    </div>
+  <div data-composition-id="book-cover-redesign-preview" data-width="982" data-height="1280" data-duration="11" data-start="0" data-track-index="0">
+    <div class="cover">
+      <div class="figure-shadow"></div>
+      <img class="figure" src="../uploads/folded-arm-fix.png" alt="" />
 
-    <div class="stage">
-      <div class="book">
-        <p class="cover-eyebrow">— a paperback —</p>
+      <h1 class="cover-title">
+        <div class="ln"><span>Book</span></div>
+        <div class="ln"><span>Cover</span></div>
+        <div class="ln"><span>Redesign</span></div>
+      </h1>
 
-        <div class="cover-title">
-          <div class="ln"><span>Book</span></div>
-          <div class="ln"><span>Cover</span></div>
-          <div class="ln"><span>Redesign</span></div>
-        </div>
+      <span class="side-tag">an anonymous study</span>
 
-        <span class="cover-rule"></span>
+      <span class="pink-rule"></span>
 
-        <div class="cover-credit">
-          <span class="key">a study by</span>
-          Zaydan Kabir Amanullah
-        </div>
-
-        <div class="cover-foot">
-          <span>No. 06</span>
-          <span>Coming Soon</span>
-        </div>
-
-        <div class="stamp-wrap">
-          <div class="stamp">Coming Soon</div>
-        </div>
+      <div class="cover-foot">
+        <span class="mark"><span class="dot"></span>Coming Soon</span>
       </div>
-      <div class="desk-shadow"></div>
-    </div>
-
-    <div class="scene-foot">
-      <span><span class="key">Disciplines</span>Digital · Graphic · Type</span>
-      <span>Edition 06</span>
     </div>
 
     <div class="vignette"></div>
@@ -306,98 +209,84 @@
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      tl.from('.scene-meta', { opacity: 0, y: -8, duration: 0.55, ease: 'power2.out' }, 0)
-        .from('.scene-foot', { opacity: 0, y: 8,  duration: 0.55, ease: 'power2.out' }, 0.08);
-
-      tl.from('.book', {
-        y: 36,
-        scale: 0.92,
+      tl.from('.cover', {
+        y: 28,
+        scale: 0.94,
         opacity: 0,
         duration: 0.95,
         ease: 'power3.out'
-      }, 0.25);
+      }, 0.15);
 
-      tl.from('.desk-shadow', {
+      tl.from('.figure', {
         opacity: 0,
-        scaleX: 0.4,
-        duration: 0.7,
-        ease: 'power2.out',
-        transformOrigin: '50% 50%'
-      }, 0.35);
-
-      tl.from('.cover-eyebrow', {
-        opacity: 0,
-        y: -8,
-        duration: 0.55,
+        scale: 1.06,
+        duration: 1.1,
         ease: 'power2.out'
-      }, 0.85);
+      }, 0.45);
 
       tl.from('.cover-title .ln span', {
         y: '110%',
         duration: 0.7,
         ease: 'expo.out',
-        stagger: 0.18
-      }, 1.0);
+        stagger: 0.16
+      }, 0.85);
 
-      tl.from('.cover-rule', {
+      tl.from('.pink-rule', {
         scaleX: 0,
         opacity: 0,
-        duration: 0.55,
+        duration: 0.6,
         ease: 'power3.out',
         transformOrigin: 'left center'
+      }, 1.65);
+
+      tl.from('.cover-foot', {
+        opacity: 0,
+        y: 12,
+        duration: 0.55,
+        ease: 'power2.out'
       }, 1.85);
 
-      tl.from('.cover-credit', {
+      tl.from('.cover-foot .dot', {
+        scale: 0,
         opacity: 0,
-        y: 10,
+        duration: 0.4,
+        ease: 'back.out(2)'
+      }, 2.05);
+
+      tl.from('.side-tag', {
+        opacity: 0,
+        y: -12,
         duration: 0.55,
         ease: 'power2.out'
       }, 2.0);
 
-      tl.from('.cover-foot > *', {
-        opacity: 0,
-        y: 8,
-        duration: 0.5,
-        ease: 'power2.out',
-        stagger: 0.08
-      }, 2.2);
+      tl.to('.cover-foot .dot', {
+        opacity: 0.35,
+        duration: 0.9,
+        repeat: 6,
+        yoyo: true,
+        ease: 'sine.inOut'
+      }, 2.4);
 
-      tl.from('.stamp-wrap', {
-        scale: 2.4,
-        opacity: 0,
-        rotation: 32,
-        duration: 0.32,
-        ease: 'power4.in'
-      }, 2.5);
-
-      tl.fromTo('.stamp-wrap', { scale: 1.2 }, {
-        scale: 1,
-        rotation: 11,
-        duration: 0.22,
-        ease: 'back.out(2.4)'
-      }, 2.82);
-
-      tl.to('.stamp-wrap', { rotation: 9.5, duration: 0.16, ease: 'sine.inOut' }, 3.06)
-        .to('.stamp-wrap', { rotation: 11,  duration: 0.18, ease: 'sine.inOut' }, 3.22);
-
-      tl.to('.book', {
+      tl.to('.figure', {
+        x: 8,
         y: -4,
-        rotation: 0.6,
+        scale: 1.012,
         duration: 3.4,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: 1
+      }, 2.6);
+
+      tl.to('.cover', {
+        rotation: -0.4,
+        y: -3,
+        duration: 3.6,
         ease: 'sine.inOut',
         yoyo: true,
         repeat: 1,
         transformOrigin: '50% 70%'
-      }, 3.4);
-
-      tl.to('.cover-rule', {
-        scaleX: 1.04,
-        duration: 2.6,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 1,
-        transformOrigin: 'left center'
-      }, 3.5);
+      }, 2.5);
 
       window.__timelines['book-cover-redesign-preview'] = tl;
 
