@@ -4,361 +4,444 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shire HyperFrame Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,900;1,400&family=Special+Elite&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Special+Elite&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #ece1c4; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #efe5ce; }
 
     [data-composition-id="shire-preview"] {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
+      color: #253126;
+      font-family: 'Libre Baskerville', Georgia, serif;
       background:
-        radial-gradient(ellipse at 38% 42%, #f3eacf 0%, #ece1c4 50%, #d8caa3 100%);
-      color: #1a2c5b;
-      font-family: 'Playfair Display', Georgia, serif;
+        linear-gradient(118deg, rgba(111,100,67,.11), transparent 32%, rgba(46,66,54,.10) 100%),
+        radial-gradient(ellipse at 22% 18%, #f6edd7 0%, #eadfc7 56%, #d9cbaa 100%);
       isolation: isolate;
     }
 
-    .stage {
+    .map-field {
       position: absolute;
-      inset: 8% 8.5%;
-      display: grid;
-      grid-template-columns: minmax(120px, 0.42fr) minmax(0, 1fr);
-      align-items: center;
-      gap: clamp(28px, 5vw, 86px);
-      z-index: 4;
+      inset: -12% -8% -8% -10%;
+      z-index: 1;
+      opacity: .48;
+      color: #59694f;
+      pointer-events: none;
     }
+    .map-field svg { width: 100%; height: 100%; display: block; }
+    .map-field path,
+    .map-field line {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.1;
+      vector-effect: non-scaling-stroke;
+    }
+    .map-field .thin { opacity: .38; stroke-width: .8; }
+    .map-field .route-line {
+      stroke: #733a2b;
+      stroke-width: 1.8;
+      stroke-dasharray: 430;
+      stroke-dashoffset: 430;
+    }
+    .map-field .route-dot { fill: #733a2b; stroke: none; opacity: .8; }
 
-    .medal-frame {
+    .stage {
       position: relative;
+      z-index: 4;
       width: 100%;
-      max-width: 240px;
-      justify-self: end;
-      filter: drop-shadow(0 6px 0 rgba(26,44,91,0.16)) drop-shadow(0 18px 22px rgba(26,44,91,0.18));
-      will-change: transform;
-    }
-    .medal-frame svg {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .copy {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: clamp(6px, 0.8vw, 14px);
-    }
-
-    .eyebrow {
-      font-family: 'Special Elite', 'Courier Prime', monospace;
-      font-size: clamp(11px, 1.05vw, 16px);
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: #b62a1f;
-      display: inline-flex;
+      height: 100%;
+      padding: clamp(32px, 6vw, 78px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(230px, .78fr);
       align-items: center;
-      gap: 0.85em;
+      gap: clamp(24px, 5vw, 72px);
     }
-    .eyebrow .rule {
-      display: inline-block;
-      width: clamp(28px, 4vw, 64px);
-      height: 1px;
-      background: #b62a1f;
+
+    .dossier {
+      position: relative;
+      min-height: min(76vh, 470px);
+      padding: clamp(24px, 4.5vw, 54px);
+      border: 1px solid rgba(37,49,38,.34);
+      background:
+        linear-gradient(90deg, rgba(37,49,38,.05) 0 1px, transparent 1px 100%),
+        linear-gradient(0deg, rgba(37,49,38,.045) 0 1px, transparent 1px 100%),
+        rgba(242,232,207,.72);
+      background-size: 28px 28px, 28px 28px, auto;
+      box-shadow: 0 18px 46px rgba(48,39,22,.2), inset 0 0 0 5px rgba(255,255,255,.18);
+      overflow: hidden;
+    }
+    .dossier::before,
+    .dossier::after {
+      content: '';
+      position: absolute;
+      pointer-events: none;
+    }
+    .dossier::before {
+      inset: 13px;
+      border: 1px solid rgba(37,49,38,.16);
+    }
+    .dossier::after {
+      right: -54px;
+      top: -48px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: 1px solid rgba(115,58,43,.3);
+      box-shadow: inset 0 0 0 14px rgba(115,58,43,.04);
+      transform: rotate(-12deg);
+    }
+
+    .file-no {
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: clamp(10px, .96vw, 13px);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(37,49,38,.62);
+      margin-bottom: clamp(18px, 3vw, 32px);
     }
 
     .wordmark {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-weight: 900;
-      font-size: clamp(72px, 14vw, 188px);
-      line-height: 0.86;
-      letter-spacing: -0.012em;
-      color: #1a2c5b;
       margin: 0;
-      will-change: transform;
+      color: #243026;
+      font-size: clamp(58px, 12vw, 150px);
+      line-height: .82;
+      letter-spacing: -.045em;
+      font-weight: 700;
+      text-transform: none;
     }
-    .wordmark .l {
+    .wordmark .letter {
       display: inline-block;
       will-change: transform, opacity;
     }
 
-    .tagline {
-      font-family: 'Playfair Display', Georgia, serif;
+    .summary {
+      margin: clamp(16px, 2.4vw, 28px) 0 0;
+      max-width: 34ch;
+      color: rgba(37,49,38,.78);
+      font-size: clamp(13px, 1.35vw, 20px);
+      line-height: 1.55;
       font-style: italic;
-      font-weight: 400;
-      font-size: clamp(15px, 1.7vw, 26px);
-      letter-spacing: 0.01em;
-      color: #1a2c5b;
-      max-width: 28ch;
     }
 
-    .credit {
-      position: absolute;
-      bottom: 6.4%;
-      right: 8.5%;
-      font-family: 'Special Elite', 'Courier Prime', monospace;
-      font-size: clamp(10px, 0.95vw, 13px);
-      letter-spacing: 0.18em;
+    .archive-rule {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: clamp(22px, 3.8vw, 44px);
+      color: #733a2b;
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: clamp(10px, .92vw, 12px);
+      letter-spacing: .2em;
       text-transform: uppercase;
-      color: rgba(26,44,91,0.72);
-      text-align: right;
-      z-index: 6;
+      white-space: nowrap;
+    }
+    .archive-rule span {
+      display: block;
+      height: 1px;
+      flex: 1 1 auto;
+      background: rgba(115,58,43,.46);
+      transform-origin: left center;
     }
 
     .stamp {
       position: absolute;
-      top: 8%;
-      right: 8.5%;
-      transform: rotate(-6deg);
-      font-family: 'Special Elite', 'Courier Prime', monospace;
-      font-size: clamp(9px, 0.92vw, 12px);
-      letter-spacing: 0.34em;
+      right: clamp(22px, 4vw, 50px);
+      bottom: clamp(18px, 3vw, 36px);
+      padding: 7px 13px 8px;
+      border: 1.5px solid rgba(115,58,43,.8);
+      color: rgba(115,58,43,.86);
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: clamp(9px, .88vw, 12px);
+      letter-spacing: .2em;
       text-transform: uppercase;
-      color: #b62a1f;
-      padding: 6px 12px 7px;
-      border: 1.5px solid #b62a1f;
-      background: rgba(236,225,196,0.4);
-      z-index: 6;
-      white-space: nowrap;
+      transform: rotate(-5deg);
     }
-    .stamp::before {
+
+    .interface-stack {
+      position: relative;
+      display: grid;
+      gap: clamp(12px, 1.8vw, 20px);
+      align-self: center;
+    }
+    .system-card {
+      position: relative;
+      padding: clamp(16px, 2.2vw, 25px);
+      border: 1px solid rgba(37,49,38,.34);
+      background: rgba(237,225,199,.82);
+      box-shadow: 0 12px 24px rgba(48,39,22,.14);
+      overflow: hidden;
+    }
+    .system-card::before {
       content: '';
       position: absolute;
-      inset: 2px;
-      border: 1px solid rgba(182,42,31,0.5);
-      pointer-events: none;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: #59694f;
+      opacity: .78;
+    }
+    .system-card:nth-child(2)::before { background: #733a2b; }
+    .system-card:nth-child(3)::before { background: #405b63; }
+
+    .card-kicker {
+      display: block;
+      margin-bottom: 9px;
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: clamp(9px, .8vw, 11px);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(37,49,38,.58);
+    }
+    .system-card strong {
+      display: block;
+      color: #243026;
+      font-size: clamp(15px, 1.45vw, 22px);
+      line-height: 1.12;
+    }
+    .record-lines {
+      margin-top: 13px;
+      display: grid;
+      gap: 7px;
+    }
+    .record-lines i {
+      display: block;
+      height: 1px;
+      background: rgba(37,49,38,.26);
+      transform-origin: left center;
+    }
+    .record-lines i:nth-child(2) { width: 78%; }
+    .record-lines i:nth-child(3) { width: 56%; }
+
+    .corner-note {
+      position: absolute;
+      left: clamp(24px, 4.8vw, 62px);
+      bottom: clamp(18px, 3vw, 34px);
+      z-index: 5;
+      font-family: 'Special Elite', 'Courier New', monospace;
+      color: rgba(37,49,38,.56);
+      font-size: clamp(9px, .88vw, 12px);
+      letter-spacing: .16em;
+      text-transform: uppercase;
     }
 
-    .halftone {
+    .grain,
+    .patina,
+    .edge {
       position: absolute;
       inset: 0;
-      z-index: 13;
       pointer-events: none;
-      opacity: 0.18;
-      mix-blend-mode: multiply;
-      background-image: radial-gradient(circle at 1px 1px, rgba(26,44,91,0.42) 0.55px, transparent 1.4px);
-      background-size: 4px 4px;
     }
-
     .grain {
-      position: absolute;
-      inset: 0;
       z-index: 12;
-      pointer-events: none;
-      opacity: 0.18;
+      opacity: .18;
       mix-blend-mode: multiply;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 160px 160px;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 170px 170px;
     }
-
-    .vignette {
-      position: absolute;
-      inset: 0;
+    .patina {
       z-index: 11;
-      pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 60%, rgba(60,38,12,0.34) 100%);
+      opacity: .22;
+      mix-blend-mode: multiply;
+      background-image:
+        radial-gradient(circle at 24% 38%, rgba(115,58,43,.22) 0 1px, transparent 2px),
+        radial-gradient(circle at 78% 26%, rgba(37,49,38,.22) 0 1px, transparent 2px);
+      background-size: 38px 38px, 52px 52px;
     }
-
-    .paper-edge {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 14;
-      box-shadow: inset 0 0 0 6px rgba(26,44,91,0.05), inset 0 0 80px rgba(60,38,12,0.18);
+    .edge {
+      z-index: 13;
+      box-shadow: inset 0 0 0 7px rgba(37,49,38,.045), inset 0 0 80px rgba(65,43,18,.2);
+      background: radial-gradient(ellipse at center, transparent 64%, rgba(50,37,20,.22) 100%);
     }
 
     @media (max-aspect-ratio: 1/1) {
       .stage {
         grid-template-columns: 1fr;
-        gap: 22px;
-        align-content: center;
-        justify-items: center;
-        text-align: center;
+        gap: 18px;
+        padding: 28px;
       }
-      .medal-frame { max-width: 180px; justify-self: center; }
-      .copy { align-items: center; text-align: center; }
-      .wordmark { font-size: clamp(56px, 18vw, 160px); }
-      .tagline { font-size: clamp(13px, 3.6vw, 22px); }
-    }
-    @media (max-aspect-ratio: 2/1) and (min-aspect-ratio: 1/1) {
-      .medal-frame { max-width: 200px; }
+      .dossier { min-height: 0; padding: 25px; }
+      .wordmark { font-size: clamp(48px, 18vw, 118px); }
+      .summary { max-width: 29ch; }
+      .interface-stack { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .system-card:nth-child(3) { grid-column: 1 / -1; }
+      .stamp { display: none; }
+      .corner-note { left: 28px; bottom: 18px; }
     }
   </style>
 </head>
 <body>
   <div data-composition-id="shire-preview" data-width="1280" data-height="640" data-duration="11" data-start="0" data-track-index="0">
+    <div class="map-field" aria-hidden="true">
+      <svg viewBox="0 0 1280 640" preserveAspectRatio="none">
+        <path class="thin" d="M-20 122 C 142 72 220 168 356 128 C 510 82 590 28 760 88 C 932 150 1040 60 1300 94" />
+        <path d="M-40 248 C 120 198 254 310 382 250 C 520 185 622 182 750 250 C 918 338 1026 226 1300 280" />
+        <path class="thin" d="M-20 392 C 170 330 286 440 446 390 C 590 346 670 330 824 392 C 984 456 1092 382 1300 428" />
+        <path class="thin" d="M-40 528 C 168 484 290 578 472 530 C 642 486 758 472 928 526 C 1068 570 1160 536 1320 560" />
+        <line class="thin" x1="118" y1="-20" x2="118" y2="680" />
+        <line class="thin" x1="418" y1="-20" x2="418" y2="680" />
+        <line class="thin" x1="762" y1="-20" x2="762" y2="680" />
+        <line class="thin" x1="1088" y1="-20" x2="1088" y2="680" />
+        <path class="route-line" d="M 173 462 C 284 390 330 274 480 302 C 630 330 638 184 792 198 C 940 212 984 118 1104 150" />
+        <circle class="route-dot" cx="173" cy="462" r="6" />
+        <circle class="route-dot" cx="480" cy="302" r="5" />
+        <circle class="route-dot" cx="792" cy="198" r="5" />
+        <circle class="route-dot" cx="1104" cy="150" r="6" />
+      </svg>
+    </div>
+
     <div class="stage">
-      <div class="medal-frame">
-        <svg viewBox="0 0 160 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"  stop-color="#e3b65a" />
-              <stop offset="48%" stop-color="#c89432" />
-              <stop offset="100%" stop-color="#8a6520" />
-            </linearGradient>
-            <linearGradient id="brassRim" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"  stop-color="#a47820" />
-              <stop offset="100%" stop-color="#5e4310" />
-            </linearGradient>
-            <linearGradient id="ribbonRed" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"  stop-color="#c8362b" />
-              <stop offset="100%" stop-color="#8a1a12" />
-            </linearGradient>
-            <linearGradient id="ribbonNavy" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"  stop-color="#26417a" />
-              <stop offset="100%" stop-color="#11203f" />
-            </linearGradient>
-          </defs>
+      <section class="dossier">
+        <div class="file-no">Archive No. 04 / service access</div>
+        <h1 class="wordmark"><span class="letter">S</span><span class="letter">h</span><span class="letter">i</span><span class="letter">r</span><span class="letter">e</span></h1>
+        <p class="summary">A quieter benefits system for veterans: care paths, claim records, and local support held in one legible place.</p>
+        <div class="archive-rule"><span></span>Currently building</div>
+        <div class="stamp">working draft</div>
+      </section>
 
-          <!-- Pin bar -->
-          <rect class="m-pin" x="40" y="6" width="80" height="6" rx="1.5" fill="url(#brassRim)" />
-
-          <!-- Striped ribbon bar -->
-          <g class="m-bar">
-            <rect x="36" y="14" width="88" height="44" fill="#1a2c5b" />
-            <rect x="36" y="14" width="29.33" height="44" fill="url(#ribbonNavy)" />
-            <rect x="65.33" y="14" width="29.33" height="44" fill="#ece1c4" />
-            <rect x="94.67" y="14" width="29.33" height="44" fill="url(#ribbonRed)" />
-            <rect x="36" y="14" width="88" height="44" fill="none" stroke="#1a2c5b" stroke-width="1.4" />
-            <line x1="36" y1="22" x2="124" y2="22" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
-          </g>
-
-          <!-- Hanging cord (folded ribbon) -->
-          <g class="m-cord">
-            <path d="M 60 58 L 56 130 L 80 156 L 104 130 L 100 58 Z" fill="url(#ribbonRed)" />
-            <path d="M 60 58 L 56 130 L 80 156 L 104 130 L 100 58 Z" fill="none" stroke="#5b110a" stroke-width="1.2" />
-            <path d="M 80 58 L 80 156" stroke="rgba(255,255,255,0.14)" stroke-width="1" />
-          </g>
-
-          <!-- Star medal -->
-          <g class="m-star" transform="translate(80 200)">
-            <circle r="56" fill="url(#brass)" stroke="url(#brassRim)" stroke-width="2.2" />
-            <circle r="46" fill="none" stroke="rgba(94,67,16,0.5)" stroke-width="1" />
-            <polygon
-              points="0,-36  9,-12  35,-12  14,4  22,32  0,16  -22,32  -14,4  -35,-12  -9,-12"
-              fill="#ece1c4"
-              stroke="rgba(94,67,16,0.55)"
-              stroke-width="1.2"
-              stroke-linejoin="round" />
-            <circle r="6" fill="#1a2c5b" />
-            <circle r="2.4" fill="#c89432" />
-          </g>
-        </svg>
-      </div>
-
-      <div class="copy">
-        <span class="eyebrow"><span class="rule"></span>Currently Building</span>
-        <h1 class="wordmark">
-          <span class="l">S</span><span class="l">H</span><span class="l">I</span><span class="l">R</span><span class="l">E</span>
-        </h1>
-        <p class="tagline">A quiet shelter — for those who served.</p>
-      </div>
+      <aside class="interface-stack" aria-hidden="true">
+        <div class="system-card">
+          <span class="card-kicker">intake</span>
+          <strong>Needfinding from lived experience</strong>
+          <span class="record-lines"><i></i><i></i><i></i></span>
+        </div>
+        <div class="system-card">
+          <span class="card-kicker">records</span>
+          <strong>Claims, evidence, and care history</strong>
+          <span class="record-lines"><i></i><i></i><i></i></span>
+        </div>
+        <div class="system-card">
+          <span class="card-kicker">routing</span>
+          <strong>Clear next steps across agencies</strong>
+          <span class="record-lines"><i></i><i></i><i></i></span>
+        </div>
+      </aside>
     </div>
 
-    <div class="stamp">Edition 01 · In Progress</div>
-
-    <div class="credit">
-      UI/UX &nbsp;·&nbsp; System &nbsp;·&nbsp; Design Thinking
-    </div>
-
-    <div class="halftone"></div>
-    <div class="vignette"></div>
+    <div class="corner-note">UI/UX / systems / design thinking</div>
+    <div class="patina"></div>
     <div class="grain"></div>
-    <div class="paper-edge"></div>
+    <div class="edge"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      tl.from('.medal-frame', {
-        y: -28,
-        opacity: 0,
-        scale: 0.92,
-        duration: 0.95,
-        ease: 'power3.out'
-      }, 0.2);
+      gsap.set('.route-line', { strokeDashoffset: 430 });
 
-      tl.from('.m-pin', {
-        scaleY: 0,
+      tl.from('.map-field path:not(.route-line), .map-field line', {
         opacity: 0,
-        duration: 0.4,
+        x: -10,
+        duration: 1.1,
         ease: 'power2.out',
-        transformOrigin: '50% 0%'
-      }, 0.4)
-      .from('.m-bar', {
-        scaleY: 0,
-        opacity: 0,
-        duration: 0.45,
-        ease: 'power3.out',
-        transformOrigin: '50% 0%'
-      }, 0.5)
-      .from('.m-cord', {
-        scaleY: 0,
-        opacity: 0,
-        duration: 0.55,
-        ease: 'power3.out',
-        transformOrigin: '50% 0%'
-      }, 0.7)
-      .from('.m-star', {
-        scale: 0,
-        opacity: 0,
-        rotation: -28,
-        duration: 0.7,
-        ease: 'back.out(1.8)',
-        transformOrigin: '50% 50%'
-      }, 0.95);
+        stagger: 0.05
+      }, 0.05);
 
-      tl.from('.eyebrow', {
-        x: -14,
+      tl.from('.dossier', {
+        y: 18,
         opacity: 0,
-        duration: 0.6,
-        ease: 'power2.out'
-      }, 1.05);
+        scale: 0.985,
+        duration: 0.85,
+        ease: 'power3.out'
+      }, 0.18);
 
-      tl.from('.wordmark .l', {
-        y: 70,
-        opacity: 0,
-        duration: 0.7,
-        ease: 'expo.out',
-        stagger: 0.07
-      }, 1.25);
-
-      tl.from('.tagline', {
-        y: 16,
-        opacity: 0,
-        duration: 0.65,
-        ease: 'power2.out'
-      }, 1.85);
-
-      tl.from('.credit', {
+      tl.from('.file-no', {
         opacity: 0,
         y: 8,
+        duration: 0.5,
+        ease: 'power2.out'
+      }, 0.62);
+
+      tl.from('.wordmark .letter', {
+        y: 28,
+        opacity: 0,
+        duration: 0.64,
+        ease: 'power3.out',
+        stagger: 0.055
+      }, 0.82);
+
+      tl.from('.summary', {
+        opacity: 0,
+        y: 12,
+        duration: 0.62,
+        ease: 'power2.out'
+      }, 1.18);
+
+      tl.from('.archive-rule span', {
+        scaleX: 0,
         duration: 0.6,
         ease: 'power2.out'
+      }, 1.35).from('.archive-rule', {
+        opacity: 0,
+        y: 7,
+        duration: 0.45,
+        ease: 'power2.out'
+      }, 1.38);
+
+      tl.from('.system-card', {
+        x: 22,
+        opacity: 0,
+        duration: 0.7,
+        ease: 'power3.out',
+        stagger: 0.13
+      }, 1.15);
+
+      tl.from('.record-lines i', {
+        scaleX: 0,
+        duration: 0.45,
+        ease: 'power2.out',
+        stagger: 0.035
+      }, 1.75);
+
+      tl.to('.route-line', {
+        strokeDashoffset: 0,
+        duration: 1.65,
+        ease: 'power2.inOut'
+      }, 1.85);
+
+      tl.from('.route-dot', {
+        scale: 0,
+        opacity: 0,
+        duration: 0.38,
+        ease: 'back.out(1.4)',
+        stagger: 0.18,
+        transformOrigin: '50% 50%'
       }, 2.05);
 
       tl.from('.stamp', {
         opacity: 0,
-        scale: 0.5,
-        rotation: 12,
-        duration: 0.6,
-        ease: 'back.out(2)'
-      }, 2.2);
+        scale: 0.92,
+        rotation: -1,
+        duration: 0.55,
+        ease: 'power2.out'
+      }, 2.35);
 
-      tl.to('.stamp', { rotation: -8, duration: 0.18, ease: 'sine.inOut' }, 2.78)
-        .to('.stamp', { rotation: -6, duration: 0.22, ease: 'sine.inOut' }, 2.96);
+      tl.from('.corner-note', {
+        opacity: 0,
+        y: 8,
+        duration: 0.5,
+        ease: 'power2.out'
+      }, 2.55);
 
-      tl.to('.medal-frame', {
-        rotation: 1.6,
+      tl.to('.route-dot', {
+        opacity: 0.32,
+        duration: 0.72,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: 4,
+        stagger: 0.08
+      }, 3.2);
+
+      tl.to('.dossier', {
+        y: -3,
         duration: 4.2,
         ease: 'sine.inOut',
         yoyo: true,
-        repeat: 1,
-        transformOrigin: '50% 6%'
-      }, 2.6);
+        repeat: 1
+      }, 3.1);
 
       window.__timelines['shire-preview'] = tl;
 
