@@ -2,10 +2,6 @@
   var storageKey = 'zaydan-theme';
   var root = document.documentElement;
 
-  function getThemeOrder() {
-    return ['light', 'dark'];
-  }
-
   function getDefaultTheme() {
     return 'light';
   }
@@ -33,15 +29,16 @@
   function applyTheme(theme) {
     theme = normalizeTheme(theme);
     root.dataset.theme = theme;
+
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) {
-      meta.setAttribute('content', theme === 'light' ? '#f0f0f0' : '#0a0a0a');
-    }
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#f0f0f0' : '#0a0a0a');
+
     var wordmarkFilter = theme === 'light'
       ? 'invert(1) drop-shadow(0 0 22px rgba(0,0,0,0.08))'
       : 'none';
     var textColor = theme === 'light' ? '#0a0a0a' : '#f0f0f0';
     var guideColor = theme === 'light' ? 'rgba(10,10,10,.42)' : 'rgba(255,255,255,.24)';
+
     document.querySelectorAll('#intro-wordmark, #masthead-reference').forEach(function (img) {
       img.style.filter = wordmarkFilter;
     });
@@ -51,6 +48,7 @@
     document.querySelectorAll('#masthead-guide, #masthead-replay').forEach(function (el) {
       el.style.color = guideColor;
     });
+
     var toggle = document.getElementById('theme-toggle');
     if (toggle) {
       toggle.querySelectorAll('button[data-theme-option]').forEach(function (button) {
@@ -64,25 +62,25 @@
   function initThemeToggle() {
     var theme = normalizeTheme(getStoredTheme());
     applyTheme(theme);
-
     if (document.getElementById('theme-toggle')) return;
 
     var toggle = document.createElement('div');
     toggle.id = 'theme-toggle';
     toggle.setAttribute('role', 'group');
     toggle.setAttribute('aria-label', 'Theme');
-    getThemeOrder().forEach(function (themeName) {
+
+    ['light', 'dark'].forEach(function (themeName) {
       var button = document.createElement('button');
       button.type = 'button';
       button.dataset.themeOption = themeName;
       button.textContent = themeName;
       button.addEventListener('click', function () {
-        theme = themeName;
-        setStoredTheme(theme);
-        applyTheme(theme);
+        setStoredTheme(themeName);
+        applyTheme(themeName);
       });
       toggle.appendChild(button);
     });
+
     document.body.appendChild(toggle);
     applyTheme(theme);
   }
@@ -93,15 +91,7 @@
     var fig = document.getElementById('panel-2-fig');
     if (!panel || !inner || !fig) return;
 
-    var manifestoText = [
-      'Design is not decoration after the fact. Design is the way a question becomes visible, the way a system reveals its pressure points, and the way an idea learns how to meet another person without demanding translation first.',
-      'I believe that design begins with attention. It begins before the interface, before the object, before the poster, before the pitch. It begins in the patient work of noticing what people already carry: habits, constraints, fears, rituals, language, memory, dignity, and the quiet workarounds that make daily life possible.',
-      'A good designer does not arrive as a hero. A good designer arrives as a listener. The task is not to impose clarity from above but to build conditions where clarity can surface from within the mess. The task is to make complexity navigable without flattening it into something false.',
-      'I want my work to be useful and strange at the same time. Useful enough to hold weight, strange enough to make someone pause. I want interfaces that feel humane, research that becomes legible, systems that admit where they fail, and visual language that remembers the people standing inside the structure.',
-      'Design should widen access. Design should make bureaucracy less violent. Design should turn information into agency. Design should give people routes through institutions that were not built with them in mind. Design should not confuse elegance with emptiness, nor polish with truth.',
-      'The best work is made in relation: between designer and community, between image and infrastructure, between emotion and evidence, between what is beautiful and what is materially consequential. A manifesto is not a promise of certainty. It is a record of commitments, revised each time the work meets the world.',
-      'I design to make systems more accountable, stories more reachable, and futures more imaginable. I design because form changes how people move. I design because the smallest interaction can disclose a larger politics. I design because every fig on the branch asks for a life, and choosing with care is also a kind of making.'
-    ].join(' ');
+    var manifestoText = 'During my years at Stanford, I often thought of Sylvia Plath\u2019s The Bell Jar. Most of the time, I saw my life branching out before me like that fig tree in the story, each fig a beautiful future, beckoning and winking. One is a humanitarian, changing the world one person at a time. Another one was a businessman, with a loving family. Another, a storm chaser with his horse in rural America, working the land and living authentically, and another, a man stuck in a town which slowly drains him of life until he concedes to whatever is demanded of him, coddled by a suffocating comfort. But as I sat at the crotch of that fig tree, starving, each of these figs fell to the ground, rotting at my feet. The words of Marguerite Duras often echoed through my being: \u201cthat very early in my life it was too late.\u201d Studying abroad at the University of Oxford, and then another semester in Washington, changed all of that. I realized that Politics, Philosophy, and Art were my interests. But Design. Design was what I wanted to do for the rest of my life. A search for meaning and inspiration in everything. To create, and not just consume. To put beauty and love back into the world that has given me so much.';
 
     var style = document.createElement('style');
     style.textContent = [
@@ -128,6 +118,7 @@
       inner.insertBefore(canvas, inner.firstChild);
     }
     var ctx = canvas.getContext('2d');
+
     var flow = document.getElementById('panel-2-flow');
     if (!flow) {
       flow = document.createElement('div');
@@ -138,7 +129,6 @@
 
     var words = manifestoText.split(/\s+/);
     var attribution = 'Design Manifesto';
-    var isMobile = window.innerWidth < 600;
     var figX = panel.clientWidth * 0.5;
     var figY = -Math.max(180, panel.clientHeight * 0.22);
     var targetX = figX;
@@ -147,6 +137,7 @@
     var dropActive = false;
     var dropVelocity = 0;
     var pointerHasMoved = false;
+    var isMobile = window.innerWidth < 600;
     var lastLayoutKey = '';
 
     function textWidth(value, font) {
@@ -203,22 +194,18 @@
 
     function setPanelPointerState(clientX, clientY) {
       var rect = panel.getBoundingClientRect();
-      var active = clientX >= rect.left && clientX <= rect.right &&
-        clientY >= rect.top && clientY <= rect.bottom;
+      var active = clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom;
       document.body.classList.toggle('panel-2-pointer-active', active);
       if (active) {
         var trail = document.getElementById('trail-canvas');
-        if (trail && trail.getContext) {
-          trail.getContext('2d').clearRect(0, 0, trail.width, trail.height);
-        }
+        if (trail && trail.getContext) trail.getContext('2d').clearRect(0, 0, trail.width, trail.height);
       }
     }
 
     document.addEventListener('mousemove', function (event) {
       var rect = panel.getBoundingClientRect();
       setPanelPointerState(event.clientX, event.clientY);
-      if (event.clientX >= rect.left && event.clientX <= rect.right &&
-          event.clientY >= rect.top && event.clientY <= rect.bottom) {
+      if (event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom) {
         setTarget(event.clientX, event.clientY);
       }
     });
@@ -227,8 +214,7 @@
       if (!event.touches.length) return;
       var touch = event.touches[0];
       var rect = panel.getBoundingClientRect();
-      if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
-          touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+      if (touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
         setTarget(touch.clientX, touch.clientY);
       }
     }, { passive: true });
@@ -285,30 +271,27 @@
         figX += (targetX - figX) * 0.14;
         figY += (targetY - figY) * 0.14;
       }
+
       fig.style.setProperty('left', figX.toFixed(1) + 'px', 'important');
       fig.style.setProperty('top', figY.toFixed(1) + 'px', 'important');
 
       var figRect = fig.getBoundingClientRect();
-      var figArtRect = getFigArtRect(figRect);
-      var figCenterX = figArtRect.left - rect.left + figArtRect.width / 2;
-      var figCenterY = figArtRect.top - rect.top + figArtRect.height / 2;
-      var padding = Math.max(1, Math.min(3, figArtRect.width * 0.018));
+      var artRect = getFigArtRect(figRect);
+      var padding = Math.max(1, Math.min(3, artRect.width * 0.018));
       var obstacle = {
-        left: figArtRect.left - rect.left - padding,
-        right: figArtRect.left - rect.left + figArtRect.width + padding,
-        top: figArtRect.top - rect.top - padding,
-        bottom: figArtRect.top - rect.top + figArtRect.height + padding,
+        left: artRect.left - rect.left - padding,
+        right: artRect.left - rect.left + artRect.width + padding,
+        top: artRect.top - rect.top - padding,
+        bottom: artRect.top - rect.top + artRect.height + padding,
         width: rect.width
       };
 
       var fontSize = Math.max(12, Math.min(17, rect.width * (isMobile ? 0.035 : 0.0145)));
       var lineHeight = fontSize * 1.55;
       var font = 'italic 400 ' + fontSize + 'px Lora, Georgia, serif';
-      var wordIndex = 0;
-      var lineY = 0;
       var layoutKey = [
-        Math.round(figCenterX / 8),
-        Math.round(figCenterY / 8),
+        Math.round(figX / 8),
+        Math.round(figY / 8),
         Math.round(rect.width),
         Math.round(rect.height),
         Math.round(fontSize)
@@ -317,6 +300,8 @@
       ctx.clearRect(0, 0, rect.width, rect.height);
       if (layoutKey !== lastLayoutKey) {
         var frag = document.createDocumentFragment();
+        var wordIndex = 0;
+        var lineY = 0;
         flow.replaceChildren();
         flow.style.left = canvas.style.left;
         flow.style.top = canvas.style.top;
@@ -350,22 +335,18 @@
         }
 
         while (wordIndex < words.length && lineY < rect.height - lineHeight * 2) {
-          rangesForLine(lineY, lineHeight, obstacle).forEach(function (range) {
-            appendCenteredRange(range);
-          });
+          rangesForLine(lineY, lineHeight, obstacle).forEach(appendCenteredRange);
           lineY += lineHeight;
         }
 
-        if (attribution) {
-          var attrSpan = document.createElement('span');
-          attrSpan.className = 'p2-flow-attr';
-          attrSpan.textContent = attribution;
-          var attrFont = '400 ' + Math.max(11, fontSize * 0.78) + 'px VT323, monospace';
-          attrSpan.style.left = Math.max(0, (rect.width - textWidth(attribution, attrFont)) / 2).toFixed(1) + 'px';
-          attrSpan.style.top = Math.min(rect.height - lineHeight, lineY + lineHeight * 0.5).toFixed(1) + 'px';
-          attrSpan.style.fontSize = Math.max(11, fontSize * 0.78).toFixed(1) + 'px';
-          frag.appendChild(attrSpan);
-        }
+        var attrSpan = document.createElement('span');
+        attrSpan.className = 'p2-flow-attr';
+        attrSpan.textContent = attribution;
+        var attrFont = '400 ' + Math.max(11, fontSize * 0.78) + 'px VT323, monospace';
+        attrSpan.style.left = Math.max(0, (rect.width - textWidth(attribution, attrFont)) / 2).toFixed(1) + 'px';
+        attrSpan.style.top = Math.min(rect.height - lineHeight, lineY + lineHeight * 0.5).toFixed(1) + 'px';
+        attrSpan.style.fontSize = Math.max(11, fontSize * 0.78).toFixed(1) + 'px';
+        frag.appendChild(attrSpan);
 
         flow.appendChild(frag);
         lastLayoutKey = layoutKey;
@@ -389,6 +370,7 @@
       dropVelocity = 0;
       dropActive = dropStarted && !pointerHasMoved;
       isMobile = window.innerWidth < 600;
+      lastLayoutKey = '';
     });
 
     if ('IntersectionObserver' in window) {
@@ -399,10 +381,10 @@
       }, { threshold: [0, 0.14, 0.28] });
       observer.observe(panel);
     }
+
     window.addEventListener('scroll', checkPanelVisible, { passive: true });
     window.addEventListener('resize', checkPanelVisible);
     checkPanelVisible();
-
     requestAnimationFrame(draw);
   }
 
