@@ -120,15 +120,15 @@
       '#panel-2-manuscript{display:none!important;}',
       '#panel-2 .p2-quote-wrap{display:none!important;}',
       '#panel-2-flow{position:absolute;inset:0;z-index:2;pointer-events:none;}',
-      '#panel-2-flow span{position:absolute;white-space:pre;font-family:Lora,Georgia,serif;font-style:italic;font-weight:400;line-height:1;color:rgba(240,240,240,.88);}',
-      'html[data-theme="light"] #panel-2-flow span{color:rgba(10,10,10,.92);}',
-      '#panel-2-flow .p2-flow-attr{font-family:VT323,monospace;font-style:normal;letter-spacing:.08em;color:rgba(240,240,240,.5);}',
+      '#panel-2-flow span{position:absolute;white-space:pre;font-family:Lora,Georgia,serif;font-style:italic;font-weight:400;line-height:1;color:rgba(240,240,240,.9);will-change:transform,opacity;}',
+      'html[data-theme="light"] #panel-2-flow span{color:rgba(10,10,10,.93);}',
+      '#panel-2-flow .p2-flow-attr{font-family:VT323,monospace;font-style:normal;letter-spacing:.08em;color:rgba(240,240,240,.5);will-change:auto;}',
       'html[data-theme="light"] #panel-2-flow .p2-flow-attr{color:rgba(10,10,10,.58);}',
-      '#panel-2-uncut-fig{position:absolute!important;left:clamp(22px,4.6vw,76px)!important;bottom:clamp(26px,5.4vh,76px)!important;width:clamp(132px,17vw,270px)!important;height:auto!important;z-index:4!important;pointer-events:none!important;user-select:none!important;filter:drop-shadow(0 14px 28px rgba(0,0,0,.32));}',
+      '#panel-2-uncut-fig{position:absolute!important;right:clamp(20px,4.2vw,66px)!important;bottom:clamp(22px,5vh,70px)!important;left:auto!important;width:clamp(96px,12.5vw,196px)!important;height:auto!important;z-index:4!important;pointer-events:none!important;user-select:none!important;filter:drop-shadow(0 12px 24px rgba(0,0,0,.3));}',
       '#panel-2-sword-wrap{position:absolute!important;left:0;top:0;z-index:6!important;pointer-events:none!important;transform-origin:0 50%;will-change:left,top,transform;}',
-      '#panel-2-sword-wrap #panel-2-fig{position:absolute!important;left:0!important;top:50%!important;right:auto!important;bottom:auto!important;width:100%!important;height:auto!important;z-index:1!important;pointer-events:none!important;user-select:none!important;transform:translate(-8%,-50%)!important;transform-origin:8% 52%!important;filter:drop-shadow(0 10px 20px rgba(0,0,0,.28));will-change:transform;}',
+      '#panel-2-sword-wrap #panel-2-fig{position:absolute!important;left:0!important;top:50%!important;right:auto!important;bottom:auto!important;width:100%!important;height:auto!important;z-index:1!important;pointer-events:none!important;user-select:none!important;transform:translate(-7%,-50%)!important;transform-origin:7% 52%!important;filter:drop-shadow(0 7px 14px rgba(0,0,0,.24));will-change:transform;}',
       'body.panel-2-pointer-active #trail-canvas{display:none!important;opacity:0!important;}',
-      '@media(max-width:600px){#panel-2-uncut-fig{left:18px!important;bottom:24px!important;width:clamp(94px,31vw,148px)!important;}#panel-2-flow span{white-space:pre;}}'
+      '@media(max-width:600px){#panel-2-uncut-fig{right:18px!important;bottom:24px!important;width:clamp(78px,24vw,118px)!important;}#panel-2-flow span{white-space:pre;}}'
     ].join('\n');
     document.head.appendChild(style);
 
@@ -142,7 +142,6 @@
 
     var measureCanvas = document.createElement('canvas');
     var ctx = measureCanvas.getContext('2d');
-    var chars = manifestoText.split('');
     var words = manifestoText.split(/\s+/);
     var attribution = 'Design Manifesto';
     var pointerHasMoved = false;
@@ -153,6 +152,7 @@
     var lastLayoutKey = '';
     var widthCacheKey = '';
     var widthCache = Object.create(null);
+    var flowLetters = [];
     var anchorX = 0;
     var anchorY = 0;
     var tipX = 0;
@@ -192,36 +192,42 @@
     function getFigRectInPanel() {
       var panelRect = panel.getBoundingClientRect();
       var figRect = stuckFig.getBoundingClientRect();
-      var fallbackWidth = Math.max(120, Math.min((panel.clientWidth || window.innerWidth) * 0.17, 270));
+      var fallbackWidth = clamp((panel.clientWidth || window.innerWidth) * 0.125, 96, 196);
       var width = figRect.width || fallbackWidth;
       var height = figRect.height || width * 0.88;
-      var left = figRect.width ? figRect.left - panelRect.left : Math.max(22, (panel.clientWidth || window.innerWidth) * 0.046);
-      var top = figRect.height ? figRect.top - panelRect.top : (panel.clientHeight || window.innerHeight) - Math.max(26, (panel.clientHeight || window.innerHeight) * 0.054) - height;
+      var right = figRect.width
+        ? (panelRect.right - figRect.right)
+        : Math.max(20, (panel.clientWidth || window.innerWidth) * 0.042);
+      var bottom = figRect.height
+        ? (panelRect.bottom - figRect.bottom)
+        : Math.max(22, (panel.clientHeight || window.innerHeight) * 0.05);
+      var left = (panel.clientWidth || window.innerWidth) - right - width;
+      var top = (panel.clientHeight || window.innerHeight) - bottom - height;
       return { left: left, top: top, width: width, height: height, right: left + width, bottom: top + height };
     }
 
     function updateAnchor() {
       var figRect = getFigRectInPanel();
-      anchorX = figRect.left + figRect.width * 0.67;
-      anchorY = figRect.top + figRect.height * 0.42;
+      anchorX = figRect.left + figRect.width * 0.42;
+      anchorY = figRect.top + figRect.height * 0.43;
       return figRect;
     }
 
     function defaultTip() {
       var size = panelSize();
       var target = {
-        x: anchorX + size.width * (window.innerWidth < 600 ? 0.52 : 0.46),
-        y: anchorY - size.height * (window.innerWidth < 600 ? 0.36 : 0.38)
+        x: anchorX - size.width * (window.innerWidth < 600 ? 0.46 : 0.42),
+        y: anchorY - size.height * (window.innerWidth < 600 ? 0.34 : 0.38)
       };
       return clampTip(target.x, target.y);
     }
 
     function clampTip(x, y) {
       var size = panelSize();
-      var margin = window.innerWidth < 600 ? 28 : 46;
+      var margin = window.innerWidth < 600 ? 26 : 44;
       return {
         x: clamp(x, margin, size.width - margin),
-        y: clamp(y, margin + 58, size.height - margin)
+        y: clamp(y, margin + 56, size.height - margin)
       };
     }
 
@@ -230,8 +236,8 @@
       var target = defaultTip();
       targetTipX = target.x;
       targetTipY = target.y;
-      tipX = anchorX + (target.x - anchorX) * 0.18;
-      tipY = anchorY + (target.y - anchorY) * 0.18;
+      tipX = anchorX + (target.x - anchorX) * 0.12;
+      tipY = anchorY + (target.y - anchorY) * 0.12;
     }
 
     function beginRelease() {
@@ -272,174 +278,133 @@
       setTarget(event.touches[0].clientX, event.touches[0].clientY);
     }, { passive: true });
 
-    function estimateLineCount(font, boxWidth) {
-      var lines = 1;
-      var lineWidth = 0;
-      words.forEach(function (word, index) {
-        var token = word + (index === words.length - 1 ? '' : ' ');
-        var tokenWidth = textWidth(token, font);
-        if (lineWidth && lineWidth + tokenWidth > boxWidth) {
-          lines += 1;
-          lineWidth = tokenWidth;
+    function buildLines(font, boxWidth) {
+      var lines = [];
+      var line = '';
+      words.forEach(function (word) {
+        var proposed = line ? line + ' ' + word : word;
+        if (line && textWidth(proposed, font) > boxWidth) {
+          lines.push(line);
+          line = word;
         } else {
-          lineWidth += tokenWidth;
+          line = proposed;
         }
       });
+      if (line) lines.push(line);
       return lines;
-    }
-
-    function subtractRange(ranges, cutStart, cutEnd) {
-      var next = [];
-      ranges.forEach(function (range) {
-        var start = Math.max(range.start, cutStart);
-        var end = Math.min(range.end, cutEnd);
-        if (end <= range.start || start >= range.end) {
-          next.push(range);
-          return;
-        }
-        if (start - range.start > 28) next.push({ start: range.start, end: start });
-        if (range.end - end > 28) next.push({ start: end, end: range.end });
-      });
-      return next.length ? next : ranges;
-    }
-
-    function swordCutForLine(lineY, lineHeight, radius) {
-      var ax = anchorX;
-      var ay = anchorY;
-      var bx = tipX;
-      var by = tipY;
-      var dx = bx - ax;
-      var dy = by - ay;
-      var length = Math.max(1, Math.sqrt(dx * dx + dy * dy));
-      var minY = Math.min(ay, by) - radius - lineHeight;
-      var maxY = Math.max(ay, by) + radius + lineHeight;
-      var lineTop = lineY - lineHeight * 0.2;
-      var lineBottom = lineY + lineHeight * 1.05;
-      if (lineBottom < minY || lineTop > maxY) return null;
-
-      var minX = Infinity;
-      var maxX = -Infinity;
-      var samples = Math.max(8, Math.ceil(length / 18));
-      for (var i = 0; i <= samples; i += 1) {
-        var t = i / samples;
-        var x = ax + dx * t;
-        var y = ay + dy * t;
-        if (y >= lineTop - radius && y <= lineBottom + radius) {
-          minX = Math.min(minX, x - radius);
-          maxX = Math.max(maxX, x + radius);
-        }
-      }
-      if (!isFinite(minX) || !isFinite(maxX)) return null;
-      return { start: minX, end: maxX };
-    }
-
-    function rangesForLine(lineY, lineHeight, boxStart, boxEnd, figRect) {
-      var ranges = [{ start: boxStart, end: boxEnd }];
-      var figPad = Math.max(10, figRect.width * 0.06);
-      if (lineY + lineHeight > figRect.top - figPad && lineY < figRect.bottom + figPad) {
-        ranges = subtractRange(ranges, figRect.left - figPad, figRect.right + figPad);
-      }
-
-      var radius = window.innerWidth < 600 ? 18 : 26;
-      var swordCut = swordCutForLine(lineY, lineHeight, radius);
-      if (swordCut) ranges = subtractRange(ranges, swordCut.start, swordCut.end);
-      return ranges.filter(function (range) { return range.end - range.start > 36; });
     }
 
     function buildTextLayout() {
       var size = panelSize();
       var isMobile = window.innerWidth < 600;
-      var boxWidth = isMobile ? size.width - 34 : Math.min(1060, size.width * 0.82);
-      var fontSize = isMobile ? Math.max(10.5, Math.min(12.8, boxWidth * 0.033)) : Math.max(12.5, Math.min(17.2, boxWidth * 0.016));
-      var lineHeight = fontSize * (isMobile ? 1.36 : 1.5);
+      var boxWidth = isMobile ? size.width - 34 : Math.min(1000, size.width * 0.78);
+      var fontSize = isMobile ? Math.max(10.5, Math.min(12.8, boxWidth * 0.033)) : Math.max(12.5, Math.min(16.8, boxWidth * 0.0158));
+      var lineHeight = fontSize * (isMobile ? 1.36 : 1.48);
       var font = 'italic 400 ' + fontSize + 'px Lora, Georgia, serif';
-      var estimated = estimateLineCount(font, boxWidth);
+      var lines = buildLines(font, boxWidth);
       var maxHeight = size.height * (isMobile ? 0.78 : 0.72);
 
-      while (fontSize > 10 && estimated * lineHeight > maxHeight) {
+      while (fontSize > 10 && lines.length * lineHeight > maxHeight) {
         fontSize -= 0.5;
-        lineHeight = fontSize * (isMobile ? 1.34 : 1.48);
+        lineHeight = fontSize * (isMobile ? 1.34 : 1.46);
         font = 'italic 400 ' + fontSize + 'px Lora, Georgia, serif';
-        estimated = estimateLineCount(font, boxWidth);
+        lines = buildLines(font, boxWidth);
       }
 
       var attrSize = Math.max(10.5, fontSize * 0.78);
       var attrFont = '400 ' + attrSize + 'px VT323, monospace';
-      var textHeight = estimated * lineHeight + lineHeight * 1.35;
-      var startY = Math.max(60, (size.height - textHeight) / 2);
+      var textHeight = lines.length * lineHeight + lineHeight * 1.35;
+      var startY = Math.max(58, (size.height - textHeight) / 2);
       var boxStart = Math.max(16, (size.width - boxWidth) / 2);
-      var boxEnd = Math.min(size.width - 16, boxStart + boxWidth);
-      var figRect = getFigRectInPanel();
       var layoutKey = [
         Math.round(size.width),
         Math.round(size.height),
         Math.round(boxWidth),
         Math.round(fontSize * 10),
-        Math.round(anchorX / 6),
-        Math.round(anchorY / 6),
-        Math.round(tipX / 6),
-        Math.round(tipY / 6)
+        root.dataset.theme || ''
       ].join(':');
 
       if (layoutKey === lastLayoutKey) return;
       lastLayoutKey = layoutKey;
+      flowLetters = [];
 
       var frag = document.createDocumentFragment();
-      var charIndex = 0;
-      var lineY = startY;
-      var lineLimit = size.height - lineHeight * 1.75;
       flow.replaceChildren();
       flow.style.width = size.width + 'px';
       flow.style.height = size.height + 'px';
 
-      while (charIndex < chars.length && lineY < lineLimit) {
-        var ranges = rangesForLine(lineY, lineHeight, boxStart, boxEnd, figRect);
-        if (!ranges.length) {
-          lineY += lineHeight;
-          continue;
+      lines.forEach(function (lineText, lineIndex) {
+        var lineWidth = textWidth(lineText, font);
+        var x = boxStart + Math.max(0, (boxWidth - lineWidth) / 2);
+        var y = startY + lineIndex * lineHeight;
+        for (var i = 0; i < lineText.length; i += 1) {
+          var ch = lineText[i];
+          var w = charWidth(ch, font);
+          var span = document.createElement('span');
+          span.textContent = ch;
+          span.style.left = x.toFixed(1) + 'px';
+          span.style.top = y.toFixed(1) + 'px';
+          span.style.fontSize = fontSize.toFixed(1) + 'px';
+          frag.appendChild(span);
+          flowLetters.push({ el: span, x: x, y: y, width: w, height: lineHeight });
+          x += w;
         }
-
-        ranges.forEach(function (range) {
-          if (charIndex >= chars.length) return;
-          while (chars[charIndex] === ' ' && (range.end - range.start) < boxWidth * 0.98) charIndex += 1;
-          var entries = [];
-          var lineWidth = 0;
-          var available = range.end - range.start;
-          while (charIndex < chars.length) {
-            var ch = chars[charIndex];
-            var w = charWidth(ch, font);
-            if (lineWidth && lineWidth + w > available) break;
-            if (!lineWidth && w > available) break;
-            entries.push({ text: ch, width: w });
-            lineWidth += w;
-            charIndex += 1;
-          }
-          if (!entries.length) return;
-          var x = range.start + Math.max(0, (available - lineWidth) / 2);
-          entries.forEach(function (entry) {
-            var span = document.createElement('span');
-            span.textContent = entry.text;
-            span.style.left = x.toFixed(1) + 'px';
-            span.style.top = lineY.toFixed(1) + 'px';
-            span.style.fontSize = fontSize.toFixed(1) + 'px';
-            frag.appendChild(span);
-            x += entry.width;
-          });
-        });
-
-        lineY += lineHeight;
-      }
+      });
 
       var attrSpan = document.createElement('span');
       var attrWidth = textWidth(attribution, attrFont);
       attrSpan.className = 'p2-flow-attr';
       attrSpan.textContent = attribution;
       attrSpan.style.left = Math.max(0, (size.width - attrWidth) / 2).toFixed(1) + 'px';
-      attrSpan.style.top = Math.min(size.height - lineHeight, lineY + lineHeight * 0.35).toFixed(1) + 'px';
+      attrSpan.style.top = (startY + lines.length * lineHeight + lineHeight * 0.5).toFixed(1) + 'px';
       attrSpan.style.fontSize = attrSize.toFixed(1) + 'px';
       frag.appendChild(attrSpan);
 
       flow.appendChild(frag);
+    }
+
+    function shapeTextAroundSword() {
+      var dx = tipX - anchorX;
+      var dy = tipY - anchorY;
+      var len = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+      var nx = -dy / len;
+      var ny = dx / len;
+      var radius = window.innerWidth < 600 ? 17 : 23;
+      var core = window.innerWidth < 600 ? 4 : 6;
+      var pushMax = window.innerWidth < 600 ? 14 : 24;
+      var figRect = getFigRectInPanel();
+      var figPad = Math.max(8, figRect.width * 0.04);
+
+      flowLetters.forEach(function (item) {
+        var cx = item.x + item.width * 0.5;
+        var cy = item.y + item.height * 0.48;
+        var t = ((cx - anchorX) * dx + (cy - anchorY) * dy) / (len * len);
+        t = clamp(t, 0, 1);
+        var px = anchorX + dx * t;
+        var py = anchorY + dy * t;
+        var signed = (cx - px) * nx + (cy - py) * ny;
+        var distance = Math.abs(signed);
+        var effect = clamp(1 - distance / radius, 0, 1);
+        var side = signed < 0 ? -1 : 1;
+        var push = effect * effect * pushMax * side;
+        var opacity = distance < core ? 0.16 : clamp(0.38 + (distance / radius) * 0.62, 0.38, 1);
+
+        var figEffect = 0;
+        if (cx > figRect.left - figPad && cx < figRect.right + figPad && cy > figRect.top - figPad && cy < figRect.bottom + figPad) {
+          figEffect = 1;
+        }
+
+        if (effect > 0.01) {
+          item.el.style.transform = 'translate(' + (nx * push).toFixed(2) + 'px,' + (ny * push).toFixed(2) + 'px)';
+          item.el.style.opacity = opacity.toFixed(3);
+        } else if (figEffect) {
+          item.el.style.transform = 'translate(-10px,-4px)';
+          item.el.style.opacity = '0.24';
+        } else {
+          item.el.style.transform = 'translate(0px,0px)';
+          item.el.style.opacity = '1';
+        }
+      });
     }
 
     function checkPanelVisible() {
@@ -458,11 +423,11 @@
       } else if (!releaseDone) {
         var target = pointerHasMoved ? { x: targetTipX, y: targetTipY } : defaultTip();
         var elapsed = performance.now() - releaseStart;
-        var t = Math.min(1, elapsed / 1250);
+        var t = Math.min(1, elapsed / 1100);
         var eased = easeOutCubic(t);
-        var wiggle = Math.sin(t * Math.PI * 12) * (1 - t);
-        tipX = anchorX + (target.x - anchorX) * (0.18 + eased * 0.82) + wiggle * 18;
-        tipY = anchorY + (target.y - anchorY) * (0.18 + eased * 0.82) + Math.cos(t * Math.PI * 10) * (1 - t) * 12;
+        var wiggle = Math.sin(t * Math.PI * 9) * (1 - t);
+        tipX = anchorX + (target.x - anchorX) * (0.1 + eased * 0.9) + wiggle * 8;
+        tipY = anchorY + (target.y - anchorY) * (0.1 + eased * 0.9) + Math.cos(t * Math.PI * 8) * (1 - t) * 7;
         if (t >= 1) releaseDone = true;
       } else {
         if (!pointerHasMoved) {
@@ -470,19 +435,19 @@
           targetTipX = fallback.x;
           targetTipY = fallback.y;
         }
-        tipX += (targetTipX - tipX) * 0.15;
-        tipY += (targetTipY - tipY) * 0.15;
+        tipX += (targetTipX - tipX) * 0.22;
+        tipY += (targetTipY - tipY) * 0.22;
       }
 
       var dx = tipX - anchorX;
       var dy = tipY - anchorY;
-      var distance = Math.max(80, Math.sqrt(dx * dx + dy * dy));
+      var distance = Math.max(58, Math.sqrt(dx * dx + dy * dy));
       var angle = Math.atan2(dy, dx) * 180 / Math.PI;
       var size = panelSize();
-      var baseWidth = clamp(size.width * (window.innerWidth < 600 ? 0.7 : 0.54), 280, 760);
-      var baseHeight = clamp(size.width * (window.innerWidth < 600 ? 0.18 : 0.105), 72, 150);
-      var baseReach = baseWidth * 0.84;
-      var scaleX = clamp(distance / baseReach, 0.42, 1.75);
+      var baseWidth = clamp(size.width * (window.innerWidth < 600 ? 0.44 : 0.34), 170, 430);
+      var baseHeight = clamp(size.width * (window.innerWidth < 600 ? 0.095 : 0.055), 38, 78);
+      var baseReach = baseWidth * 0.86;
+      var scaleX = clamp(distance / baseReach, 0.48, 1.62);
 
       swordWrap.style.width = baseWidth.toFixed(1) + 'px';
       swordWrap.style.height = baseHeight.toFixed(1) + 'px';
@@ -494,6 +459,7 @@
     function animate() {
       renderSword();
       buildTextLayout();
+      shapeTextAroundSword();
       requestAnimationFrame(animate);
     }
 
