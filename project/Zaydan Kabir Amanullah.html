@@ -287,7 +287,11 @@
          can never make this lag. Snap-to-panel is also native. */
       overflow-x: auto;
       overflow-y: hidden;
-      scroll-snap-type: x mandatory;
+      /* proximity (not mandatory) — mandatory snapped scrollLeft back to
+         0 on every small wheel delta, making panel-2 unreachable. With
+         proximity, the browser only snaps when the user releases near a
+         snap point. */
+      scroll-snap-type: x proximity;
       scroll-behavior: auto;
       scrollbar-width: none;
       -ms-overflow-style: none;
