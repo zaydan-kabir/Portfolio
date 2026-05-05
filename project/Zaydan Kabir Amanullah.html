@@ -952,6 +952,11 @@ const zaydanAnimationReady = (() => {
     return d;
   }
 
+  // Tracked input velocity (px/ms), exponentially decayed in the RAF loop.
+  // Used to make the smoother snappier when the user is scrolling hard.
+  let inputVelocity = 0;
+  let lastWheelTs = 0;
+
   function handleWheel(e) {
     if (e.ctrlKey) return;
     e.preventDefault();
@@ -964,6 +969,14 @@ const zaydanAnimationReady = (() => {
         if (!atBottom && !atTop) { inner.scrollBy(0, delta); return; }
       }
     }
+    // Update input velocity (low-pass filtered). At high event rates the
+    // browser may fire 100+ wheel events/sec on a fast spin — this gives
+    // the smoother a measure of how hard the user is scrolling.
+    const now = e.timeStamp || performance.now();
+    const dtw = lastWheelTs ? Math.max(1, now - lastWheelTs) : 16;
+    lastWheelTs = now;
+    const instant = Math.abs(delta) / dtw;
+    inputVelocity = inputVelocity * 0.6 + instant * 0.4;
     moveHorizontal(delta);
   }
 
@@ -1015,30 +1028,59 @@ const zaydanAnimationReady = (() => {
     }
   }, { passive: true });
 
-  // Frame-rate independent critically-damped smoothing.
-  // τ controls how long it takes to "catch up" to target (~3·τ to settle).
-  // 90ms feels immediate but still glides — lower felt twitchy, higher felt floaty.
-  const SMOOTH_TAU_MS = 90;
+  // Adaptive smoothing: τ shrinks with gap size and recent input velocity.
+  // - Slow precise scroll: small gap, low velocity → τ ≈ τ_max → graceful.
+  // - Fast spin / flick:   large gap, high velocity → τ → τ_min → snappy.
+  // Plus a per-frame minimum closing speed proportional to input velocity
+  // so a hard wheel-spin never feels like the page is "catching up".
+  const TAU_MAX = 110;
+  const TAU_MIN = 28;
   let lastFrameTs = 0;
   let lastWritingActive = false;
+  let renderedX = -1;
+
   function renderHorizontalTrack(ts) {
     if (!lastFrameTs) lastFrameTs = ts;
     const dt = Math.min(64, ts - lastFrameTs);
     lastFrameTs = ts;
 
     if (currentX !== targetX) {
-      const k = isDragging ? 1 : 1 - Math.exp(-dt / SMOOTH_TAU_MS);
-      currentX += (targetX - currentX) * k;
+      const gap = targetX - currentX;
+      const absGap = gap < 0 ? -gap : gap;
+      // gap-proportional τ: at gap = 35% of viewport or more, drop to τ_min.
+      const gapRatio = Math.min(1, absGap / (maxX * 0.35));
+      // velocity-proportional τ: recent fast input → snappier.
+      const velRatio = Math.min(1, inputVelocity / 4); // px/ms
+      const blend = Math.max(gapRatio, velRatio);
+      const tau = TAU_MAX + (TAU_MIN - TAU_MAX) * blend;
+
+      const k = isDragging ? 1 : 1 - Math.exp(-dt / tau);
+      let next = currentX + gap * k;
+
+      // Floor on closing speed: keep up with input rate (px per ms × dt).
+      // Stops the smoother from looking laggy after a hard wheel-spin.
+      const minStep = inputVelocity * dt * 0.85;
+      if (gap > 0 && next - currentX < minStep) next = currentX + Math.min(gap, minStep);
+      else if (gap < 0 && currentX - next < minStep) next = currentX - Math.min(-gap, minStep);
+
+      currentX = next;
       if (Math.abs(targetX - currentX) < 0.05) currentX = targetX;
-      // Round to whole pixels — sub-pixel updates force extra compositor
-      // work without changing what the user sees.
-      track.style.transform = `translate3d(${(-currentX) | 0}px,0,0)`;
+
+      const rounded = (-currentX) | 0;
+      if (rounded !== renderedX) {
+        track.style.transform = `translate3d(${rounded}px,0,0)`;
+        renderedX = rounded;
+      }
       const writing = currentX > maxX * 0.45;
       if (writing !== lastWritingActive) {
         panel2.classList.toggle('writing-active', writing);
         lastWritingActive = writing;
       }
     }
+
+    // Decay input velocity each frame so the snappy-mode releases gracefully.
+    inputVelocity *= Math.exp(-dt / 120);
+
     requestAnimationFrame(renderHorizontalTrack);
   }
   requestAnimationFrame(renderHorizontalTrack);
