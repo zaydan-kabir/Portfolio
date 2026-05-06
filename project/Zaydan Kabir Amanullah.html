@@ -592,7 +592,13 @@
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
       mix-blend-mode: normal;
+      /* Hidden until decoded so the layout box doesn't paint as a
+         placeholder square on first load (especially on mobile where
+         async PNG decode is visible for a frame or two). */
+      opacity: 0;
+      transition: opacity .25s ease;
     }
+    #panel-2-fig.is-loaded { opacity: 1; }
     #panel-2-writing {
       position: absolute;
       right: clamp(26px, 4.8vw, 84px);
@@ -809,7 +815,11 @@
       <canvas id="portrait-canvas"></canvas>
     </div>
     <div class="panel" id="panel-2">
-      <img id="panel-2-fig" src="uploads/Uncut%20Fig%201.png" alt="" aria-hidden="true">
+      <img id="panel-2-fig" src="uploads/Uncut%20Fig%201.png" alt="" aria-hidden="true"
+           decoding="async" loading="eager" fetchpriority="high"
+           onload="this.classList.add('is-loaded')"
+           onerror="this.classList.add('is-loaded')">
+      <script>(function(){var f=document.getElementById('panel-2-fig');if(f&&f.complete&&f.naturalWidth>0){f.classList.add('is-loaded');}})();</script>
       <div id="panel-2-writing" aria-hidden="true">
         <div class="p2-writing-line">In this life, I choose design.</div>
         <svg class="p2-writing-arrow" viewBox="0 0 80 120" focusable="false">
