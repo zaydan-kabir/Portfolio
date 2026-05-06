@@ -1010,7 +1010,7 @@ const zaydanAnimationReady = (() => {
       }
     }
     e.preventDefault();
-    stage.scrollLeft += dy;
+    stage.scrollLeft -= dy;
   }
   window.addEventListener('wheel', handleWheel, { passive: false });
 
@@ -1342,7 +1342,7 @@ const zaydanAnimationReady = (() => {
 
   // ── Keyboard nav ──────────────────────────────────────────────────
   document.addEventListener('keydown', e => {
-    const d = { ArrowDown: 200, ArrowRight: 200, ArrowUp: -200, ArrowLeft: -200 }[e.key];
+    const d = { ArrowDown: -200, ArrowRight: 200, ArrowUp: 200, ArrowLeft: -200 }[e.key];
     if (d) moveHorizontal(d);
   });
 
