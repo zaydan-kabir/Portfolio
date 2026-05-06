@@ -313,8 +313,7 @@
       display: none;
     }
 
-    /* ── Track: 2 panels wide, laid out as a flex row inside the
-       native scroll container. No JS transform — the browser scrolls. */
+    /* ── Track: single panel — second panel is hidden. ──────────── */
     #track {
       position: relative;
       top: 0; left: 0;
@@ -322,6 +321,8 @@
       width: 100vw;
       display: flex;
     }
+    #panel-2 { display: none; }
+    #masthead-guide { display: none; }
 
     .panel {
       position: relative;
