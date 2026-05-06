@@ -1032,31 +1032,76 @@ const zaydanAnimationReady = (() => {
   let touchStartScrollLeft = 0, touchStartInnerScrollTop = 0;
   let touchOnPanel2 = false;
   let touchDir = null; // 'h' | 'v' once intent is clear
+  let lastTouchX = 0, lastTouchT = 0;
+  let touchVelocity = 0; // px/ms, positive = swiping right
+  let snapAnimId = 0;
+  const RUBBER = 0.35; // resistance past edges
+  const FLICK_THRESHOLD = 0.3; // px/ms
+
+  function cancelSnap() {
+    if (snapAnimId) { cancelAnimationFrame(snapAnimId); snapAnimId = 0; }
+  }
+
+  function smoothSnapTo(target) {
+    cancelSnap();
+    const startLeft = stage.scrollLeft;
+    const distance = target - startLeft;
+    if (Math.abs(distance) < 0.5) { stage.scrollLeft = target; return; }
+    // Duration scales with distance, kept tight so the snap feels responsive
+    const dur = Math.min(420, 200 + Math.abs(distance) * 0.18);
+    const startTime = performance.now();
+    function step(now) {
+      const t = Math.min(1, (now - startTime) / dur);
+      const k = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      stage.scrollLeft = startLeft + distance * k;
+      if (t < 1) snapAnimId = requestAnimationFrame(step);
+      else { snapAnimId = 0; stage.scrollLeft = target; }
+    }
+    snapAnimId = requestAnimationFrame(step);
+  }
 
   stage.addEventListener('touchstart', e => {
     if (e.touches.length !== 1) return;
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
+    cancelSnap();
+    const t = e.touches[0];
+    touchStartX = lastTouchX = t.clientX;
+    touchStartY = t.clientY;
     touchStartScrollLeft = stage.scrollLeft;
     touchOnPanel2 = stage.scrollLeft >= maxX * 0.95;
     const inner = document.getElementById('panel-2-inner');
     touchStartInnerScrollTop = inner ? inner.scrollTop : 0;
     touchDir = null;
+    lastTouchT = performance.now();
+    touchVelocity = 0;
   }, { passive: true });
 
   stage.addEventListener('touchmove', e => {
     if (e.touches.length !== 1) return;
-    const dx = e.touches[0].clientX - touchStartX;
-    const dy = e.touches[0].clientY - touchStartY;
+    const t = e.touches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
     if (touchDir === null) {
-      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
         touchDir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
       } else return;
     }
+    const now = performance.now();
+    const dtFrame = now - lastTouchT;
+    if (dtFrame > 0) {
+      const instV = (t.clientX - lastTouchX) / dtFrame;
+      // EMA so a single spurious sample doesn't decide the flick
+      touchVelocity = touchVelocity * 0.6 + instV * 0.4;
+    }
+    lastTouchX = t.clientX;
+    lastTouchT = now;
+
     if (touchDir === 'h') {
       e.preventDefault();
-      // swipe right (dx > 0) → larger scrollLeft → panel 2
-      stage.scrollLeft = Math.max(0, Math.min(maxX, touchStartScrollLeft + dx));
+      let target = touchStartScrollLeft + dx;
+      // Soft rubber-band past edges so the swipe doesn't feel like a wall
+      if (target < 0) target *= RUBBER;
+      else if (target > maxX) target = maxX + (target - maxX) * RUBBER;
+      stage.scrollLeft = target;
     } else if (touchDir === 'v' && touchOnPanel2) {
       const inner = document.getElementById('panel-2-inner');
       if (inner && inner.scrollHeight > inner.clientHeight) {
@@ -1070,10 +1115,20 @@ const zaydanAnimationReady = (() => {
   }, { passive: false });
 
   stage.addEventListener('touchend', () => {
-    // Snap to nearest panel after swipe
     if (touchDir === 'h') {
-      const target = stage.scrollLeft > maxX * 0.5 ? maxX : 0;
-      stage.scrollTo({ left: target, behavior: 'smooth' });
+      // Velocity decides flicks; otherwise snap to whichever panel is closer.
+      let target;
+      if (touchVelocity > FLICK_THRESHOLD) target = maxX;
+      else if (touchVelocity < -FLICK_THRESHOLD) target = 0;
+      else target = stage.scrollLeft > maxX * 0.5 ? maxX : 0;
+      smoothSnapTo(target);
+    }
+    touchDir = null;
+  }, { passive: true });
+
+  stage.addEventListener('touchcancel', () => {
+    if (touchDir === 'h') {
+      smoothSnapTo(stage.scrollLeft > maxX * 0.5 ? maxX : 0);
     }
     touchDir = null;
   }, { passive: true });
