@@ -19,8 +19,17 @@
       background: var(--bg, #0a0a0a);
       color: var(--ink, #f0f0f0);
       overflow: hidden;
+      cursor: none;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+    }
+
+    a,
+    a:hover,
+    a:active,
+    button,
+    button:hover {
+      cursor: none !important;
     }
 
     body::after {
@@ -50,6 +59,26 @@
       transform: scaleY(0);
       transform-origin: top;
       transition: transform 0.45s cubic-bezier(.76,0,.24,1) 0.05s;
+    }
+
+    #cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--theme-cursor, #fff);
+      pointer-events: none;
+      transform: translate3d(-20px, -20px, 0) translate(-50%, -50%);
+      z-index: 10003;
+    }
+
+    #trail-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10001;
     }
 
     .manifesto-header {
@@ -145,9 +174,29 @@
         line-height: 1.42;
       }
     }
+
+    @media (pointer: coarse) {
+      body {
+        cursor: auto;
+      }
+
+      a,
+      button,
+      a:hover,
+      button:hover {
+        cursor: auto !important;
+      }
+
+      #cursor,
+      #trail-canvas {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body data-manifesto-page>
+  <div id="cursor"></div>
+  <canvas id="trail-canvas"></canvas>
   <div id="page-out"></div>
   <header class="manifesto-header">
     <a href="work.html" data-page="work.html">Work</a>
@@ -179,6 +228,55 @@
         window.dispatchEvent(new Event('resize'));
       });
     }
+
+    const cursor = document.getElementById('cursor');
+    const trailCanvas = document.getElementById('trail-canvas');
+    const trailCtx = trailCanvas.getContext('2d');
+    const points = [];
+    let trailFrame = 0;
+
+    function resizeTrail() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      trailCanvas.width = Math.floor(window.innerWidth * dpr);
+      trailCanvas.height = Math.floor(window.innerHeight * dpr);
+      trailCanvas.style.width = window.innerWidth + 'px';
+      trailCanvas.style.height = window.innerHeight + 'px';
+      trailCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function trailColor() {
+      return document.documentElement.dataset.theme === 'light' ? '10,10,10' : '240,240,240';
+    }
+
+    function drawTrail() {
+      trailFrame = 0;
+      trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+      const now = Date.now();
+      trailCtx.lineCap = 'round';
+      trailCtx.lineJoin = 'round';
+      const rgb = trailColor();
+      for (let i = 1; i < points.length; i++) {
+        const age = (now - points[i].t) / 300;
+        const alpha = Math.max(0, 1 - age);
+        trailCtx.beginPath();
+        trailCtx.moveTo(points[i - 1].x, points[i - 1].y);
+        trailCtx.lineTo(points[i].x, points[i].y);
+        trailCtx.strokeStyle = `rgba(${rgb},${(alpha * 0.42).toFixed(3)})`;
+        trailCtx.lineWidth = (i / points.length) * 2.5;
+        trailCtx.stroke();
+      }
+      while (points.length && now - points[0].t > 300) points.shift();
+      if (points.length) trailFrame = requestAnimationFrame(drawTrail);
+    }
+
+    resizeTrail();
+    window.addEventListener('resize', resizeTrail);
+    document.addEventListener('mousemove', event => {
+      cursor.style.transform = `translate3d(${event.clientX}px,${event.clientY}px,0) translate(-50%,-50%)`;
+      points.push({ x: event.clientX, y: event.clientY, t: Date.now() });
+      if (points.length > 32) points.shift();
+      if (!trailFrame) trailFrame = requestAnimationFrame(drawTrail);
+    }, { passive: true });
 
     document.querySelectorAll('a[data-page]').forEach(link => {
       link.addEventListener('click', event => {
