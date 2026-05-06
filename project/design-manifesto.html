@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Design Manifesto - Zaydan Kabir Amanullah</title>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="theme.css?v=20260501-light-first-all">
+  <link rel="stylesheet" href="theme.css?v=20260506-manifesto-fix">
   <style>
     @font-face { font-family: 'VT323'; src: url('uploads/VT323-Regular.ttf') format('truetype'); }
 
@@ -81,32 +81,55 @@
       z-index: 10001;
     }
 
-    .manifesto-header {
+    /* Trail-canvas filter:invert(1) from theme.css would double-invert
+       the JS-drawn trail in light mode (black → white) and hide it. */
+    html[data-theme="light"] #trail-canvas { filter: none !important; }
+
+    /* ── Safe-area top strip (matches work.html / profile) ─── */
+    #safe-area-top {
+      position: fixed; left: 0; right: 0;
+      top: calc(-1 * env(safe-area-inset-top, 0px));
+      height: calc(env(safe-area-inset-top, 0px) * 2);
+      background: var(--bg, #0a0a0a);
+      z-index: 2000;
+      pointer-events: none;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+    html[data-theme="light"] #safe-area-top { background: var(--bg) !important; }
+
+    /* ── Header (matches work.html exactly) ─────────────────── */
+    #header {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      left: 0; right: 0;
+      top: calc(-1 * env(safe-area-inset-top, 0px));
       z-index: 1000;
       display: flex;
-      align-items: center;
+      align-items: baseline;
       justify-content: space-between;
       padding: calc(env(safe-area-inset-top, 0px) + 24px) 48px 10px;
       border-bottom: 1px solid var(--gray3, #2a2a2a);
       background: var(--bg, #0a0a0a);
-      font: 13px/1 'Lora', Georgia, serif;
-      font-style: italic;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      will-change: transform;
     }
-
-    .manifesto-header a {
-      color: inherit;
-      text-decoration: none;
-      min-width: 0;
+    .h-name {
+      font-family: 'Lora', serif; font-size: 14px; font-weight: 400; letter-spacing: -0.01em;
+      color: var(--gray2, #8a8a8a); text-decoration: none; transition: color .2s;
     }
-
-    .manifesto-header a:hover {
-      text-decoration: underline;
-      text-underline-offset: 4px;
+    .h-name:hover, .h-name.active { color: var(--ink, #f0f0f0); }
+    .h-nav { display: flex; gap: 28px; align-items: baseline; }
+    .h-link {
+      font-family: 'Lora', serif; font-size: 13px; font-weight: 300; font-style: italic; color: var(--gray2, #8a8a8a);
+      text-decoration: none; letter-spacing: .02em; position: relative; transition: color .2s;
     }
+    .h-link::after {
+      content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 1px;
+      background: var(--ink, #f0f0f0); transform: scaleX(0); transition: transform .2s ease;
+    }
+    .h-link:hover, .h-link.active { color: var(--ink, #f0f0f0); }
+    .h-link:hover::after, .h-link.active::after { transform: scaleX(1); }
 
     .panel {
       position: fixed;
@@ -152,16 +175,10 @@
     #panel-2-writing { display: none; }
 
     @media (max-width: 700px) {
-      .manifesto-header {
+      #header {
         padding: calc(env(safe-area-inset-top, 0px) + 18px) 18px 9px;
       }
-
-      .manifesto-header a:last-child {
-        max-width: 58vw;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
+      .h-nav { gap: 16px; }
 
       #panel-2-inner {
         padding: 72px 16px 48px;
@@ -195,12 +212,16 @@
   </style>
 </head>
 <body data-manifesto-page>
+  <div id="safe-area-top"></div>
   <div id="cursor"></div>
   <canvas id="trail-canvas"></canvas>
   <div id="page-out"></div>
-  <header class="manifesto-header">
-    <a href="work.html" data-page="work.html">Work</a>
-    <a href="Zaydan%20Kabir%20Amanullah.html" data-page="Zaydan%20Kabir%20Amanullah.html">Zaydan Kabir Amanullah</a>
+  <header id="header">
+    <a class="h-name" href="Zaydan%20Kabir%20Amanullah.html" data-page="Zaydan%20Kabir%20Amanullah.html">Zaydan Kabir Amanullah</a>
+    <nav class="h-nav">
+      <a class="h-link" href="work.html" data-page="work.html">Work</a>
+      <a class="h-link" href="index.html" data-page="index.html">About</a>
+    </nav>
   </header>
 
   <main class="panel" id="panel-2">
@@ -217,7 +238,7 @@
     </div>
   </main>
 
-  <script src="theme.js?v=20260501-light-first-all"></script>
+  <script src="theme.js?v=20260506-manifesto-fix"></script>
   <script>
     const overlay = document.getElementById('page-out');
     overlay.classList.add('revealing');
