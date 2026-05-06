@@ -285,6 +285,7 @@
     .grid-item:nth-child(4) { grid-column: 1 / span 4; grid-row: span 3; }
     .grid-item:nth-child(5) { grid-column: 5 / span 5; grid-row: span 2; }
     .grid-item:nth-child(6) { grid-column: 10 / span 3; grid-row: 3 / span 3; }
+    .grid-item:nth-child(7) { grid-column: 3 / span 7; grid-row: span 2; }
 
     .grid-item img, .grid-item iframe {
       width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.08) saturate(.92) contrast(.96);
@@ -348,6 +349,7 @@
       .grid-item:nth-child(4) { grid-column: 4 / span 3; grid-row: span 3; }
       .grid-item:nth-child(5) { grid-column: 1 / span 3; grid-row: span 2; }
       .grid-item:nth-child(6) { grid-column: 1 / span 6; grid-row: span 3; }
+      .grid-item:nth-child(7) { grid-column: 2 / span 4; grid-row: span 2; }
     }
     @media (max-width: 560px) {
       #header { padding-left: 18px; padding-right: 18px; }
@@ -360,6 +362,7 @@
       .grid-item, .grid-item:nth-child(n) { grid-column: 1; grid-row: auto; aspect-ratio: 1 / .72; }
       .grid-item:nth-child(1) { aspect-ratio: 1.55 / 1; }
       .grid-item:nth-child(6) { aspect-ratio: 1.45 / 1; }
+      .grid-item:nth-child(7) { aspect-ratio: 1.2 / 1; }
       .grid-overlay { min-width: 170px; max-width: calc(100% - 28px); padding: 8px 12px 10px; }
       .work-footer-strip { flex-direction: column; }
     }
@@ -370,7 +373,7 @@
       .grid-overlay { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     }
   </style>
-  <script src="theme.js?v=20260505-mobile-fig-balance"></script>
+  <script src="theme.js?v=20260505-panel-empty-manifesto-project"></script>
   <link rel="stylesheet" href="theme.css?v=20260501-light-first-all">
 </head>
 <body>
@@ -459,6 +462,11 @@
     <a class="grid-item" href="#" data-project-link="book-cover-redesign">
       <iframe src="book-cover-redesign-hyperframe/index.html?v=20260505-figure" title="Book Cover Re-Design animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Coming Soon: Book Cover Re-Design</span><span class="item-subtitle">Digital Design, Graphic Design, Type Design</span></div>
+    </a>
+
+    <a class="grid-item" href="design-manifesto-hyperframe/index.html" data-project-link="design-manifesto" aria-label="Open Design Manifesto animated project">
+      <iframe src="design-manifesto-hyperframe/index.html?v=20260505-manifesto" title="Design Manifesto animated preview" aria-hidden="true"></iframe>
+      <div class="grid-overlay"><span class="item-name">Design Manifesto</span><span class="item-subtitle">Design Writing, Research &amp; Visual Systems</span></div>
     </a>
 
     <div class="work-footer-strip"><span>more work soon</span></div>
