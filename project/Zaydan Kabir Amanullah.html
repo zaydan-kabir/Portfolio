@@ -956,7 +956,7 @@ const zaydanAnimationReady = (() => {
     });
   });
 
-  // ── Down-scroll → native horizontal scroll ───────────────────────
+  // ── Up-scroll → native horizontal scroll ─────────────────────────
   // The horizontal track is a real native scroll container (#stage), so
   // motion runs on the browser's compositor scroll thread and cannot be
   // blocked by main-thread JS work. We only:
@@ -965,38 +965,48 @@ const zaydanAnimationReady = (() => {
   const stage = document.getElementById('stage');
   const panel2 = document.getElementById('panel-2');
   const bodyEl = document.body;
-  let maxX = window.innerWidth;
+  let maxX = 0;
+
+  function updateMaxX() {
+    maxX = Math.max(0, stage.scrollWidth - stage.clientWidth);
+  }
 
   function moveHorizontal(delta) {
     stage.scrollLeft = Math.max(0, Math.min(maxX, stage.scrollLeft + delta));
   }
 
-  window.addEventListener('resize', () => { maxX = window.innerWidth; });
+  updateMaxX();
+  window.addEventListener('resize', updateMaxX);
 
   // Vertical wheel → horizontal scrollLeft. The browser's own scroll
   // thread does the actual painting; we just nudge the position.
   function handleWheel(e) {
     if (e.ctrlKey) return;
-    let dy = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-    if (e.deltaMode === 1) dy *= 16;
-    else if (e.deltaMode === 2) dy *= window.innerHeight;
+    const useVertical = Math.abs(e.deltaY) >= Math.abs(e.deltaX);
+    let inputDelta = useVertical ? e.deltaY : e.deltaX;
+    if (e.deltaMode === 1) inputDelta *= 16;
+    else if (e.deltaMode === 2) inputDelta *= window.innerHeight;
+
+    // The page instruction is "scroll up to move forward": upward
+    // vertical wheel input should travel right into panel 2.
+    const stageDelta = useVertical ? -inputDelta : inputDelta;
 
     // If we're on panel 2 and its inner column can scroll, send the
     // delta there instead.
     if (stage.scrollLeft >= maxX * 0.95) {
       const inner = document.getElementById('panel-2-inner');
       if (inner && inner.scrollHeight > inner.clientHeight) {
-        const atBottom = dy > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
-        const atTop    = dy < 0 && inner.scrollTop <= 0;
+        const atBottom = inputDelta > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
+        const atTop    = inputDelta < 0 && inner.scrollTop <= 0;
         if (!atBottom && !atTop) {
           e.preventDefault();
-          inner.scrollTop += dy;
+          inner.scrollTop += inputDelta;
           return;
         }
       }
     }
     e.preventDefault();
-    stage.scrollLeft += dy;
+    moveHorizontal(stageDelta);
   }
   window.addEventListener('wheel', handleWheel, { passive: false });
 
@@ -1328,8 +1338,11 @@ const zaydanAnimationReady = (() => {
 
   // ── Keyboard nav ──────────────────────────────────────────────────
   document.addEventListener('keydown', e => {
-    const d = { ArrowDown: 200, ArrowRight: 200, ArrowUp: -200, ArrowLeft: -200 }[e.key];
-    if (d) moveHorizontal(d);
+    const d = { ArrowUp: 200, ArrowRight: 200, ArrowDown: -200, ArrowLeft: -200 }[e.key];
+    if (d) {
+      e.preventDefault();
+      moveHorizontal(d);
+    }
   });
 
   // ── Info / Contact popup ──────────────────────────────────────────
