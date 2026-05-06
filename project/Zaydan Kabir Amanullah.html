@@ -721,7 +721,7 @@
       }
     }
   </style>
-  <script src="theme.js?v=20260505-panel-empty-manifesto-project"></script>
+  <script src="theme.js?v=20260506-restored-manifesto-panel"></script>
   <link rel="stylesheet" href="theme.css?v=20260501-light-first-all">
   <style>
     html[data-theme="light"] #masthead-guide,
@@ -787,7 +787,21 @@
       <canvas id="portrait-canvas"></canvas>
     </div>
     <div class="panel" id="panel-2">
-      <div id="panel-2-inner" aria-hidden="true"></div>
+      <img id="panel-2-fig" src="uploads/Uncut Fig 1.png" alt="" aria-hidden="true">
+      <div id="panel-2-writing" aria-hidden="true">
+        <div class="p2-writing-line">In this life, I choose design.</div>
+        <svg class="p2-writing-arrow" viewBox="0 0 80 120" focusable="false">
+          <path d="M 45 112 C 44 84 37 57 31 30"></path>
+          <polygon points="30,10 16,34 44,28"></polygon>
+        </svg>
+      </div>
+      <div id="panel-2-inner">
+        <div class="p2-quote-wrap">
+          <p class="p2-quote-text">During my years at Stanford, I often returned to Sylvia Plath&rsquo;s <em>The Bell Jar</em>. I imagined my life much like that fig tree in the novel, each fig hanging before me as a different future. There was the life spent in service of others, trying in some small way to lessen injustice. There was the life of stability, success, and family. There was the fantasy of retreat, of distance from ambition and noise. And there was, too, the far less visible danger of drifting into a life that was comfortable enough to remain in, but not alive enough to feel proud of. For a long time, I found myself suspended between these possibilities, unable to commit to any one of them without feeling I was betraying the others. In moments like that, I often thought of Marguerite Duras&rsquo;s line: &ldquo;that very early in my life it was too late.&rdquo;</p>
+          <p class="p2-quote-text">My semester at the University of Oxford, followed by another in Washington, altered something fundamental in me. Distance has a way of clarifying what familiarity obscures. Removed from the habits and rhythms of Stanford, I began to understand that politics, philosophy, and art were not simply subjects I loved, but different vocabularies through which I had always tried to make sense of the world. Design, however, emerged as something more than an interest. It felt like a mode of attention, a way of looking closely enough at people, systems, and objects to imagine how they might be made better. For the first time, I had found not just what compelled me, but the form through which that compulsion could become real.</p>
+          <p class="p2-quote-text">Since then, design has come to represent for me a search for meaning in the everyday: the possibility of creating rather than merely consuming, of shaping experiences rather than simply moving through them, and of returning something thoughtful, useful, and beautiful to a world that has given me so much.</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -956,7 +970,7 @@ const zaydanAnimationReady = (() => {
     });
   });
 
-  // ── Up-scroll → native horizontal scroll ─────────────────────────
+  // ── Down-scroll → native horizontal scroll ───────────────────────
   // The horizontal track is a real native scroll container (#stage), so
   // motion runs on the browser's compositor scroll thread and cannot be
   // blocked by main-thread JS work. We only:
@@ -965,78 +979,40 @@ const zaydanAnimationReady = (() => {
   const stage = document.getElementById('stage');
   const panel2 = document.getElementById('panel-2');
   const bodyEl = document.body;
-  let maxX = 0;
-  let panelNavLockUntil = 0;
-
-  function updateMaxX() {
-    maxX = Math.max(0, stage.scrollWidth - stage.clientWidth);
-  }
+  let maxX = window.innerWidth;
 
   function moveHorizontal(delta) {
     stage.scrollLeft = Math.max(0, Math.min(maxX, stage.scrollLeft + delta));
   }
 
-  function glideToPanel(left) {
-    updateMaxX();
-    stage.scrollTo({
-      left: Math.max(0, Math.min(maxX, left)),
-      behavior: 'smooth'
-    });
-    panelNavLockUntil = performance.now() + 720;
-  }
-
-  updateMaxX();
-  window.addEventListener('resize', updateMaxX);
+  window.addEventListener('resize', () => { maxX = window.innerWidth; });
 
   // Vertical wheel → horizontal scrollLeft. The browser's own scroll
   // thread does the actual painting; we just nudge the position.
   function handleWheel(e) {
-    if (e.__zaydanWheelHandled) return;
-    e.__zaydanWheelHandled = true;
     if (e.ctrlKey) return;
-    const useVertical = Math.abs(e.deltaY) >= Math.abs(e.deltaX);
-    let inputDelta = useVertical ? e.deltaY : e.deltaX;
-    if (e.deltaMode === 1) inputDelta *= 16;
-    else if (e.deltaMode === 2) inputDelta *= window.innerHeight;
-
-    updateMaxX();
-
-    if (useVertical && performance.now() < panelNavLockUntil) {
-      e.preventDefault();
-      return;
-    }
-
-    // At the left edge, the first panel has no vertical scroll content.
-    // Send the user's first vertical mouse gesture directly into panel 2
-    // so device-specific wheel direction cannot trap the page at panel 1.
-    if (useVertical && maxX > 0 && stage.scrollLeft <= maxX * 0.08) {
-      e.preventDefault();
-      glideToPanel(maxX);
-      return;
-    }
-
-    const stageDelta = useVertical ? -inputDelta : inputDelta;
+    let dy = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    if (e.deltaMode === 1) dy *= 16;
+    else if (e.deltaMode === 2) dy *= window.innerHeight;
 
     // If we're on panel 2 and its inner column can scroll, send the
     // delta there instead.
     if (stage.scrollLeft >= maxX * 0.95) {
       const inner = document.getElementById('panel-2-inner');
       if (inner && inner.scrollHeight > inner.clientHeight) {
-        const atBottom = inputDelta > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
-        const atTop    = inputDelta < 0 && inner.scrollTop <= 0;
+        const atBottom = dy > 0 && inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;
+        const atTop    = dy < 0 && inner.scrollTop <= 0;
         if (!atBottom && !atTop) {
           e.preventDefault();
-          inner.scrollTop += inputDelta;
+          inner.scrollTop += dy;
           return;
         }
       }
     }
     e.preventDefault();
-    moveHorizontal(stageDelta);
+    stage.scrollLeft += dy;
   }
-  window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
-  document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
-  stage.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+  window.addEventListener('wheel', handleWheel, { passive: false });
 
   // Read scroll position to drive .writing-active and .is-scrolling.
   // No RAF loop — the scroll event already fires on each compositor
@@ -1366,11 +1342,8 @@ const zaydanAnimationReady = (() => {
 
   // ── Keyboard nav ──────────────────────────────────────────────────
   document.addEventListener('keydown', e => {
-    const d = { ArrowUp: 200, ArrowRight: 200, ArrowDown: -200, ArrowLeft: -200 }[e.key];
-    if (d) {
-      e.preventDefault();
-      moveHorizontal(d);
-    }
+    const d = { ArrowDown: 200, ArrowRight: 200, ArrowUp: -200, ArrowLeft: -200 }[e.key];
+    if (d) moveHorizontal(d);
   });
 
   // ── Info / Contact popup ──────────────────────────────────────────
