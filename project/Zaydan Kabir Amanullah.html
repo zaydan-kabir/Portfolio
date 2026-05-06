@@ -598,10 +598,6 @@
       will-change: opacity;
       backface-visibility: hidden;
       image-rendering: -webkit-optimize-contrast;
-      /* Soften the canvas edges of the source PNG so the fig's near-edge
-         content doesn't read as a hard rectangle on small renders. */
-      -webkit-mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, #000 78%, transparent 100%);
-              mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, #000 78%, transparent 100%);
       /* Hidden until decoded so the layout box doesn't paint as a
          placeholder square on first load. */
       opacity: 0;
@@ -824,7 +820,7 @@
       <canvas id="portrait-canvas"></canvas>
     </div>
     <div class="panel" id="panel-2">
-      <img id="panel-2-fig" src="uploads/Uncut%20Fig%201.png" alt="" aria-hidden="true"
+      <img id="panel-2-fig" src="uploads/Uncut%20Fig%201.png?v=20260506-no-paper" alt="" aria-hidden="true"
            decoding="async" loading="eager" fetchpriority="high"
            onload="this.classList.add('is-loaded')"
            onerror="this.classList.add('is-loaded')">
