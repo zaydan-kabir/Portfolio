@@ -291,15 +291,9 @@
     #stage {
       position: fixed;
       inset: 0;
-      /* Native horizontal scroll container. The browser's compositor
-         scroll thread runs independently of the main thread, so JS work
-         can never make this lag. Snap-to-panel is also native. */
-      overflow-x: hidden;
-      overflow-y: hidden;
-      /* proximity (not mandatory) — mandatory snapped scrollLeft back to
-         0 on every small wheel delta, making panel-2 unreachable. With
-         proximity, the browser only snaps when the user releases near a
-         snap point. */
+      /* clip is stricter than hidden — disables programmatic scroll too,
+         so nothing (JS, native swipe, snap) can shift the track. */
+      overflow: clip;
       scroll-snap-type: none;
       scroll-behavior: auto;
       scrollbar-width: none;
@@ -534,9 +528,8 @@
       a, button, a:hover, button:hover, .pixel-btn { cursor: auto !important; }
       #cursor, #trail-canvas { display: none; }
       .pixel-btn:hover { color: rgba(255,255,255,.55); text-shadow: none; }
-      /* Disable native horizontal touch-scroll so the custom swipe-right
-         handler can map a rightward finger drag to forward (panel 2). */
-      #stage { touch-action: pan-y; }
+      /* Panel 2 is hidden, so block all touch panning on the stage. */
+      #stage { touch-action: none; }
     }
     @media (max-width: 600px) {
       #header { padding: 14px 20px 8px; }
@@ -1011,6 +1004,14 @@ const zaydanAnimationReady = (() => {
   const bodyEl = document.body;
   const enableHorizontalPanel = false;
   let maxX = window.innerWidth;
+
+  // Defensive pin: with the second panel hidden the track is exactly
+  // viewport-wide, but if any animation / older cached script tries to
+  // shift scrollLeft, snap it straight back to 0.
+  if (!enableHorizontalPanel) {
+    stage.scrollLeft = 0;
+    stage.addEventListener('scroll', () => { if (stage.scrollLeft !== 0) stage.scrollLeft = 0; }, { passive: true });
+  }
 
   function moveHorizontal(delta) {
     if (!enableHorizontalPanel) return;
