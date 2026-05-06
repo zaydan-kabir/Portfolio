@@ -178,17 +178,31 @@
     #page-out.revealing { transform: scaleY(0); transform-origin: top;
       transition: transform 0.45s cubic-bezier(.76,0,.24,1) 0.05s; }
 
+    /* ── Safe-area top strip (matches work.html) ──────────── */
+    #safe-area-top {
+      position: fixed; left: 0; right: 0;
+      top: calc(-1 * env(safe-area-inset-top, 0px));
+      height: calc(env(safe-area-inset-top, 0px) * 2);
+      background: var(--bg);
+      z-index: 2000;
+      pointer-events: none;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+
     /* ── Header (fixed, always on top) ────────────────────── */
     #header {
       position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
+      left: 0; right: 0;
+      top: calc(-1 * env(safe-area-inset-top, 0px));
+      z-index: 1000;
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      padding: 24px 48px 10px;
+      padding: calc(env(safe-area-inset-top, 0px) + 24px) 48px 10px;
       border-bottom: 1px solid var(--gray3);
       background: var(--bg);
+      -webkit-transform: translateZ(0);
       transform: translateZ(0);
       will-change: transform;
     }
@@ -740,7 +754,7 @@
       }
     }
   </style>
-  <script src="theme.js?v=20260506-panel2-removed"></script>
+  <script src="theme.js?v=20260506-light-trail-navbar"></script>
   <link rel="stylesheet" href="theme.css?v=20260501-light-first-all">
   <style>
     html[data-theme="light"] #masthead-guide,
@@ -754,6 +768,7 @@
   </style>
 </head>
 <body>
+<div id="safe-area-top"></div>
 
 <!-- ── Intro overlay ──────────────────────────────────── -->
 <div id="intro-screen">
@@ -1293,19 +1308,19 @@ const zaydanAnimationReady = (() => {
     }
   }
 
-  function drawBlackTrailOverZaydan() {
+  function drawBlackTrailOverZaydan(overColor) {
     if (!wordmarkMaskReady) return;
 
     const rect = wordmarkImg.getBoundingClientRect();
     overlayCtx.clearRect(0, 0, trailOverlay.width, trailOverlay.height);
-    drawTrailPath(overlayCtx, '#000');
+    drawTrailPath(overlayCtx, overColor || '#000');
     overlayCtx.globalCompositeOperation = 'destination-in';
     overlayCtx.drawImage(wordmarkMask, rect.left, rect.top, rect.width, rect.height);
     overlayCtx.globalCompositeOperation = 'source-over';
     tCtx.drawImage(trailOverlay, 0, 0);
   }
 
-  function drawBlackTrailOverPopup() {
+  function drawBlackTrailOverPopup(overColor) {
     const popup = document.querySelector('.p-popup-box');
     if (!popup || getComputedStyle(popup.parentElement).display === 'none') return;
 
@@ -1314,7 +1329,7 @@ const zaydanAnimationReady = (() => {
     tCtx.beginPath();
     tCtx.rect(rect.left, rect.top, rect.width, rect.height);
     tCtx.clip();
-    drawTrailPath(tCtx, '#000');
+    drawTrailPath(tCtx, overColor || '#000');
     tCtx.restore();
   }
 
@@ -1342,9 +1357,12 @@ const zaydanAnimationReady = (() => {
     if (trailDirty) {
       tCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
       if (pts.length > 1) {
-        drawTrailPath(tCtx, '#fff');
-        drawBlackTrailOverZaydan();
-        drawBlackTrailOverPopup();
+        const isLightTheme = document.documentElement.dataset.theme === 'light';
+        const mainColor = isLightTheme ? '#000' : '#fff';
+        const overColor = isLightTheme ? '#fff' : '#000';
+        drawTrailPath(tCtx, mainColor);
+        drawBlackTrailOverZaydan(overColor);
+        drawBlackTrailOverPopup(overColor);
       }
       if (pts.length === 0) trailDirty = false;
     }
