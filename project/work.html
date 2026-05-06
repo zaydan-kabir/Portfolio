@@ -475,7 +475,7 @@
       <div class="grid-overlay"><span class="item-name">Coming Soon: Book Cover Re-Design</span><span class="item-subtitle">Digital Design, Graphic Design, Type Design</span></div>
     </a>
 
-    <a class="grid-item" href="#" data-project-link="design-manifesto">
+    <a class="grid-item" href="design-manifesto.html" target="_blank" rel="noopener noreferrer" data-project-link="design-manifesto" aria-label="Open Refined Design Manifesto">
       <iframe src="design-manifesto-hyperframe/index.html?v=20260505-manifesto" title="Refined Design Manifesto animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Coming Soon: Refined Design Manifesto</span><span class="item-subtitle">Creative Coding, Vibe Coding, UI Design</span></div>
     </a>
@@ -528,6 +528,14 @@
         if (link.getAttribute('href') === '#') e.preventDefault();
       });
     });
+
+    const manifestoLink = document.querySelector('[data-project-link="design-manifesto"]');
+    if (manifestoLink) {
+      manifestoLink.addEventListener('click', e => {
+        e.preventDefault();
+        window.open(manifestoLink.href, '_blank', 'noopener,noreferrer');
+      });
+    }
   </script>
 </body>
 </html>
