@@ -294,13 +294,13 @@
       /* Native horizontal scroll container. The browser's compositor
          scroll thread runs independently of the main thread, so JS work
          can never make this lag. Snap-to-panel is also native. */
-      overflow-x: auto;
+      overflow-x: hidden;
       overflow-y: hidden;
       /* proximity (not mandatory) — mandatory snapped scrollLeft back to
          0 on every small wheel delta, making panel-2 unreachable. With
          proximity, the browser only snaps when the user releases near a
          snap point. */
-      scroll-snap-type: x proximity;
+      scroll-snap-type: none;
       scroll-behavior: auto;
       scrollbar-width: none;
       -ms-overflow-style: none;
@@ -319,7 +319,7 @@
       position: relative;
       top: 0; left: 0;
       height: 100%;
-      width: 200vw;
+      width: 100vw;
       display: flex;
     }
 
@@ -428,19 +428,7 @@
       100% { opacity: 1; }
     }
     #masthead-guide {
-      position: absolute;
-      left: 50%;
-      bottom: calc(100% + 48px);
-      transform: translateX(-50%);
-      font-family: 'VT323', monospace;
-      font-size: clamp(14px, 1.15vw, 18px);
-      letter-spacing: 0.06em;
-      color: rgba(255,255,255,0.24);
-      display: block;
-      margin-bottom: 0;
-      text-align: center;
-      line-height: 1.35;
-      white-space: nowrap;
+      display: none;
     }
     #masthead-replay {
       position: absolute;
@@ -693,6 +681,10 @@
       from { opacity: 0; transform: scale(0.6); }
       to { opacity: 1; transform: scale(1); }
     }
+    #panel-2,
+    #scroll-capture {
+      display: none !important;
+    }
     @keyframes p2-write-cover {
       to { transform: scaleX(0); }
     }
@@ -810,7 +802,7 @@
   <div id="track">
     <div class="panel" id="panel-1">
       <div id="masthead" role="button" tabindex="0" aria-label="Replay Zaydan masthead animation">
-        <span id="masthead-guide">&lt;scroll up&gt;<br>to move forward</span>
+        <span id="masthead-guide"></span>
         <span id="masthead-text" data-text="Zaydan">Zaydan</span>
         <img id="masthead-reference" src="uploads/zaydan-screenshot-wordmark.png" alt="" aria-hidden="true">
         <span id="masthead-replay">&lt;click&gt;<br>to replay animation</span>
@@ -1016,9 +1008,11 @@ const zaydanAnimationReady = (() => {
   const stage = document.getElementById('stage');
   const panel2 = document.getElementById('panel-2');
   const bodyEl = document.body;
+  const enableHorizontalPanel = false;
   let maxX = window.innerWidth;
 
   function moveHorizontal(delta) {
+    if (!enableHorizontalPanel) return;
     stage.scrollLeft = Math.max(0, Math.min(maxX, stage.scrollLeft + delta));
   }
 
@@ -1049,12 +1043,11 @@ const zaydanAnimationReady = (() => {
     e.preventDefault();
     stage.scrollLeft -= dy;
   }
-  window.addEventListener('wheel', handleWheel, { passive: false });
+  if (enableHorizontalPanel) {
+    window.addEventListener('wheel', handleWheel, { passive: false });
+  }
 
-  // ── Touch: invert direction so swipe-right = forward (panel 2) ────
-  // Native horizontal scroll moves content opposite to finger; the page
-  // guide says "swipe right to move forward", so we override touch with
-  // a custom handler that maps positive dx → larger scrollLeft.
+  // ── Touch: disabled while the manifesto panel is hidden ───────────
   let touchStartX = 0, touchStartY = 0;
   let touchStartScrollLeft = 0, touchStartInnerScrollTop = 0;
   let touchOnPanel2 = false;
@@ -1087,7 +1080,7 @@ const zaydanAnimationReady = (() => {
     snapAnimId = requestAnimationFrame(step);
   }
 
-  stage.addEventListener('touchstart', e => {
+  if (enableHorizontalPanel) stage.addEventListener('touchstart', e => {
     if (e.touches.length !== 1) return;
     cancelSnap();
     const t = e.touches[0];
@@ -1102,7 +1095,7 @@ const zaydanAnimationReady = (() => {
     touchVelocity = 0;
   }, { passive: true });
 
-  stage.addEventListener('touchmove', e => {
+  if (enableHorizontalPanel) stage.addEventListener('touchmove', e => {
     if (e.touches.length !== 1) return;
     const t = e.touches[0];
     const dx = t.clientX - touchStartX;
@@ -1141,7 +1134,7 @@ const zaydanAnimationReady = (() => {
     }
   }, { passive: false });
 
-  stage.addEventListener('touchend', () => {
+  if (enableHorizontalPanel) stage.addEventListener('touchend', () => {
     if (touchDir === 'h') {
       // Velocity decides flicks; otherwise snap to whichever panel is closer.
       let target;
@@ -1153,7 +1146,7 @@ const zaydanAnimationReady = (() => {
     touchDir = null;
   }, { passive: true });
 
-  stage.addEventListener('touchcancel', () => {
+  if (enableHorizontalPanel) stage.addEventListener('touchcancel', () => {
     if (touchDir === 'h') {
       smoothSnapTo(stage.scrollLeft > maxX * 0.5 ? maxX : 0);
     }
@@ -1165,7 +1158,7 @@ const zaydanAnimationReady = (() => {
   // frame the scroll moves.
   let lastWritingActive = false;
   let scrollIdleTimer = 0;
-  stage.addEventListener('scroll', () => {
+  if (enableHorizontalPanel) stage.addEventListener('scroll', () => {
     const x = stage.scrollLeft;
     const writing = x > maxX * 0.45;
     if (writing !== lastWritingActive) {
@@ -1270,7 +1263,7 @@ const zaydanAnimationReady = (() => {
   const isMobile = window.innerWidth < 600;
   if (isMobile) {
     const guide = document.getElementById('masthead-guide');
-    if (guide) guide.innerHTML = '&lt;swipe right&gt;<br>to move forward';
+    if (guide) guide.textContent = '';
     const replay = document.getElementById('masthead-replay');
     if (replay) replay.innerHTML = '&lt;tap&gt;<br>to replay animation';
   }
