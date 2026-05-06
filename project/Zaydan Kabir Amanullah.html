@@ -585,16 +585,25 @@
       z-index: 2;
       pointer-events: none;
       user-select: none;
-      background: transparent;
+      background: transparent !important;
       border: 0;
       outline: none;
       box-shadow: none;
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
       mix-blend-mode: normal;
+      /* Force its own GPU layer — fixes iOS Safari painting a faint
+         rectangle behind alpha PNGs at certain pixel ratios. */
+      transform: translateZ(0);
+      will-change: opacity;
+      backface-visibility: hidden;
+      image-rendering: -webkit-optimize-contrast;
+      /* Soften the canvas edges of the source PNG so the fig's near-edge
+         content doesn't read as a hard rectangle on small renders. */
+      -webkit-mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, #000 78%, transparent 100%);
+              mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, #000 78%, transparent 100%);
       /* Hidden until decoded so the layout box doesn't paint as a
-         placeholder square on first load (especially on mobile where
-         async PNG decode is visible for a frame or two). */
+         placeholder square on first load. */
       opacity: 0;
       transition: opacity .25s ease;
     }
@@ -733,9 +742,9 @@
         overflow-y: auto;
       }
       #panel-2-fig {
-        right: clamp(20px, 6vw, 28px);
+        right: clamp(16px, 5vw, 24px);
         bottom: calc(74px + env(safe-area-inset-bottom, 0px));
-        width: clamp(58px, 19vw, 76px);
+        width: clamp(40px, 12vw, 56px);
       }
       #panel-2-writing {
         right: 12px;
