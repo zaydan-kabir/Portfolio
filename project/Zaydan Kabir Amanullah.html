@@ -1036,6 +1036,66 @@ const zaydanAnimationReady = (() => {
   // ── ASCII ramp ────────────────────────────────────────────────────
   const RAMP = " .'`,:;iltfcj-+!rILvzsx=*eaounCVZSX%mwdbpqMWDB#&@";
 
+  // ── Variable-typographic ASCII via pretext ───────────────────────
+  let typoPalette = null;
+
+  async function buildTypoPalette(fontSize) {
+    const { prepareWithSegments } = await import('./node_modules/@chenglou/pretext/dist/layout.js');
+    const CHARS = " .,:;!il|-+=*#@%&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const variants = [
+      { weight: 400, style: 'normal'  },
+      { weight: 400, style: 'italic'  },
+      { weight: 700, style: 'normal'  },
+      { weight: 700, style: 'italic'  },
+    ];
+    const tw = Math.ceil(fontSize * 3), th = Math.ceil(fontSize * 2);
+    const tmp = document.createElement('canvas');
+    tmp.width = tw; tmp.height = th;
+    const tc = tmp.getContext('2d', { willReadFrequently: true });
+    const entries = [];
+    for (const { weight, style } of variants) {
+      const fontStr = `${style} ${weight} ${fontSize}px 'Georgia',serif`;
+      for (const ch of CHARS) {
+        const prep = prepareWithSegments(ch, fontStr);
+        const width = (prep.widths && prep.widths.length > 0) ? prep.widths[0] : fontSize * 0.5;
+        let brightness = 0;
+        if (ch !== ' ') {
+          tc.clearRect(0, 0, tw, th);
+          tc.font = fontStr;
+          tc.fillStyle = '#000';
+          tc.textBaseline = 'alphabetic';
+          tc.fillText(ch, 1, Math.ceil(fontSize * 1.25));
+          const data = tc.getImageData(0, 0, tw, th).data;
+          let inkSum = 0;
+          for (let p = 3; p < data.length; p += 4) inkSum += data[p];
+          brightness = inkSum / (255 * tw * th);
+        }
+        entries.push({ ch, fontStr, width, brightness });
+      }
+    }
+    entries.sort((a, b) => a.brightness - b.brightness);
+    return entries;
+  }
+
+  function findBestChar(palette, targetBrightness, targetWidth) {
+    let lo = 0, hi = palette.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (palette[mid].brightness < targetBrightness) lo = mid + 1;
+      else hi = mid;
+    }
+    let best = palette[lo], bestScore = Infinity;
+    const s = Math.max(0, lo - 20), e = Math.min(palette.length - 1, lo + 20);
+    for (let k = s; k <= e; k++) {
+      const en = palette[k];
+      const be = Math.abs(en.brightness - targetBrightness);
+      const we = Math.abs(en.width - targetWidth) / Math.max(targetWidth, 1);
+      const score = be * 2.5 + we;
+      if (score < bestScore) { bestScore = score; best = en; }
+    }
+    return best;
+  }
+
   // ── Luminance grid (min-lum for dark-chars-on-light-bg sources) ───
   function toGrid(img, cols, rows) {
     const sw = cols * 2, sh = rows * 2;
@@ -1122,6 +1182,8 @@ const zaydanAnimationReady = (() => {
   }
   initGrids();
   window.addEventListener('load', initGrids);
+  buildTypoPalette(H_CH).then(p => { typoPalette = p; });
+
   // ── Render helpers ────────────────────────────────────────────────
   // Hot path — runs ~6500 fillText calls per frame across both grids.
   // Pulled all invariants out of the inner loop and iterates a precomputed
@@ -1132,7 +1194,6 @@ const zaydanAnimationReady = (() => {
     const theme = document.documentElement.dataset.theme;
     const asciiColor = theme === 'light' ? '0,0,0' : '255,255,255';
     const isLight = theme === 'light';
-    ctx.font = `bold ${ch}px 'Courier New', monospace`;
     ctx.textBaseline = 'alphabetic';
 
     const visible = gridData.visible;
@@ -1143,18 +1204,25 @@ const zaydanAnimationReady = (() => {
       const breath = Math.sin(t * 0.55 + c * 0.18 + r * 0.09) * 0.5 + 0.5;
       let alpha = norm * (isLight ? 1.2 : 0.6 + breath * 0.3);
       if (alpha > 1) alpha = 1;
-
-      const flicker = Math.sin(t * 1.1 + c * 0.38 + r * 0.22) > 0.82 ? 1 : 0;
-      const base = (norm * rampMax) | 0;
-      let ci = base + flicker;
-      if (ci > rampMax) ci = rampMax;
-      const char = RAMP[ci];
-      if (!char || char === ' ') continue;
-      // Quantise alpha to 64 buckets — avoids string churn and lets the
-      // browser cache the fillStyle parse.
       const aQ = ((alpha * 64) | 0) / 64;
-      ctx.fillStyle = `rgba(${asciiColor},${aQ})`;
-      ctx.fillText(char, c * cw, (r + 1) * ch);
+
+      if (typoPalette) {
+        const flicker = Math.sin(t * 1.1 + c * 0.38 + r * 0.22) > 0.88 ? 0.05 : 0;
+        const best = findBestChar(typoPalette, Math.min(1, norm + flicker), cw);
+        ctx.font = best.fontStr;
+        ctx.fillStyle = `rgba(${asciiColor},${aQ})`;
+        ctx.fillText(best.ch, c * cw, (r + 1) * ch);
+      } else {
+        const flicker = Math.sin(t * 1.1 + c * 0.38 + r * 0.22) > 0.82 ? 1 : 0;
+        const base = (norm * rampMax) | 0;
+        let ci = base + flicker;
+        if (ci > rampMax) ci = rampMax;
+        const char = RAMP[ci];
+        if (!char || char === ' ') continue;
+        ctx.font = `bold ${ch}px 'Courier New', monospace`;
+        ctx.fillStyle = `rgba(${asciiColor},${aQ})`;
+        ctx.fillText(char, c * cw, (r + 1) * ch);
+      }
     }
   }
 
