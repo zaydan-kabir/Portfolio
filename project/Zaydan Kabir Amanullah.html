@@ -966,6 +966,7 @@ const zaydanAnimationReady = (() => {
   const panel2 = document.getElementById('panel-2');
   const bodyEl = document.body;
   let maxX = 0;
+  let panelNavLockUntil = 0;
 
   function updateMaxX() {
     maxX = Math.max(0, stage.scrollWidth - stage.clientWidth);
@@ -975,20 +976,45 @@ const zaydanAnimationReady = (() => {
     stage.scrollLeft = Math.max(0, Math.min(maxX, stage.scrollLeft + delta));
   }
 
+  function glideToPanel(left) {
+    updateMaxX();
+    stage.scrollTo({
+      left: Math.max(0, Math.min(maxX, left)),
+      behavior: 'smooth'
+    });
+    panelNavLockUntil = performance.now() + 720;
+  }
+
   updateMaxX();
   window.addEventListener('resize', updateMaxX);
 
   // Vertical wheel → horizontal scrollLeft. The browser's own scroll
   // thread does the actual painting; we just nudge the position.
   function handleWheel(e) {
+    if (e.__zaydanWheelHandled) return;
+    e.__zaydanWheelHandled = true;
     if (e.ctrlKey) return;
     const useVertical = Math.abs(e.deltaY) >= Math.abs(e.deltaX);
     let inputDelta = useVertical ? e.deltaY : e.deltaX;
     if (e.deltaMode === 1) inputDelta *= 16;
     else if (e.deltaMode === 2) inputDelta *= window.innerHeight;
 
-    // The page instruction is "scroll up to move forward": upward
-    // vertical wheel input should travel right into panel 2.
+    updateMaxX();
+
+    if (useVertical && performance.now() < panelNavLockUntil) {
+      e.preventDefault();
+      return;
+    }
+
+    // At the left edge, the first panel has no vertical scroll content.
+    // Send the user's first vertical mouse gesture directly into panel 2
+    // so device-specific wheel direction cannot trap the page at panel 1.
+    if (useVertical && maxX > 0 && stage.scrollLeft <= maxX * 0.08) {
+      e.preventDefault();
+      glideToPanel(maxX);
+      return;
+    }
+
     const stageDelta = useVertical ? -inputDelta : inputDelta;
 
     // If we're on panel 2 and its inner column can scroll, send the
@@ -1008,7 +1034,9 @@ const zaydanAnimationReady = (() => {
     e.preventDefault();
     moveHorizontal(stageDelta);
   }
-  window.addEventListener('wheel', handleWheel, { passive: false });
+  window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+  document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+  stage.addEventListener('wheel', handleWheel, { passive: false, capture: true });
 
   // Read scroll position to drive .writing-active and .is-scrolling.
   // No RAF loop — the scroll event already fires on each compositor
