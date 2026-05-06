@@ -215,7 +215,7 @@
       text-decoration: none;
       transition: color 0.2s;
     }
-    .h-name:hover { color: var(--ink); }
+    .h-name:hover, .h-name.active { color: var(--ink); }
     .h-nav { display: flex; gap: 28px; align-items: baseline; }
     .h-link {
       font-family: 'Lora', serif;
@@ -237,8 +237,8 @@
       transform: scaleX(0);
       transition: transform 0.2s ease;
     }
-    .h-link:hover { color: var(--ink); }
-    .h-link:hover::after { transform: scaleX(1); }
+    .h-link:hover, .h-link.active { color: var(--ink); }
+    .h-link:hover::after, .h-link.active::after { transform: scaleX(1); }
 
     /* ── Upcoming ticker ───────────────────────────────────── */
     #upcoming-ticker {
@@ -754,8 +754,8 @@
       }
     }
   </style>
-  <script src="theme.js?v=20260506-light-trail-navbar-laptop"></script>
-  <link rel="stylesheet" href="theme.css?v=20260501-light-first-all">
+  <script src="theme.js?v=20260506-trail-fix"></script>
+  <link rel="stylesheet" href="theme.css?v=20260506-trail-fix">
   <style>
     html[data-theme="light"] #masthead-guide,
     html[data-theme="light"] #masthead-replay { color: rgba(10,10,10,.42) !important; }
@@ -1357,12 +1357,12 @@ const zaydanAnimationReady = (() => {
     if (trailDirty) {
       tCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
       if (pts.length > 1) {
-        const isLightTheme = document.documentElement.dataset.theme === 'light';
-        const mainColor = isLightTheme ? '#000' : '#fff';
-        const overColor = isLightTheme ? '#fff' : '#000';
-        drawTrailPath(tCtx, mainColor);
-        drawBlackTrailOverZaydan(overColor);
-        drawBlackTrailOverPopup(overColor);
+        // Always draw white. theme.css applies filter:invert(1) on the
+        // canvas in light mode so the line reads black there. Drawing
+        // a different colour in JS would be double-inverted to white.
+        drawTrailPath(tCtx, '#fff');
+        drawBlackTrailOverZaydan('#000');
+        drawBlackTrailOverPopup('#000');
       }
       if (pts.length === 0) trailDirty = false;
     }
