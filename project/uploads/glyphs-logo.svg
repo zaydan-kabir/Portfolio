@@ -1,0 +1,11 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" rx="224" ry="224" fill="#ffffff"/>
+  <g fill="#13AB46">
+    <!-- Left C-shape: half-circle (radius 332) -->
+    <path d="M488 180 a332 332 0 0 0 0 664 Z"/>
+    <!-- Top-right D rotated: flat left, half-circle bottom-right -->
+    <path d="M538 180 H872 V392 a212 212 0 0 1 -212 212 H538 Z"/>
+    <!-- Bottom-right D rotated: flat left, half-circle top-right -->
+    <path d="M538 632 H660 a212 212 0 0 1 212 212 V844 H538 Z"/>
+  </g>
+</svg>
