@@ -305,15 +305,15 @@
 
     #panel-2-writing { display: none; }
 
-    @media (max-width: 700px) {
-      html[data-theme="light"],
-      html[data-theme="light"] body,
-      html[data-theme="light"] .panel,
-      html[data-theme="light"] #safe-area-top {
-        --bg: #f2f1ee;
-        background: #f2f1ee !important;
-      }
+    html[data-theme="light"],
+    html[data-theme="light"] body,
+    html[data-theme="light"] .panel,
+    html[data-theme="light"] #safe-area-top {
+      --bg: #f2f1ee;
+      background: #f2f1ee !important;
+    }
 
+    @media (max-width: 700px) {
       #header {
         padding: calc(env(safe-area-inset-top, 0px) + 18px) 18px 9px;
       }
