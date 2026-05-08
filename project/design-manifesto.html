@@ -74,11 +74,44 @@
       z-index: 10003;
     }
 
+    body.bee-cursor-active #cursor {
+      opacity: 0;
+    }
+
+    #bee-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: clamp(42px, 5vw, 72px);
+      height: clamp(42px, 5vw, 72px);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate3d(-140px, -140px, 0) translate(-50%, -50%) rotate(0deg);
+      transform-origin: 50% 50%;
+      z-index: 10004;
+      filter: drop-shadow(0 12px 20px rgba(0,0,0,.28));
+      transition: opacity .45s ease;
+      user-select: none;
+      will-change: transform, opacity;
+    }
+
+    #bee-cursor.is-visible {
+      opacity: 1;
+    }
+
+    html[data-theme="light"] #bee-cursor {
+      filter: drop-shadow(0 10px 18px rgba(10,10,10,.2));
+    }
+
     #trail-canvas {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 10001;
+    }
+
+    body.bee-cursor-active #trail-canvas {
+      display: none;
     }
 
     /* Trail-canvas filter:invert(1) from theme.css would double-invert
@@ -205,6 +238,7 @@
       }
 
       #cursor,
+      #bee-cursor,
       #trail-canvas {
         display: none;
       }
@@ -214,6 +248,7 @@
 <body data-manifesto-page>
   <div id="safe-area-top"></div>
   <div id="cursor"></div>
+  <img id="bee-cursor" src="uploads/bee-cursor.png" alt="" aria-hidden="true">
   <canvas id="trail-canvas"></canvas>
   <div id="page-out"></div>
   <header id="header">
@@ -251,10 +286,26 @@
     }
 
     const cursor = document.getElementById('cursor');
+    const beeCursor = document.getElementById('bee-cursor');
     const trailCanvas = document.getElementById('trail-canvas');
     const trailCtx = trailCanvas.getContext('2d');
     const points = [];
     let trailFrame = 0;
+    const bee = {
+      active: false,
+      entering: false,
+      x: -160,
+      y: -160,
+      targetX: window.innerWidth / 2,
+      targetY: window.innerHeight / 2,
+      lastPointerX: window.innerWidth / 2,
+      lastPointerY: window.innerHeight / 2,
+      angle: 0,
+      targetAngle: 0,
+      frame: 0,
+      timer: 0,
+      lastMoveAt: 0
+    };
 
     function resizeTrail() {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -265,12 +316,25 @@
       trailCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
+    function clearTrail() {
+      points.length = 0;
+      trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+      if (trailFrame) {
+        cancelAnimationFrame(trailFrame);
+        trailFrame = 0;
+      }
+    }
+
     function trailColor() {
       return document.documentElement.dataset.theme === 'light' ? '10,10,10' : '240,240,240';
     }
 
     function drawTrail() {
       trailFrame = 0;
+      if (bee.active) {
+        clearTrail();
+        return;
+      }
       trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
       const now = Date.now();
       trailCtx.lineCap = 'round';
@@ -292,11 +356,69 @@
 
     resizeTrail();
     window.addEventListener('resize', resizeTrail);
+
+    function normalizeAngle(angle) {
+      return Math.atan2(Math.sin(angle), Math.cos(angle));
+    }
+
+    function setBeeTargetFromMovement(dx, dy) {
+      if (Math.hypot(dx, dy) < 1.5) return;
+      const movementAngle = Math.atan2(dy, dx);
+      bee.targetAngle = normalizeAngle(movementAngle - Math.PI);
+    }
+
+    function renderBee() {
+      const positionEase = bee.entering ? 0.075 : 0.18;
+      bee.x += (bee.targetX - bee.x) * positionEase;
+      bee.y += (bee.targetY - bee.y) * positionEase;
+      bee.angle = normalizeAngle(bee.angle + normalizeAngle(bee.targetAngle - bee.angle) * 0.16);
+      const bob = Math.sin(performance.now() / 145) * 2.2;
+      const wing = Math.sin(performance.now() / 82) * 2.4;
+      beeCursor.style.transform = `translate3d(${bee.x}px,${bee.y + bob}px,0) translate(-50%,-50%) rotate(${bee.angle + wing * Math.PI / 180}rad)`;
+      if (bee.entering && Math.hypot(bee.targetX - bee.x, bee.targetY - bee.y) < 3) {
+        bee.entering = false;
+      }
+      bee.frame = requestAnimationFrame(renderBee);
+    }
+
+    function startBeeCursor() {
+      if (bee.active || window.matchMedia('(pointer: coarse)').matches) return;
+      bee.active = true;
+      bee.entering = true;
+      const fromLeft = bee.targetX < window.innerWidth * 0.5;
+      bee.x = fromLeft ? -140 : window.innerWidth + 140;
+      bee.y = Math.min(window.innerHeight + 110, Math.max(-110, bee.targetY + (bee.targetY < window.innerHeight * 0.5 ? 120 : -120)));
+      setBeeTargetFromMovement(bee.targetX - bee.x, bee.targetY - bee.y);
+      clearTrail();
+      document.body.classList.add('bee-cursor-active');
+      beeCursor.classList.add('is-visible');
+      if (!bee.frame) bee.frame = requestAnimationFrame(renderBee);
+    }
+
+    function scheduleBeeCursor() {
+      if (bee.active || bee.timer || window.matchMedia('(pointer: coarse)').matches) return;
+      bee.timer = window.setTimeout(() => {
+        bee.timer = 0;
+        startBeeCursor();
+      }, 1800);
+    }
+
     document.addEventListener('mousemove', event => {
       cursor.style.transform = `translate3d(${event.clientX}px,${event.clientY}px,0) translate(-50%,-50%)`;
-      points.push({ x: event.clientX, y: event.clientY, t: Date.now() });
-      if (points.length > 32) points.shift();
-      if (!trailFrame) trailFrame = requestAnimationFrame(drawTrail);
+      const dx = event.clientX - bee.lastPointerX;
+      const dy = event.clientY - bee.lastPointerY;
+      bee.targetX = event.clientX;
+      bee.targetY = event.clientY;
+      bee.lastPointerX = event.clientX;
+      bee.lastPointerY = event.clientY;
+      bee.lastMoveAt = Date.now();
+      setBeeTargetFromMovement(dx, dy);
+      scheduleBeeCursor();
+      if (!bee.active) {
+        points.push({ x: event.clientX, y: event.clientY, t: Date.now() });
+        if (points.length > 32) points.shift();
+        if (!trailFrame) trailFrame = requestAnimationFrame(drawTrail);
+      }
     }, { passive: true });
 
     document.querySelectorAll('a[data-page]').forEach(link => {
