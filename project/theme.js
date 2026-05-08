@@ -224,6 +224,7 @@
     }
 
     window.__designManifestoBuzzWake = function (detail) {
+      if (window.matchMedia('(pointer: coarse), (max-width: 700px)').matches) return;
       var rect = panel.getBoundingClientRect();
       var dx = Number(detail && detail.dx) || 1;
       var dy = Number(detail && detail.dy) || 0;
