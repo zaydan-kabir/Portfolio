@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Design Manifesto HyperFrame Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=VT323&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=VT323&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #f0f0f0; }
@@ -19,304 +19,208 @@
       background:
         linear-gradient(90deg, rgba(10,10,10,.035) 0 1px, transparent 1px 100%),
         linear-gradient(0deg, rgba(10,10,10,.028) 0 1px, transparent 1px 100%),
-        radial-gradient(ellipse at 24% 18%, rgba(217,121,87,.13) 0%, transparent 34%),
-        radial-gradient(ellipse at 82% 74%, rgba(82,102,106,.16) 0%, transparent 38%),
+        radial-gradient(ellipse at 74% 76%, rgba(255,214,80,.18) 0%, transparent 28%),
+        radial-gradient(ellipse at 22% 18%, rgba(217,121,87,.12) 0%, transparent 34%),
         #f0f0f0;
-      background-size: 32px 32px, 32px 32px, auto, auto, auto;
+      background-size: 34px 34px, 34px 34px, auto, auto, auto;
       isolation: isolate;
     }
 
-    .composition {
+    .page {
       position: relative;
-      z-index: 4;
+      z-index: 3;
       width: 100%;
       height: 100%;
-      padding: clamp(36px, 6vw, 82px);
+      padding: clamp(30px, 5vw, 76px);
       display: grid;
-      grid-template-columns: minmax(170px, .55fr) minmax(360px, 1.18fr) minmax(150px, .5fr);
+      grid-template-rows: auto 1fr auto;
+      gap: clamp(10px, 2.2vw, 26px);
+    }
+
+    .topline {
+      display: flex;
       align-items: center;
-      gap: clamp(18px, 4vw, 62px);
-    }
-
-    .manifesto-card {
-      position: relative;
-      min-height: min(76vh, 650px);
-      padding: clamp(28px, 4.6vw, 64px);
-      border: 1px solid rgba(10,10,10,.22);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.62), rgba(240,240,240,.78)),
-        #f0f0f0;
-      box-shadow:
-        0 24px 58px rgba(10,10,10,.16),
-        inset 0 0 0 8px rgba(255,255,255,.24);
-      overflow: hidden;
-      will-change: transform, opacity;
-    }
-    .manifesto-card::before,
-    .manifesto-card::after {
-      content: '';
-      position: absolute;
-      inset: 16px;
-      border: 1px solid rgba(10,10,10,.08);
-      pointer-events: none;
-    }
-    .manifesto-card::after {
-      inset: auto clamp(20px, 3vw, 42px) clamp(18px, 3vw, 38px) auto;
-      width: clamp(58px, 7vw, 92px);
-      height: clamp(58px, 7vw, 92px);
-      border-color: rgba(217,121,87,.58);
-      border-radius: 50%;
-      transform: rotate(-8deg);
-    }
-
-    .kicker,
-    .folio,
-    .side-note,
-    .annotation {
+      justify-content: space-between;
+      gap: 18px;
+      color: rgba(10,10,10,.42);
       font-family: 'VT323', 'Courier New', monospace;
-      letter-spacing: .12em;
+      font-size: clamp(13px, 1.25vw, 18px);
+      letter-spacing: .13em;
       text-transform: uppercase;
     }
 
-    .kicker {
-      display: block;
-      margin-bottom: clamp(18px, 3vw, 36px);
-      color: rgba(10,10,10,.58);
-      font-size: clamp(14px, 1.7vw, 22px);
-    }
-
-    .title {
-      margin: 0;
-      max-width: 10ch;
-      color: #0a0a0a;
-      font-size: clamp(48px, 6.3vw, 86px);
-      font-weight: 600;
-      font-style: italic;
-      line-height: .84;
-      letter-spacing: 0;
-    }
-    .title span {
-      display: block;
-      overflow: hidden;
-    }
-    .title i {
-      display: block;
-      font-style: inherit;
-      will-change: transform, opacity;
-    }
-
-    .deck {
-      margin-top: clamp(22px, 3vw, 40px);
-      display: grid;
-      gap: clamp(8px, 1.2vw, 14px);
-      max-width: 54ch;
-    }
-    .line {
-      position: relative;
-      overflow: hidden;
-      color: rgba(10,10,10,.76);
-      font-size: clamp(15px, 1.45vw, 22px);
-      line-height: 1.35;
-      font-style: italic;
-    }
-    .line span {
-      display: block;
-      will-change: transform, opacity;
-    }
-
-    .rule {
-      width: 100%;
-      height: 1px;
-      margin: clamp(20px, 3vw, 38px) 0 clamp(16px, 2.5vw, 28px);
-      background: #0a0a0a;
-      transform-origin: left center;
-      will-change: transform, opacity;
-    }
-
-    .annotation {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      color: #d97957;
-      font-size: clamp(14px, 1.55vw, 20px);
-      will-change: transform, opacity;
-    }
-    .annotation::before {
+    .topline::after {
       content: '';
-      display: block;
-      width: clamp(20px, 3.5vw, 48px);
+      flex: 1;
       height: 1px;
-      background: currentColor;
+      background: rgba(10,10,10,.18);
       transform-origin: left center;
     }
 
-    .folio {
-      position: absolute;
-      right: clamp(20px, 3vw, 42px);
-      top: clamp(18px, 2.8vw, 38px);
-      color: rgba(10,10,10,.42);
-      font-size: clamp(12px, 1.1vw, 16px);
+    .text-field {
+      position: relative;
+      width: min(940px, 86vw);
+      margin: auto;
+      min-height: min(66vh, 620px);
+      display: grid;
+      place-items: center;
+      padding: clamp(22px, 4vw, 54px);
     }
 
-    .fig-system {
-      position: relative;
-      height: min(58vh, 470px);
-      color: #52666a;
+    .text-field::before {
+      content: '';
+      position: absolute;
+      inset: 8%;
+      border: 1px solid rgba(10,10,10,.08);
+      border-radius: 50%;
+      transform: rotate(-7deg) scaleX(1.28);
+      opacity: .9;
     }
-    .fig-system svg {
+
+    .flow {
+      position: relative;
       width: 100%;
-      height: 100%;
-      display: block;
+      max-width: 830px;
+      color: rgba(10,10,10,.86);
+      text-align: center;
+      font-style: italic;
+      font-size: clamp(14px, 1.72vw, 24px);
+      line-height: 1.4;
+    }
+
+    .flow span {
+      display: inline-block;
+      margin: 0 .14em;
+      will-change: transform, opacity;
+    }
+
+    .flow .warm { color: #d97957; }
+    .flow .muted { color: #52666a; }
+
+    .caption {
+      justify-self: center;
+      color: rgba(10,10,10,.62);
+      font-family: 'VT323', 'Courier New', monospace;
+      font-size: clamp(12px, 1.15vw, 16px);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      will-change: transform, opacity;
+    }
+
+    .fig {
+      position: absolute;
+      right: clamp(22px, 5vw, 72px);
+      bottom: clamp(46px, 7vw, 104px);
+      width: clamp(58px, 8.2vw, 116px);
+      height: auto;
+      z-index: 7;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,.28));
+      transform-origin: 54% 56%;
+      will-change: transform, opacity, filter;
+    }
+
+    .bee {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: clamp(42px, 5.7vw, 82px);
+      height: clamp(42px, 5.7vw, 82px);
+      z-index: 9;
+      pointer-events: none;
+      filter: drop-shadow(0 12px 20px rgba(0,0,0,.3));
+      transform-origin: 50% 50%;
+      will-change: transform, opacity, filter;
+    }
+
+    .cursor-dot {
+      position: absolute;
+      left: 23%;
+      top: 54%;
+      width: clamp(7px, .9vw, 12px);
+      height: clamp(7px, .9vw, 12px);
+      border-radius: 50%;
+      background: #0a0a0a;
+      z-index: 8;
+      will-change: transform, opacity;
+    }
+
+    .trace {
+      position: absolute;
+      left: 23%;
+      top: 54%;
+      width: clamp(120px, 24vw, 340px);
+      height: clamp(42px, 8vw, 90px);
+      z-index: 6;
+      opacity: .52;
       overflow: visible;
     }
-    .fig-system path,
-    .fig-system line {
+
+    .trace path {
       fill: none;
-      stroke: currentColor;
-      stroke-width: 1.8;
+      stroke: rgba(10,10,10,.4);
+      stroke-width: 1.6;
       stroke-linecap: round;
-      stroke-linejoin: round;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
       vector-effect: non-scaling-stroke;
-      opacity: .72;
-    }
-    .fig-system .branch {
-      stroke-dasharray: 420;
-      stroke-dashoffset: 0;
-    }
-    .fig-system .fig-node {
-      fill: #0a0a0a;
-      stroke: #f0f0f0;
-      stroke-width: 2.5;
-      transform-origin: center;
-      will-change: transform, opacity;
-    }
-    .fig-system .node-warm { fill: #d97957; }
-    .fig-system .node-muted { fill: #52666a; }
-
-    .side-note {
-      align-self: end;
-      margin: 0;
-      color: rgba(10,10,10,.46);
-      font-size: clamp(13px, 1.3vw, 18px);
-      line-height: 1.15;
-      max-width: 18ch;
-      will-change: transform, opacity;
     }
 
-    .margin-column {
-      position: relative;
-      min-height: min(70vh, 580px);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 22px;
-    }
-    .fragment {
-      padding: 14px 0;
-      border-top: 1px solid rgba(10,10,10,.2);
-      color: rgba(10,10,10,.68);
-      font-size: clamp(14px, 1.28vw, 19px);
-      line-height: 1.35;
-      font-style: italic;
-      will-change: transform, opacity;
-    }
-    .fragment strong {
-      display: block;
-      margin-bottom: 6px;
-      color: #0a0a0a;
+    .edge-word {
+      position: absolute;
+      left: clamp(16px, 3vw, 42px);
+      bottom: clamp(12px, 2.5vw, 34px);
+      z-index: 2;
+      color: rgba(10,10,10,.13);
       font-family: 'VT323', 'Courier New', monospace;
-      font-size: clamp(13px, 1.16vw, 17px);
-      font-weight: 400;
-      letter-spacing: .12em;
+      font-size: clamp(70px, 13vw, 185px);
+      line-height: .7;
+      letter-spacing: .06em;
       text-transform: uppercase;
+      pointer-events: none;
     }
 
     .grain {
       position: absolute;
       inset: 0;
-      z-index: 8;
-      opacity: .13;
+      z-index: 20;
+      opacity: .12;
       mix-blend-mode: multiply;
       pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
       background-size: 180px 180px;
     }
 
-    .edge-word {
-      position: absolute;
-      left: clamp(18px, 2.8vw, 40px);
-      bottom: clamp(14px, 2.4vw, 34px);
-      z-index: 5;
-      color: rgba(10,10,10,.18);
-      font-family: 'VT323', 'Courier New', monospace;
-      font-size: clamp(62px, 12vw, 180px);
-      line-height: .7;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      pointer-events: none;
-      will-change: transform, opacity;
-    }
-
     @media (max-aspect-ratio: 1/1) {
-      .composition {
-        grid-template-columns: 1fr;
-        padding: clamp(22px, 6vw, 44px);
-      }
-      .fig-system,
-      .margin-column { display: none; }
-      .manifesto-card { min-height: min(82vh, 620px); }
-      .title { font-size: clamp(44px, 11.5vw, 80px); }
-      .line { font-size: clamp(14px, 4vw, 19px); }
+      .page { padding: clamp(22px, 6vw, 42px); }
+      .text-field { width: 100%; min-height: 70vh; padding: 18px; }
+      .flow { font-size: clamp(13px, 4vw, 20px); line-height: 1.34; }
+      .fig { width: clamp(58px, 18vw, 88px); right: 24px; bottom: 74px; }
+      .bee { width: clamp(42px, 14vw, 64px); height: clamp(42px, 14vw, 64px); }
     }
   </style>
 </head>
 <body>
   <div data-composition-id="design-manifesto-preview" data-width="1280" data-height="982" data-duration="12" data-start="0" data-track-index="0">
-    <div class="composition">
-      <div class="fig-system" aria-hidden="true">
-        <svg viewBox="0 0 270 520" focusable="false">
-          <path class="branch" d="M136 496 C134 396 141 308 142 226 C143 170 132 112 110 42"></path>
-          <path class="branch" d="M139 298 C108 250 72 209 34 170"></path>
-          <path class="branch" d="M143 238 C178 201 205 158 224 92"></path>
-          <path class="branch" d="M139 358 C174 320 207 294 244 270"></path>
-          <line class="branch" x1="82" y1="217" x2="64" y2="250"></line>
-          <line class="branch" x1="198" y1="142" x2="216" y2="178"></line>
-          <circle class="fig-node node-warm" cx="34" cy="170" r="12"></circle>
-          <circle class="fig-node" cx="224" cy="92" r="13"></circle>
-          <circle class="fig-node node-muted" cx="244" cy="270" r="10"></circle>
-          <circle class="fig-node" cx="64" cy="250" r="9"></circle>
-          <circle class="fig-node node-warm" cx="216" cy="178" r="8"></circle>
-        </svg>
-      </div>
-
-      <section class="manifesto-card">
-        <span class="folio">folio 02 / manifesto</span>
-        <span class="kicker">Design writing</span>
-        <h1 class="title">
-          <span><i>Design</i></span>
-          <span><i>Manifesto</i></span>
-        </h1>
-
-        <div class="rule"></div>
-
-        <div class="deck">
-          <p class="line"><span>During my years at Stanford, I often returned to Sylvia Plath&rsquo;s fig tree.</span></p>
-          <p class="line"><span>Distance has a way of clarifying what familiarity obscures.</span></p>
-          <p class="line"><span>Design emerged as a mode of attention: a way of looking closely enough.</span></p>
-          <p class="line"><span>Creating rather than merely consuming; shaping experiences rather than passing through them.</span></p>
-        </div>
-
-        <div class="rule"></div>
-        <span class="annotation">meaning in the everyday</span>
+    <div class="page">
+      <div class="topline"><span>Design Manifesto</span></div>
+      <section class="text-field" aria-hidden="true">
+        <p class="flow">
+          <span>During</span><span>my</span><span>years</span><span>at</span><span>Stanford,</span><span>I</span><span>often</span><span>returned</span><span>to</span><span>Sylvia</span><span>Plath&rsquo;s</span><span class="warm">fig</span><span>tree.</span>
+          <span>Distance</span><span>has</span><span>a</span><span>way</span><span>of</span><span>clarifying</span><span>what</span><span>familiarity</span><span>obscures.</span>
+          <span>Design,</span><span>however,</span><span>emerged</span><span>as</span><span>something</span><span>more</span><span>than</span><span>an</span><span>interest.</span>
+          <span>It</span><span>felt</span><span>like</span><span>a</span><span class="muted">mode</span><span class="muted">of</span><span class="muted">attention,</span><span>a</span><span>way</span><span>of</span><span>looking</span><span>closely</span><span>enough.</span>
+          <span>To</span><span>create,</span><span>and</span><span>not</span><span>just</span><span>consume.</span>
+        </p>
       </section>
-
-      <aside class="margin-column">
-        <p class="fragment"><strong>Politics</strong> a vocabulary for systems, power, and public life.</p>
-        <p class="fragment"><strong>Philosophy</strong> a discipline for asking what a life is for.</p>
-        <p class="fragment"><strong>Art</strong> a method for returning beauty to ordinary experience.</p>
-      </aside>
+      <div class="caption">meaning in the everyday</div>
     </div>
 
+    <svg class="trace" viewBox="0 0 340 90" focusable="false" aria-hidden="true">
+      <path d="M4 58 C64 10 116 106 174 48 C218 3 264 72 336 20"></path>
+    </svg>
+    <span class="cursor-dot" aria-hidden="true"></span>
+    <img class="fig" src="../uploads/Uncut%20Fig%201.png" alt="" aria-hidden="true">
+    <img class="bee" src="../uploads/bee-cursor.png" alt="" aria-hidden="true">
     <div class="edge-word" aria-hidden="true">fig</div>
     <div class="grain"></div>
 
@@ -325,112 +229,191 @@
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      tl.from('.manifesto-card', {
-        y: 34,
-        scale: 0.965,
-        duration: 0.85,
-        ease: 'power3.out',
-        immediateRender: false
-      }, 0.1);
-
-      tl.from('.kicker, .folio', {
+      tl.from('.topline span', {
         y: 14,
-        duration: 0.5,
+        opacity: 0,
+        duration: 0.55,
         ease: 'power3.out',
-        stagger: 0.08,
         immediateRender: false
-      }, 0.42);
+      }, 0.16);
 
-      tl.from('.title i', {
-        y: '112%',
-        duration: 0.78,
+      tl.from('.topline', {
+        scaleX: 0.72,
+        duration: 0.7,
         ease: 'expo.out',
-        stagger: 0.14,
-        immediateRender: false
-      }, 0.62);
-
-      tl.from('.rule', {
-        scaleX: 0,
-        duration: 0.64,
-        ease: 'power3.out',
         transformOrigin: 'left center',
-        stagger: 0.22,
         immediateRender: false
-      }, 1.18);
+      }, 0.2);
 
-      tl.from('.line span', {
-        y: '116%',
-        duration: 0.62,
-        ease: 'power3.out',
-        stagger: 0.18,
-        immediateRender: false
-      }, 1.48);
-
-      tl.from('.annotation', {
-        x: -18,
-        duration: 0.52,
+      tl.from('.text-field', {
+        y: 18,
+        opacity: 0,
+        duration: 0.78,
         ease: 'power3.out',
         immediateRender: false
-      }, 2.52);
+      }, 0.26);
 
-      tl.from('.branch', {
-        strokeDashoffset: 420,
-        duration: 1.35,
-        ease: 'power2.out',
-        stagger: 0.1,
+      tl.from('.flow span', {
+        opacity: 0,
+        y: 16,
+        rotation: -2,
+        duration: 0.58,
+        ease: 'power3.out',
+        stagger: 0.018,
         immediateRender: false
-      }, 0.86);
+      }, 0.58);
 
-      tl.from('.fig-node', {
-        scale: 0,
-        duration: 0.44,
+      tl.from('.fig', {
+        scale: 0.72,
+        opacity: 0,
+        y: 16,
+        duration: 0.7,
         ease: 'back.out(1.8)',
-        stagger: 0.11,
         immediateRender: false
-      }, 1.78);
+      }, 1.55);
 
-      tl.to('.fig-node', {
-        scale: 1.18,
-        duration: 1.1,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 4,
-        stagger: 0.08
-      }, 3.1);
-
-      tl.from('.fragment', {
-        x: 20,
-        duration: 0.62,
-        ease: 'power3.out',
-        stagger: 0.16,
+      tl.from('.caption', {
+        y: 12,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.out',
         immediateRender: false
-      }, 2.05);
+      }, 1.8);
 
       tl.from('.edge-word', {
-        y: 30,
-        duration: 0.8,
+        y: 28,
+        opacity: 0,
+        duration: 0.76,
         ease: 'power2.out',
         immediateRender: false
-      }, 2.7);
+      }, 1.95);
 
-      tl.to('.manifesto-card', {
-        y: -3,
-        rotation: -0.25,
-        duration: 3.4,
+      tl.from('.cursor-dot', {
+        scale: 0,
+        opacity: 0,
+        duration: 0.34,
+        ease: 'back.out(2.4)',
+        immediateRender: false
+      }, 2.18);
+
+      tl.to('.trace path', {
+        strokeDashoffset: 0,
+        duration: 1.0,
+        ease: 'power2.out'
+      }, 2.3);
+
+      tl.to('.flow span', {
+        x: (index) => Math.sin(index * 1.7) * 9,
+        y: (index) => Math.cos(index * 1.15) * 7,
+        rotation: (index) => Math.sin(index * .82) * 2.6,
+        duration: 1.7,
         ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 1,
-        transformOrigin: '50% 60%'
-      }, 4.1);
+        stagger: 0.006
+      }, 2.45);
 
-      tl.to('.edge-word', {
-        x: 18,
-        opacity: 0.26,
-        duration: 3.1,
+      tl.fromTo('.bee', {
+        xPercent: -50,
+        yPercent: -50,
+        x: '-58vw',
+        y: '18vh',
+        rotation: -8,
+        scaleX: 1,
+        opacity: 0
+      }, {
+        x: '-12vw',
+        y: '2vh',
+        rotation: -4,
+        opacity: 1,
+        duration: 1.05,
+        ease: 'power3.out'
+      }, 3.05);
+
+      tl.to('.cursor-dot', {
+        opacity: 0,
+        scale: 0.4,
+        duration: 0.32,
+        ease: 'power2.out'
+      }, 3.28);
+
+      tl.to('.trace', {
+        opacity: 0,
+        duration: 0.42,
+        ease: 'power2.out'
+      }, 3.36);
+
+      tl.to('.bee', {
+        x: '19vw',
+        y: '-4vh',
+        rotation: 8,
+        scaleX: -1,
+        duration: 1.25,
+        ease: 'sine.inOut'
+      }, 4.05);
+
+      tl.to('.bee', {
+        x: '31vw',
+        y: '18vh',
+        rotation: -34,
+        scaleX: -1,
+        duration: 1.05,
+        ease: 'sine.inOut'
+      }, 5.12);
+
+      tl.to('.fig', {
+        filter: 'drop-shadow(0 0 10px rgba(255,255,210,.48)) drop-shadow(0 12px 24px rgba(0,0,0,.3))',
+        scale: 1.05,
+        duration: 0.74,
+        ease: 'sine.inOut'
+      }, 5.7);
+
+      tl.to('.bee', {
+        x: '34vw',
+        y: '24vh',
+        rotation: -8,
+        scale: 0.82,
+        scaleX: -0.82,
+        duration: 0.82,
+        ease: 'power3.out'
+      }, 6.08);
+
+      tl.to('.bee', {
+        filter: 'drop-shadow(0 0 8px rgba(255,255,210,.9)) drop-shadow(0 0 20px rgba(255,214,80,.72)) drop-shadow(0 0 34px rgba(255,184,46,.42)) drop-shadow(0 8px 16px rgba(0,0,0,.3))',
+        duration: 0.6,
+        ease: 'sine.inOut'
+      }, 6.42);
+
+      tl.to('.fig', {
+        filter: 'drop-shadow(0 0 16px rgba(255,232,130,.56)) drop-shadow(0 12px 24px rgba(0,0,0,.3))',
+        duration: 0.9,
+        yoyo: true,
+        repeat: 3,
+        ease: 'sine.inOut'
+      }, 6.5);
+
+      tl.to('.flow span', {
+        x: (index) => Math.sin(index * .9) * 5,
+        y: (index) => Math.cos(index * .7) * 4,
+        rotation: (index) => Math.sin(index * .45) * 1.5,
+        duration: 2.6,
+        ease: 'sine.inOut'
+      }, 7.1);
+
+      tl.to('.text-field', {
+        y: -4,
+        duration: 2.8,
         ease: 'sine.inOut',
         yoyo: true,
         repeat: 1
-      }, 4.25);
+      }, 7.25);
+
+      tl.to('.edge-word', {
+        x: 18,
+        opacity: .22,
+        duration: 2.8,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: 1
+      }, 7.3);
 
       window.__timelines['design-manifesto-preview'] = tl;
 
