@@ -116,19 +116,20 @@
 
     html[data-theme="light"] #bee-cursor.is-parked {
       filter:
-        drop-shadow(0 0 9px rgba(255,250,188,1))
-        drop-shadow(0 0 24px rgba(255,195,34,.9))
-        drop-shadow(0 0 46px rgba(255,142,0,.62))
-        drop-shadow(0 0 70px rgba(255,214,80,.28))
-        drop-shadow(0 8px 16px rgba(10,10,10,.24));
+        drop-shadow(0 0 1px rgba(0,0,0,1))
+        drop-shadow(0 0 5px rgba(0,0,0,.92))
+        drop-shadow(0 0 14px rgba(0,0,0,.58))
+        drop-shadow(0 0 26px rgba(0,0,0,.26))
+        drop-shadow(0 8px 16px rgba(10,10,10,.22));
     }
 
     @media (max-width: 700px) {
       html[data-theme="light"] #bee-cursor.is-parked {
         filter:
-          drop-shadow(0 0 8px rgba(255,250,188,.98))
-          drop-shadow(0 0 18px rgba(255,195,34,.82))
-          drop-shadow(0 0 34px rgba(255,142,0,.5))
+          drop-shadow(0 0 1px rgba(0,0,0,1))
+          drop-shadow(0 0 5px rgba(0,0,0,.9))
+          drop-shadow(0 0 13px rgba(0,0,0,.52))
+          drop-shadow(0 0 22px rgba(0,0,0,.22))
           drop-shadow(0 7px 14px rgba(10,10,10,.22));
       }
     }
@@ -421,8 +422,8 @@
       const isCompact = window.matchMedia('(max-width: 700px)').matches;
       const activeGlow = isLight
         ? isCompact
-          ? 'drop-shadow(0 0 9px rgba(255,245,178,.72)) drop-shadow(0 0 21px rgba(255,184,36,.5)) drop-shadow(0 0 34px rgba(255,142,0,.24)) drop-shadow(0 9px 18px rgba(0,0,0,.28))'
-          : 'drop-shadow(0 0 12px rgba(255,245,178,.78)) drop-shadow(0 0 30px rgba(255,184,36,.56)) drop-shadow(0 0 52px rgba(255,142,0,.3)) drop-shadow(0 12px 24px rgba(0,0,0,.3))'
+          ? 'drop-shadow(0 0 1px rgba(0,0,0,1)) drop-shadow(0 0 6px rgba(0,0,0,.88)) drop-shadow(0 0 16px rgba(0,0,0,.5)) drop-shadow(0 9px 18px rgba(0,0,0,.26))'
+          : 'drop-shadow(0 0 1px rgba(0,0,0,1)) drop-shadow(0 0 7px rgba(0,0,0,.9)) drop-shadow(0 0 20px rgba(0,0,0,.52)) drop-shadow(0 0 34px rgba(0,0,0,.22)) drop-shadow(0 12px 24px rgba(0,0,0,.26))'
         : 'drop-shadow(0 0 10px rgba(255,255,210,.28)) drop-shadow(0 12px 24px rgba(0,0,0,.3))';
       fig.style.setProperty('pointer-events', active || bee.parked ? 'auto' : 'none', 'important');
       fig.style.setProperty('cursor', 'none', 'important');
