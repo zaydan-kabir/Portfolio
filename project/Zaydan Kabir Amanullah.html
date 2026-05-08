@@ -1231,6 +1231,9 @@ const zaydanAnimationReady = (() => {
   const wordmarkMask = document.createElement('canvas');
   const wordmarkCtx  = wordmarkMask.getContext('2d', { willReadFrequently: true });
   let wordmarkMaskReady = false;
+  let lastCursorX = 0;
+  let lastCursorY = 0;
+  let trailDirty = true;
 
   function buildWordmarkMask() {
     if (!wordmarkImg.complete || !wordmarkImg.naturalWidth) return;
@@ -1241,8 +1244,27 @@ const zaydanAnimationReady = (() => {
     wordmarkMaskReady = true;
   }
 
-  if (wordmarkImg.complete && wordmarkImg.naturalWidth) buildWordmarkMask();
-  else wordmarkImg.addEventListener('load', buildWordmarkMask, { once: true });
+  function refreshWordmarkMask() {
+    buildWordmarkMask();
+    if (cursorEl && wordmarkMaskReady) {
+      cursorEl.style.background = cursorColorAt(lastCursorX, lastCursorY);
+      trailDirty = true;
+    }
+  }
+
+  if (wordmarkImg.complete && wordmarkImg.naturalWidth) {
+    if (wordmarkImg.decode) wordmarkImg.decode().then(refreshWordmarkMask).catch(refreshWordmarkMask);
+    else refreshWordmarkMask();
+  } else {
+    wordmarkImg.addEventListener('load', () => {
+      if (wordmarkImg.decode) wordmarkImg.decode().then(refreshWordmarkMask).catch(refreshWordmarkMask);
+      else refreshWordmarkMask();
+    }, { once: true });
+  }
+  zaydanAnimationReady.then(() => requestAnimationFrame(refreshWordmarkMask));
+  masthead.addEventListener('transitionend', event => {
+    if (event.target === wordmarkImg || event.target === mastheadText) refreshWordmarkMask();
+  });
 
   function isOverZaydanLetter(x, y) {
     if (wordmarkMaskReady) {
@@ -1290,6 +1312,8 @@ const zaydanAnimationReady = (() => {
   document.addEventListener('mousemove', e => {
     pendingCursorX = e.clientX;
     pendingCursorY = e.clientY;
+    lastCursorX = e.clientX;
+    lastCursorY = e.clientY;
     cursorDirty = true;
     pts.push({ x: e.clientX, y: e.clientY, t: Date.now() });
     if (pts.length > 40) pts.shift();
@@ -1336,7 +1360,6 @@ const zaydanAnimationReady = (() => {
   // Trail loop: skip the expensive composites entirely when nothing is
   // moving and the trail has fully faded. Also coalesce mousemove → one
   // cursor DOM write per frame instead of one per event.
-  let trailDirty = true;
   (function drawTrail() {
     // Skip all cursor + trail work while the track is moving — the
     // canvas is hidden via CSS anyway and getImageData calls inside
