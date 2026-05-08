@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Book Cover Re-Design HyperFrame Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #08070a; }
@@ -14,222 +13,73 @@
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      color: #ff1aa3;
-      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
       background:
         radial-gradient(ellipse at 50% 38%, #1a1620 0%, #0a080d 60%, #050307 100%);
       isolation: isolate;
-    }
-
-    /* The cover — portrait card, anchored centre */
-    .cover {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: min(72vh, 82vw, 480px);
-      aspect-ratio: 0.66;
-      background: #2c2820;
-      box-shadow:
-        0 40px 80px rgba(0,0,0,0.78),
-        0 0 0 1px rgba(255,26,163,0.18);
-      overflow: hidden;
-      animation: rise 6s ease-in-out infinite;
-    }
-
-    @keyframes rise {
-      0%, 100% { transform: translate(-50%, -50%) translateY(0); }
-      50%      { transform: translate(-50%, -50%) translateY(-6px); }
-    }
-
-    /* Painting backdrop — evokes the Symbolist Sappho figure on rocks
-       with a dim sea horizon. CSS only, abstract. */
-    .painting {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 65% 38% at 18% 88%, rgba(48,42,32,0.85) 0%, rgba(20,18,14,0) 60%),
-        radial-gradient(ellipse 60% 35% at 78% 80%, rgba(58,46,32,0.78) 0%, rgba(20,18,14,0) 60%),
-        linear-gradient(180deg, #2a2620 0%, #221d18 38%, #1c1814 70%, #14110d 100%);
-      z-index: 1;
-    }
-    .horizon {
-      position: absolute;
-      left: 0; right: 0;
-      bottom: 32%;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(180,160,130,0) 0%, rgba(190,170,140,0.55) 22%, rgba(210,190,150,0.7) 50%, rgba(190,170,140,0.55) 78%, rgba(180,160,130,0) 100%);
-      box-shadow: 0 0 18px rgba(220,200,170,0.18);
-      z-index: 2;
-    }
-    /* Rough silhouette of the cloaked figure */
-    .figure {
-      position: absolute;
-      left: 50%;
-      top: 22%;
-      transform: translateX(-50%);
-      width: 46%;
-      height: 64%;
-      background:
-        radial-gradient(ellipse 30% 14% at 50% 8%, rgba(36,30,24,0.95) 0%, rgba(20,16,12,0.7) 60%, transparent 100%),
-        linear-gradient(180deg, rgba(20,16,12,0.95) 0%, rgba(28,22,16,0.94) 40%, rgba(34,28,20,0.92) 100%);
-      clip-path: polygon(
-        50% 0%, 70% 6%, 76% 18%, 78% 36%,
-        82% 56%, 88% 78%, 78% 96%, 64% 100%,
-        38% 100%, 22% 96%, 18% 76%, 24% 54%,
-        28% 36%, 30% 18%, 36% 6%
-      );
-      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.45));
-      z-index: 3;
-    }
-
-    /* Top title */
-    .title {
-      position: absolute;
-      top: 6%;
-      left: 6%;
-      right: 6%;
-      z-index: 8;
-      color: #ff1aa3;
-      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
-      font-weight: 900;
-      font-size: clamp(14px, 5vw, 38px);
-      line-height: 0.96;
-      letter-spacing: 0.005em;
-      text-transform: uppercase;
-      text-shadow: 0 0 16px rgba(255,26,163,0.25);
-    }
-
-    /* Pull quote */
-    .pullquote {
-      position: absolute;
-      right: 9%;
-      top: 44%;
-      z-index: 9;
-      max-width: 36%;
-      color: #fff;
-      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
-      font-weight: 700;
-      font-style: italic;
-      font-size: clamp(7px, 1.2vw, 11px);
-      line-height: 1.22;
-      text-align: right;
-      letter-spacing: 0.01em;
-    }
-    .pullquote em { font-style: italic; }
-    .pullquote .credit { display: block; font-style: normal; margin-top: 2px; }
-
-    /* Author */
-    .author {
-      position: absolute;
-      bottom: 6%;
-      left: 6%;
-      right: 6%;
-      z-index: 8;
-      color: #ff1aa3;
-      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
-      font-weight: 900;
-      font-size: clamp(16px, 5.6vw, 44px);
-      line-height: 0.96;
-      letter-spacing: 0.005em;
-      text-transform: uppercase;
-      text-shadow: 0 0 16px rgba(255,26,163,0.25);
-    }
-
-    /* Right spine band — NYT BESTSELLER */
-    .spine {
-      position: absolute;
-      top: 0; right: 0; bottom: 0;
-      width: 9.2%;
-      background: #07060a;
-      z-index: 9;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 6%;
-      box-shadow: -1px 0 0 rgba(255,26,163,0.22) inset;
-    }
-    .spine-text {
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
-      color: #fff;
-      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
-      font-weight: 800;
-      font-size: clamp(7px, 1.2vw, 12px);
-      letter-spacing: 0.04em;
-      white-space: nowrap;
-      text-transform: uppercase;
-    }
-    .penguin {
-      position: absolute;
-      bottom: 5%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 64%;
-      aspect-ratio: 1;
-      border-radius: 50%;
-      background: radial-gradient(circle at 50% 50%, #ff8a00 0%, #f57f00 55%, #d96a00 100%);
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
-    }
-    .penguin::before {
-      content: '';
-      position: absolute;
-      inset: 18%;
-      background:
-        radial-gradient(ellipse at 50% 38%, #fff 0%, #fff 35%, transparent 36%),
-        radial-gradient(ellipse at 50% 78%, #111 0%, #111 42%, transparent 43%);
-    }
-
-    /* Subtle film grain over the cover */
-    .grain {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.10;
-      mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 200px 200px;
-      z-index: 12;
     }
 
     /* Soft pink halo behind the cover for atmosphere */
     .halo {
       position: absolute;
       left: 50%; top: 50%;
-      width: 80vh; height: 80vh;
+      width: 90vmin; height: 90vmin;
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(255,26,163,0.13) 0%, rgba(255,26,163,0) 60%);
+      background: radial-gradient(circle, rgba(255,26,163,0.14) 0%, rgba(255,26,163,0) 60%);
       z-index: 0;
       pointer-events: none;
+      filter: blur(2px);
     }
 
-    @media (max-width: 700px) {
-      .cover { width: 78vw; }
-      .title { font-size: 4.6vw; }
-      .author { font-size: 5.2vw; }
-      .pullquote { font-size: 9px; }
+    .cover {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: auto;
+      height: 86%;
+      max-width: 92%;
+      object-fit: contain;
+      box-shadow:
+        0 40px 80px rgba(0,0,0,0.78),
+        0 0 0 1px rgba(255,26,163,0.18);
+      animation: rise 6s ease-in-out infinite;
+      will-change: transform;
+      z-index: 2;
+      background: #14110d;
+    }
+
+    @keyframes rise {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0) scale(1); }
+      50%      { transform: translate(-50%, -50%) translateY(-6px) scale(1.005); }
+    }
+
+    /* Subtle film grain over the whole composition */
+    .grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.07;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      z-index: 5;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cover { animation: none; }
     }
   </style>
 </head>
 <body>
   <div data-composition-id="book-cover-redesign-preview">
     <div class="halo"></div>
-    <div class="cover">
-      <div class="painting"></div>
-      <div class="horizon"></div>
-      <div class="figure"></div>
-      <div class="title">My Year of Rest and Relaxation</div>
-      <div class="pullquote">
-        &ldquo;Superabundantly talented&hellip; Always a deep pleasure to read&rdquo;
-        <span class="credit">Dwight Garner &middot; The New York Times</span>
-      </div>
-      <div class="author">Ottessa Moshfegh</div>
-      <div class="spine">
-        <div class="spine-text">The New York Times Bestseller</div>
-        <div class="penguin" aria-hidden="true"></div>
-      </div>
-      <div class="grain"></div>
-    </div>
+    <img class="cover"
+         src="../uploads/book-cover-moshfegh.jpg?v=20260506"
+         alt="Book Cover Re-Design — My Year of Rest and Relaxation"
+         decoding="async"
+         loading="eager"
+         fetchpriority="high">
+    <div class="grain"></div>
   </div>
 </body>
 </html>
