@@ -99,8 +99,27 @@
       opacity: 1;
     }
 
+    #bee-cursor.is-parked {
+      width: clamp(24px, 3vw, 38px);
+      height: clamp(24px, 3vw, 38px);
+      pointer-events: auto;
+      filter:
+        drop-shadow(0 0 8px rgba(255,255,210,.9))
+        drop-shadow(0 0 20px rgba(255,214,80,.72))
+        drop-shadow(0 0 34px rgba(255,184,46,.42))
+        drop-shadow(0 8px 16px rgba(0,0,0,.3));
+    }
+
     html[data-theme="light"] #bee-cursor {
       filter: drop-shadow(0 10px 18px rgba(10,10,10,.2));
+    }
+
+    html[data-theme="light"] #bee-cursor.is-parked {
+      filter:
+        drop-shadow(0 0 8px rgba(255,245,178,.95))
+        drop-shadow(0 0 20px rgba(255,198,45,.76))
+        drop-shadow(0 0 34px rgba(255,162,20,.46))
+        drop-shadow(0 8px 16px rgba(10,10,10,.22));
     }
 
     #trail-canvas {
@@ -294,6 +313,7 @@
     const bee = {
       active: false,
       entering: false,
+      parked: false,
       x: -160,
       y: -160,
       targetX: window.innerWidth / 2,
@@ -302,10 +322,82 @@
       lastPointerY: window.innerHeight / 2,
       angle: 0,
       targetAngle: 0,
+      flip: 1,
       frame: 0,
       timer: 0,
       lastMoveAt: 0
     };
+
+    function getVisibleFig() {
+      return document.getElementById('panel-2-uncut-fig') || document.getElementById('panel-2-fig');
+    }
+
+    function setFigGlow(active) {
+      const fig = getVisibleFig();
+      if (!fig) return;
+      fig.style.setProperty('pointer-events', active || bee.parked ? 'auto' : 'none', 'important');
+      fig.style.setProperty('cursor', 'none', 'important');
+      fig.style.setProperty(
+        'filter',
+        active
+          ? 'drop-shadow(0 0 10px rgba(255,255,210,.28)) drop-shadow(0 12px 24px rgba(0,0,0,.3))'
+          : 'drop-shadow(0 12px 24px rgba(0,0,0,.3))',
+        'important'
+      );
+    }
+
+    function resumeBeeCursor() {
+      if (!bee.parked || window.matchMedia('(pointer: coarse)').matches) return;
+      bee.parked = false;
+      bee.active = true;
+      bee.entering = false;
+      bee.targetX = bee.lastPointerX;
+      bee.targetY = bee.lastPointerY;
+      clearTrail();
+      document.body.classList.add('bee-cursor-active');
+      setFigGlow(true);
+      beeCursor.classList.add('is-visible');
+      beeCursor.classList.remove('is-parked');
+      if (!bee.frame) bee.frame = requestAnimationFrame(renderBee);
+    }
+
+    function toggleBeeAtFig() {
+      const fig = getVisibleFig();
+      if (!fig) return;
+      if (bee.parked) {
+        resumeBeeCursor();
+        return;
+      }
+      if (!bee.active) return;
+      const rect = fig.getBoundingClientRect();
+      bee.parked = true;
+      bee.active = false;
+      bee.entering = false;
+      bee.targetX = rect.left + rect.width / 2;
+      bee.targetY = rect.top + rect.height / 2;
+      bee.x = bee.targetX;
+      bee.y = bee.targetY;
+      beeCursor.classList.add('is-parked');
+      beeCursor.style.transform = `translate3d(${bee.x}px,${bee.y}px,0) translate(-50%,-50%) rotate(${bee.angle}rad) scaleX(${bee.flip})`;
+      document.body.classList.remove('bee-cursor-active');
+      setFigGlow(false);
+      if (bee.frame) {
+        cancelAnimationFrame(bee.frame);
+        bee.frame = 0;
+      }
+    }
+
+    function bindFigClick() {
+      const fig = getVisibleFig();
+      if (fig && fig.dataset.beeClickBound !== 'true') {
+        fig.dataset.beeClickBound = 'true';
+        fig.addEventListener('click', toggleBeeAtFig);
+      }
+      if (beeCursor.dataset.beeClickBound !== 'true') {
+        beeCursor.dataset.beeClickBound = 'true';
+        beeCursor.addEventListener('click', toggleBeeAtFig);
+      }
+    }
 
     function resizeTrail() {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -363,18 +455,28 @@
 
     function setBeeTargetFromMovement(dx, dy) {
       if (Math.hypot(dx, dy) < 1.5) return;
-      const movementAngle = Math.atan2(dy, dx);
-      bee.targetAngle = normalizeAngle(movementAngle - Math.PI);
+      var absX = Math.abs(dx);
+      var absY = Math.abs(dy);
+      if (absX > 0.8) {
+        bee.flip = dx > 0 ? -1 : 1;
+      }
+      if (absX < 0.8 && absY > 0.8) {
+        bee.targetAngle = dy > 0 ? -Math.PI / 2 : Math.PI / 2;
+        return;
+      }
+      var tilt = Math.atan2(dy, Math.max(absX, 1));
+      bee.targetAngle = bee.flip === -1 ? tilt : -tilt;
     }
 
     function renderBee() {
+      if (bee.parked) return;
       const positionEase = bee.entering ? 0.075 : 0.18;
       bee.x += (bee.targetX - bee.x) * positionEase;
       bee.y += (bee.targetY - bee.y) * positionEase;
       bee.angle = normalizeAngle(bee.angle + normalizeAngle(bee.targetAngle - bee.angle) * 0.16);
       const bob = Math.sin(performance.now() / 145) * 2.2;
       const wing = Math.sin(performance.now() / 82) * 2.4;
-      beeCursor.style.transform = `translate3d(${bee.x}px,${bee.y + bob}px,0) translate(-50%,-50%) rotate(${bee.angle + wing * Math.PI / 180}rad)`;
+      beeCursor.style.transform = `translate3d(${bee.x}px,${bee.y + bob}px,0) translate(-50%,-50%) rotate(${bee.angle + wing * Math.PI / 180}rad) scaleX(${bee.flip})`;
       if (bee.entering && Math.hypot(bee.targetX - bee.x, bee.targetY - bee.y) < 3) {
         bee.entering = false;
       }
@@ -382,7 +484,7 @@
     }
 
     function startBeeCursor() {
-      if (bee.active || window.matchMedia('(pointer: coarse)').matches) return;
+      if (bee.active || bee.parked || window.matchMedia('(pointer: coarse)').matches) return;
       bee.active = true;
       bee.entering = true;
       const fromLeft = bee.targetX < window.innerWidth * 0.5;
@@ -391,12 +493,15 @@
       setBeeTargetFromMovement(bee.targetX - bee.x, bee.targetY - bee.y);
       clearTrail();
       document.body.classList.add('bee-cursor-active');
+      bindFigClick();
+      setFigGlow(true);
       beeCursor.classList.add('is-visible');
+      beeCursor.classList.remove('is-parked');
       if (!bee.frame) bee.frame = requestAnimationFrame(renderBee);
     }
 
     function scheduleBeeCursor() {
-      if (bee.active || bee.timer || window.matchMedia('(pointer: coarse)').matches) return;
+      if (bee.active || bee.parked || bee.timer || window.matchMedia('(pointer: coarse)').matches) return;
       bee.timer = window.setTimeout(() => {
         bee.timer = 0;
         startBeeCursor();
@@ -412,8 +517,10 @@
       bee.lastPointerX = event.clientX;
       bee.lastPointerY = event.clientY;
       bee.lastMoveAt = Date.now();
-      setBeeTargetFromMovement(dx, dy);
-      scheduleBeeCursor();
+      if (!bee.parked) {
+        setBeeTargetFromMovement(dx, dy);
+        scheduleBeeCursor();
+      }
       if (!bee.active) {
         points.push({ x: event.clientX, y: event.clientY, t: Date.now() });
         if (points.length > 32) points.shift();
