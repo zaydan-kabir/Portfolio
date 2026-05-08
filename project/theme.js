@@ -151,6 +151,7 @@
     var targetY = 0;
     var fieldX = 0;
     var fieldY = 0;
+    var buzzWakes = [];
 
     function clamp(value, min, max) {
       return Math.max(min, Math.min(max, value));
@@ -204,6 +205,23 @@
     document.addEventListener('mouseleave', function () {
       pointerActive = false;
     });
+
+    window.__designManifestoBuzzWake = function (detail) {
+      var rect = panel.getBoundingClientRect();
+      var dx = Number(detail && detail.dx) || 1;
+      var dy = Number(detail && detail.dy) || 0;
+      var length = Math.sqrt(dx * dx + dy * dy) || 1;
+      buzzWakes.push({
+        x: (Number(detail && detail.x) || 0) - rect.left,
+        y: (Number(detail && detail.y) || 0) - rect.top,
+        dx: dx / length,
+        dy: dy / length,
+        distance: Number(detail && detail.distance) || Math.max(window.innerWidth, window.innerHeight),
+        startedAt: performance.now(),
+        duration: Number(detail && detail.duration) || 2450
+      });
+      if (buzzWakes.length > 5) buzzWakes.shift();
+    };
 
     function buildLines(font, boxWidth) {
       var lines = [];
@@ -296,6 +314,13 @@
     function moveLettersAwayFromPointer() {
       var radius = window.innerWidth < 600 ? 58 : 86;
       var pushMax = window.innerWidth < 600 ? 34 : 52;
+      var now = performance.now();
+      var wakeRadius = window.innerWidth < 600 ? 34 : 52;
+      var wakeForward = window.innerWidth < 600 ? 68 : 96;
+      var wakePushMax = window.innerWidth < 600 ? 24 : 38;
+      buzzWakes = buzzWakes.filter(function (wake) {
+        return now - wake.startedAt < wake.duration + 260;
+      });
       if (pointerActive) {
         fieldX += (targetX - fieldX) * 0.34;
         fieldY += (targetY - fieldY) * 0.34;
@@ -318,6 +343,26 @@
             nextY = Math.sin(angle) * push;
           }
         }
+
+        buzzWakes.forEach(function (wake) {
+          var progress = clamp((now - wake.startedAt) / wake.duration, 0, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          var headX = wake.x + wake.dx * wake.distance * eased;
+          var headY = wake.y + wake.dy * wake.distance * eased;
+          var rx = cx - headX;
+          var ry = cy - headY;
+          var forward = rx * wake.dx + ry * wake.dy;
+          var side = rx * -wake.dy + ry * wake.dx;
+          if (forward > -18 && forward < wakeForward && Math.abs(side) < wakeRadius) {
+            var sideStrength = 1 - Math.abs(side) / wakeRadius;
+            var frontStrength = 1 - Math.max(0, forward) / wakeForward;
+            var fade = progress < 0.88 ? 1 : Math.max(0, (1 - progress) / 0.12);
+            var push = sideStrength * sideStrength * frontStrength * wakePushMax * fade;
+            var sideSign = side >= 0 ? 1 : -1;
+            nextX += (-wake.dy * sideSign + wake.dx * 0.32) * push;
+            nextY += (wake.dx * sideSign + wake.dy * 0.32) * push;
+          }
+        });
 
         item.ox += (nextX - item.ox) * 0.32;
         item.oy += (nextY - item.oy) * 0.32;

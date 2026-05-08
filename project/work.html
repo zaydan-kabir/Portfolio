@@ -138,12 +138,21 @@
       white-space: nowrap;
     }
     .stack-marquee {
+      --stack-drag-offset: 0px;
       flex: 1 1 auto;
       min-width: 0;
       overflow: hidden;
       position: relative;
+      touch-action: pan-y;
+      user-select: none;
       -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
       mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+    }
+    .stack-marquee.is-dragging .stack-track {
+      animation-play-state: paused;
+    }
+    .stack-marquee.is-settling .stack-track {
+      transition: transform .38s cubic-bezier(.22,1,.36,1);
     }
     .stack-track {
       display: flex;
@@ -263,8 +272,8 @@
       border: 1px solid rgba(10,10,10,.16);
     }
     @keyframes stackMarquee {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
+      from { transform: translate3d(var(--stack-drag-offset), 0, 0); }
+      to { transform: translate3d(calc(-50% + var(--stack-drag-offset)), 0, 0); }
     }
     @media (prefers-reduced-motion: reduce) {
       .stack-track { animation: none; }
@@ -550,6 +559,77 @@
         e.preventDefault();
         window.open(manifestoLink.href, '_blank', 'noopener,noreferrer');
       });
+    }
+
+    const stackMarquee = document.querySelector('.stack-marquee');
+    if (stackMarquee && window.matchMedia('(pointer: coarse)').matches) {
+      let stackPointerId = null;
+      let stackStartX = 0;
+      let stackStartY = 0;
+      let stackDragX = 0;
+      let stackSettlingFrame = 0;
+      let stackIsHorizontal = false;
+
+      function setStackOffset(value) {
+        stackDragX = Math.max(-140, Math.min(140, value));
+        stackMarquee.style.setProperty('--stack-drag-offset', `${stackDragX}px`);
+      }
+
+      function settleStackOffset() {
+        cancelAnimationFrame(stackSettlingFrame);
+        const start = stackDragX;
+        const startedAt = performance.now();
+        const duration = 520;
+        stackMarquee.classList.add('is-settling');
+
+        function tick(now) {
+          const progress = Math.min(1, (now - startedAt) / duration);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          setStackOffset(start * (1 - eased));
+          if (progress < 1) {
+            stackSettlingFrame = requestAnimationFrame(tick);
+          } else {
+            stackMarquee.classList.remove('is-settling');
+            stackSettlingFrame = 0;
+          }
+        }
+
+        stackSettlingFrame = requestAnimationFrame(tick);
+      }
+
+      stackMarquee.addEventListener('pointerdown', event => {
+        if (event.pointerType === 'mouse') return;
+        cancelAnimationFrame(stackSettlingFrame);
+        stackPointerId = event.pointerId;
+        stackStartX = event.clientX;
+        stackStartY = event.clientY;
+        stackIsHorizontal = false;
+        stackMarquee.classList.add('is-dragging');
+        stackMarquee.classList.remove('is-settling');
+        stackMarquee.setPointerCapture(event.pointerId);
+      }, { passive: true });
+
+      stackMarquee.addEventListener('pointermove', event => {
+        if (event.pointerId !== stackPointerId) return;
+        const dx = event.clientX - stackStartX;
+        const dy = event.clientY - stackStartY;
+        if (!stackIsHorizontal && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+          stackIsHorizontal = true;
+        }
+        if (!stackIsHorizontal) return;
+        event.preventDefault();
+        setStackOffset(dx * 0.72);
+      }, { passive: false });
+
+      function endStackDrag(event) {
+        if (event.pointerId !== stackPointerId) return;
+        stackPointerId = null;
+        stackMarquee.classList.remove('is-dragging');
+        settleStackOffset();
+      }
+
+      stackMarquee.addEventListener('pointerup', endStackDrag);
+      stackMarquee.addEventListener('pointercancel', endStackDrag);
     }
   </script>
 </body>

@@ -148,6 +148,73 @@
        the JS-drawn trail in light mode (black → white) and hide it. */
     html[data-theme="light"] #trail-canvas { filter: none !important; }
 
+    .bee-buzz {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 10002;
+      pointer-events: none;
+      display: inline-flex;
+      gap: .08em;
+      align-items: center;
+      color: var(--theme-cursor, #f0f0f0);
+      font: italic clamp(15px, 1.6vw, 24px)/1 'Lora', Georgia, serif;
+      letter-spacing: 0;
+      text-shadow:
+        0 0 12px rgba(255,255,210,.26),
+        0 10px 22px rgba(0,0,0,.2);
+      transform: translate3d(var(--buzz-x), var(--buzz-y), 0) translate(-50%, -50%) rotate(var(--buzz-angle));
+      will-change: transform, opacity;
+      animation: buzzGroup 2.45s cubic-bezier(.22,.8,.18,1) forwards;
+    }
+
+    html[data-theme="light"] .bee-buzz {
+      text-shadow:
+        0 0 11px rgba(255,195,34,.34),
+        0 8px 18px rgba(10,10,10,.18);
+    }
+
+    .bee-buzz span {
+      display: inline-block;
+      animation: buzzLetter 2.45s cubic-bezier(.2,.78,.18,1) forwards;
+      animation-delay: calc(var(--i) * 64ms);
+      will-change: transform, opacity;
+    }
+
+    @keyframes buzzGroup {
+      0% {
+        opacity: 0;
+        transform: translate3d(var(--buzz-x), var(--buzz-y), 0) translate(-50%, -50%) rotate(var(--buzz-angle)) scale(.92);
+      }
+      12% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(calc(var(--buzz-x) + var(--buzz-travel-x)), calc(var(--buzz-y) + var(--buzz-travel-y)), 0) translate(-50%, -50%) rotate(var(--buzz-angle)) scale(1.08);
+      }
+    }
+
+    @keyframes buzzLetter {
+      0% {
+        opacity: 0;
+        transform: translate3d(calc(var(--buzz-dir-x) * -10px), calc(var(--buzz-dir-y) * -10px), 0);
+      }
+      15% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(calc(var(--buzz-dir-x) * 18px), calc(var(--buzz-dir-y) * 18px), 0);
+      }
+    }
+
+    @media (pointer: coarse), (max-width: 700px) {
+      .bee-buzz {
+        display: none;
+      }
+    }
+
     /* ── Safe-area top strip (matches work.html / profile) ─── */
     #safe-area-top {
       position: fixed; left: 0; right: 0;
@@ -334,6 +401,8 @@
       angle: 0,
       targetAngle: 0,
       flip: 1,
+      dirX: 1,
+      dirY: 0,
       frame: 0,
       timer: 0,
       lastMoveAt: 0
@@ -488,8 +557,58 @@
       return Math.atan2(Math.sin(angle), Math.cos(angle));
     }
 
+    function distanceToScreenEdge(x, y, dx, dy) {
+      const distances = [];
+      if (dx > 0.01) distances.push((window.innerWidth + 180 - x) / dx);
+      if (dx < -0.01) distances.push((-180 - x) / dx);
+      if (dy > 0.01) distances.push((window.innerHeight + 180 - y) / dy);
+      if (dy < -0.01) distances.push((-180 - y) / dy);
+      return Math.max(220, Math.min(...distances.filter(distance => distance > 0)));
+    }
+
+    function launchBuzz() {
+      if (!bee.active || bee.parked || bee.entering || window.matchMedia('(pointer: coarse), (max-width: 700px)').matches) return;
+      const dirLength = Math.hypot(bee.dirX, bee.dirY) || 1;
+      const dirX = bee.dirX / dirLength;
+      const dirY = bee.dirY / dirLength;
+      const distance = distanceToScreenEdge(bee.x, bee.y, dirX, dirY);
+      const buzz = document.createElement('div');
+      buzz.className = 'bee-buzz';
+      buzz.setAttribute('aria-hidden', 'true');
+      buzz.style.setProperty('--buzz-x', `${bee.x}px`);
+      buzz.style.setProperty('--buzz-y', `${bee.y}px`);
+      buzz.style.setProperty('--buzz-dir-x', dirX.toFixed(4));
+      buzz.style.setProperty('--buzz-dir-y', dirY.toFixed(4));
+      buzz.style.setProperty('--buzz-travel-x', `${(dirX * distance).toFixed(1)}px`);
+      buzz.style.setProperty('--buzz-travel-y', `${(dirY * distance).toFixed(1)}px`);
+      buzz.style.setProperty('--buzz-angle', `${Math.atan2(dirY, dirX).toFixed(4)}rad`);
+      if (window.__designManifestoBuzzWake) {
+        window.__designManifestoBuzzWake({
+          x: bee.x,
+          y: bee.y,
+          dx: dirX,
+          dy: dirY,
+          distance: distance,
+          duration: 2450
+        });
+      }
+      'buzz buzz'.split('').forEach((letter, index) => {
+        const span = document.createElement('span');
+        span.style.setProperty('--i', index);
+        span.textContent = letter === ' ' ? '\u00a0' : letter;
+        buzz.appendChild(span);
+      });
+      document.body.appendChild(buzz);
+      buzz.addEventListener('animationend', event => {
+        if (event.target === buzz) buzz.remove();
+      });
+    }
+
     function setBeeTargetFromMovement(dx, dy) {
-      if (Math.hypot(dx, dy) < 1.5) return;
+      var distance = Math.hypot(dx, dy);
+      if (distance < 1.5) return;
+      bee.dirX = dx / distance;
+      bee.dirY = dy / distance;
       var absX = Math.abs(dx);
       var absY = Math.abs(dy);
       if (absX > 0.8) {
@@ -562,6 +681,13 @@
         if (!trailFrame) trailFrame = requestAnimationFrame(drawTrail);
       }
     }, { passive: true });
+
+    document.addEventListener('click', event => {
+      if (window.matchMedia('(pointer: coarse), (max-width: 700px)').matches) return;
+      const fig = getVisibleFig();
+      if (fig && fig.contains(event.target)) return;
+      launchBuzz();
+    });
 
     document.querySelectorAll('a[data-page]').forEach(link => {
       link.addEventListener('click', event => {
