@@ -206,19 +206,39 @@
       pointerActive = false;
     });
 
+    function buzzEase(value) {
+      var x1 = 0.22;
+      var y1 = 0.8;
+      var x2 = 0.18;
+      var y2 = 1;
+      var t = value;
+      for (var i = 0; i < 5; i += 1) {
+        var inv = 1 - t;
+        var x = 3 * inv * inv * t * x1 + 3 * inv * t * t * x2 + t * t * t;
+        var dx = 3 * inv * inv * x1 + 6 * inv * t * (x2 - x1) + 3 * t * t * (1 - x2);
+        if (Math.abs(dx) < 0.0001) break;
+        t = clamp(t - (x - value) / dx, 0, 1);
+      }
+      var invT = 1 - t;
+      return 3 * invT * invT * t * y1 + 3 * invT * t * t * y2 + t * t * t;
+    }
+
     window.__designManifestoBuzzWake = function (detail) {
       var rect = panel.getBoundingClientRect();
       var dx = Number(detail && detail.dx) || 1;
       var dy = Number(detail && detail.dy) || 0;
       var length = Math.sqrt(dx * dx + dy * dy) || 1;
+      var now = performance.now();
       buzzWakes.push({
         x: (Number(detail && detail.x) || 0) - rect.left,
         y: (Number(detail && detail.y) || 0) - rect.top,
         dx: dx / length,
         dy: dy / length,
         distance: Number(detail && detail.distance) || Math.max(window.innerWidth, window.innerHeight),
-        startedAt: performance.now(),
-        duration: Number(detail && detail.duration) || 3800
+        startedAt: now,
+        lastEmitAt: now - 40,
+        duration: Number(detail && detail.duration) || 3800,
+        particles: []
       });
       if (buzzWakes.length > 5) buzzWakes.shift();
     };
@@ -315,11 +335,31 @@
       var radius = window.innerWidth < 600 ? 58 : 86;
       var pushMax = window.innerWidth < 600 ? 34 : 52;
       var now = performance.now();
-      var wakeRadius = window.innerWidth < 600 ? 34 : 52;
-      var wakeForward = window.innerWidth < 600 ? 68 : 96;
-      var wakePushMax = window.innerWidth < 600 ? 24 : 38;
+      var wakeRadius = window.innerWidth < 600 ? 42 : 62;
+      var wakePushMax = window.innerWidth < 600 ? 23 : 36;
       buzzWakes = buzzWakes.filter(function (wake) {
-        return now - wake.startedAt < wake.duration + 260;
+        var age = now - wake.startedAt;
+        var progress = clamp(age / wake.duration, 0, 1);
+        var eased = buzzEase(progress);
+        var headX = wake.x + wake.dx * wake.distance * eased;
+        var headY = wake.y + wake.dy * wake.distance * eased;
+
+        if (age <= wake.duration && now - wake.lastEmitAt > 34) {
+          wake.particles.push({
+            x: headX,
+            y: headY,
+            bornAt: now,
+            drift: (Math.random() - 0.5) * 10
+          });
+          wake.lastEmitAt = now;
+          if (wake.particles.length > 32) wake.particles.shift();
+        }
+
+        wake.particles = wake.particles.filter(function (particle) {
+          return now - particle.bornAt < 680;
+        });
+
+        return age < wake.duration + 720 || wake.particles.length > 0;
       });
       if (pointerActive) {
         fieldX += (targetX - fieldX) * 0.34;
@@ -345,22 +385,20 @@
         }
 
         buzzWakes.forEach(function (wake) {
-          var progress = clamp((now - wake.startedAt) / wake.duration, 0, 1);
-          var buzzCenterX = wake.x + wake.dx * wake.distance * progress;
-          var buzzCenterY = wake.y + wake.dy * wake.distance * progress;
-          var rx = cx - buzzCenterX;
-          var ry = cy - buzzCenterY;
-          var forward = rx * wake.dx + ry * wake.dy;
-          var side = rx * -wake.dy + ry * wake.dx;
-          if (forward > -30 && forward < wakeForward && Math.abs(side) < wakeRadius) {
-            var sideStrength = 1 - Math.abs(side) / wakeRadius;
-            var frontStrength = 1 - Math.max(0, forward) / wakeForward;
-            var fade = progress < 0.88 ? 1 : Math.max(0, (1 - progress) / 0.12);
-            var push = sideStrength * sideStrength * frontStrength * wakePushMax * fade;
-            var sideSign = side >= 0 ? 1 : -1;
-            nextX += (-wake.dy * sideSign + wake.dx * 0.32) * push;
-            nextY += (wake.dx * sideSign + wake.dy * 0.32) * push;
-          }
+          wake.particles.forEach(function (particle) {
+            var particleAge = now - particle.bornAt;
+            var life = Math.max(0, 1 - particleAge / 680);
+            var px = particle.x + wake.dx * particleAge * 0.022 + -wake.dy * particle.drift * (1 - life);
+            var py = particle.y + wake.dy * particleAge * 0.022 + wake.dx * particle.drift * (1 - life);
+            var rx = cx - px;
+            var ry = cy - py;
+            var distance = Math.sqrt(rx * rx + ry * ry);
+            if (distance < 0.001 || distance >= wakeRadius) return;
+            var strength = 1 - distance / wakeRadius;
+            var push = strength * strength * wakePushMax * life;
+            nextX += (rx / distance + wake.dx * 0.18) * push;
+            nextY += (ry / distance + wake.dy * 0.18) * push;
+          });
         });
 
         var response = buzzWakes.length ? 0.72 : 0.32;
