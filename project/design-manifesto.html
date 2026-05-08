@@ -336,7 +336,6 @@
       }
 
       #cursor,
-      #bee-cursor,
       #trail-canvas {
         display: none;
       }
@@ -437,7 +436,7 @@
     }
 
     function resumeBeeCursor() {
-      if (!bee.parked || window.matchMedia('(pointer: coarse)').matches) return;
+      if (!bee.parked) return;
       bee.parked = false;
       bee.active = true;
       bee.entering = false;
@@ -674,7 +673,7 @@
     }
 
     function startBeeCursor() {
-      if (bee.active || bee.parked || window.matchMedia('(pointer: coarse)').matches) return;
+      if (bee.active || bee.parked) return;
       bee.active = true;
       bee.entering = true;
       const fromLeft = bee.targetX < window.innerWidth * 0.5;
@@ -691,31 +690,48 @@
     }
 
     function scheduleBeeCursor() {
-      if (bee.active || bee.parked || bee.timer || window.matchMedia('(pointer: coarse)').matches) return;
+      if (bee.active || bee.parked || bee.timer) return;
       bee.timer = window.setTimeout(() => {
         bee.timer = 0;
         startBeeCursor();
       }, 1800);
     }
 
-    document.addEventListener('mousemove', event => {
-      cursor.style.transform = `translate3d(${event.clientX}px,${event.clientY}px,0) translate(-50%,-50%)`;
-      const dx = event.clientX - bee.lastPointerX;
-      const dy = event.clientY - bee.lastPointerY;
-      bee.targetX = event.clientX;
-      bee.targetY = event.clientY;
-      bee.lastPointerX = event.clientX;
-      bee.lastPointerY = event.clientY;
+    function moveBeeTarget(clientX, clientY, allowTrail) {
+      cursor.style.transform = `translate3d(${clientX}px,${clientY}px,0) translate(-50%,-50%)`;
+      const dx = clientX - bee.lastPointerX;
+      const dy = clientY - bee.lastPointerY;
+      bee.targetX = clientX;
+      bee.targetY = clientY;
+      bee.lastPointerX = clientX;
+      bee.lastPointerY = clientY;
       bee.lastMoveAt = Date.now();
       if (!bee.parked) {
         setBeeTargetFromMovement(dx, dy);
         scheduleBeeCursor();
       }
-      if (!bee.active) {
-        points.push({ x: event.clientX, y: event.clientY, t: Date.now() });
+      if (allowTrail && !bee.active) {
+        points.push({ x: clientX, y: clientY, t: Date.now() });
         if (points.length > 32) points.shift();
         if (!trailFrame) trailFrame = requestAnimationFrame(drawTrail);
       }
+    }
+
+    document.addEventListener('mousemove', event => {
+      moveBeeTarget(event.clientX, event.clientY, true);
+    }, { passive: true });
+
+    document.addEventListener('touchstart', event => {
+      if (!event.touches.length) return;
+      const touch = event.touches[0];
+      moveBeeTarget(touch.clientX, touch.clientY, false);
+      if (!bee.active && !bee.parked) startBeeCursor();
+    }, { passive: true });
+
+    document.addEventListener('touchmove', event => {
+      if (!event.touches.length) return;
+      const touch = event.touches[0];
+      moveBeeTarget(touch.clientX, touch.clientY, false);
     }, { passive: true });
 
     document.addEventListener('pointerdown', startBuzzHold);
