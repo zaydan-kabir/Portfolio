@@ -346,16 +346,13 @@
 
         buzzWakes.forEach(function (wake) {
           var progress = clamp((now - wake.startedAt) / wake.duration, 0, 1);
-          var eased = progress < 0.12
-            ? progress / 0.12 * 0.06
-            : 0.06 + (1 - Math.pow(1 - ((progress - 0.12) / 0.88), 2)) * 0.94;
-          var buzzCenterX = wake.x + wake.dx * wake.distance * eased;
-          var buzzCenterY = wake.y + wake.dy * wake.distance * eased;
+          var buzzCenterX = wake.x + wake.dx * wake.distance * progress;
+          var buzzCenterY = wake.y + wake.dy * wake.distance * progress;
           var rx = cx - buzzCenterX;
           var ry = cy - buzzCenterY;
           var forward = rx * wake.dx + ry * wake.dy;
           var side = rx * -wake.dy + ry * wake.dx;
-          if (forward > -24 && forward < wakeForward && Math.abs(side) < wakeRadius) {
+          if (forward > -30 && forward < wakeForward && Math.abs(side) < wakeRadius) {
             var sideStrength = 1 - Math.abs(side) / wakeRadius;
             var frontStrength = 1 - Math.max(0, forward) / wakeForward;
             var fade = progress < 0.88 ? 1 : Math.max(0, (1 - progress) / 0.12);
@@ -366,8 +363,9 @@
           }
         });
 
-        item.ox += (nextX - item.ox) * 0.32;
-        item.oy += (nextY - item.oy) * 0.32;
+        var response = buzzWakes.length ? 0.72 : 0.32;
+        item.ox += (nextX - item.ox) * response;
+        item.oy += (nextY - item.oy) * response;
         item.el.style.transform = 'translate3d(' + item.ox.toFixed(2) + 'px,' + item.oy.toFixed(2) + 'px,0)';
         item.el.style.opacity = '1';
       });
