@@ -149,30 +149,6 @@
        the JS-drawn trail in light mode (black → white) and hide it. */
     html[data-theme="light"] #trail-canvas { filter: none !important; }
 
-    #fig-press-halo {
-      position: absolute;
-      pointer-events: none;
-      opacity: 0;
-      z-index: 3;
-      border-radius: 999px;
-      background:
-        radial-gradient(ellipse at center,
-          rgba(0,0,0,.28) 0%,
-          rgba(0,0,0,.18) 42%,
-          rgba(0,0,0,0) 74%);
-      filter: blur(5px);
-      transform: translate3d(0,0,0) scale(1.12);
-      transition: opacity .22s ease;
-      will-change: opacity, left, top, width, height;
-    }
-
-    @media (max-width: 700px) {
-      #fig-press-halo {
-        filter: blur(4px);
-        transform: translate3d(0,0,0) scale(1.16);
-      }
-    }
-
     .bee-buzz {
       position: fixed;
       left: 0;
@@ -439,30 +415,6 @@
       return document.getElementById('panel-2-uncut-fig') || document.getElementById('panel-2-fig');
     }
 
-    function getFigHalo(fig) {
-      if (!fig || !fig.parentElement) return null;
-      let halo = document.getElementById('fig-press-halo');
-      if (!halo) {
-        halo = document.createElement('div');
-        halo.id = 'fig-press-halo';
-        halo.setAttribute('aria-hidden', 'true');
-        fig.parentElement.insertBefore(halo, fig);
-      }
-      return halo;
-    }
-
-    function setFigHalo(fig, active) {
-      const halo = getFigHalo(fig);
-      if (!halo) return;
-      const parentRect = fig.parentElement.getBoundingClientRect();
-      const figRect = fig.getBoundingClientRect();
-      halo.style.left = `${figRect.left - parentRect.left}px`;
-      halo.style.top = `${figRect.top - parentRect.top}px`;
-      halo.style.width = `${figRect.width}px`;
-      halo.style.height = `${figRect.height}px`;
-      halo.style.opacity = active ? '1' : '0';
-    }
-
     function setFigGlow(active) {
       const fig = getVisibleFig();
       if (!fig) return;
@@ -475,10 +427,9 @@
         : 'drop-shadow(0 0 10px rgba(255,255,210,.28)) drop-shadow(0 12px 24px rgba(0,0,0,.3))';
       fig.style.setProperty('pointer-events', active || bee.parked ? 'auto' : 'none', 'important');
       fig.style.setProperty('cursor', 'none', 'important');
-      setFigHalo(fig, active && isLight);
       fig.style.setProperty(
         'filter',
-        active && !isLight
+        active
           ? activeGlow
           : 'drop-shadow(0 12px 24px rgba(0,0,0,.3))',
         'important'
