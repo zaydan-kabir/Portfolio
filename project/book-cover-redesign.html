@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Book Cover Re-Design — Zaydan Kabir Amanullah</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css?v=20260506-manifesto-fix">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg, #0a0a0a);
+      color: var(--ink, #f0f0f0);
+      overflow: hidden;
+      cursor: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a, a:hover, a:active, button, button:hover { cursor: none !important; }
+
+    html[data-theme="light"] #trail-canvas { filter: none !important; }
+
+    #safe-area-top {
+      position: fixed; left: 0; right: 0;
+      top: calc(-1 * env(safe-area-inset-top, 0px));
+      height: calc(env(safe-area-inset-top, 0px) * 2);
+      background: var(--bg, #0a0a0a);
+      z-index: 2000;
+      pointer-events: none;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+    html[data-theme="light"] #safe-area-top { background: var(--bg) !important; }
+
+    #cursor {
+      position: fixed; top: 0; left: 0;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--theme-cursor, #fff);
+      pointer-events: none;
+      transform: translate3d(-20px, -20px, 0) translate(-50%, -50%);
+      z-index: 10003;
+    }
+    #trail-canvas {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 10001;
+    }
+
+    #page-out {
+      position: fixed; inset: 0;
+      background: var(--ink, #f0f0f0);
+      z-index: 8888;
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform 0.45s cubic-bezier(.76,0,.24,1);
+    }
+    #page-out.covering  { transform: scaleY(1); transform-origin: bottom; }
+    #page-out.revealing { transform: scaleY(0); transform-origin: top;
+      transition: transform 0.45s cubic-bezier(.76,0,.24,1) 0.05s; }
+
+    /* Header (matches work.html / design-manifesto.html) */
+    #header {
+      position: fixed;
+      left: 0; right: 0;
+      top: calc(-1 * env(safe-area-inset-top, 0px));
+      z-index: 1000;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: calc(env(safe-area-inset-top, 0px) + 24px) 48px 10px;
+      border-bottom: 1px solid var(--gray3, #2a2a2a);
+      background: var(--bg, #0a0a0a);
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      will-change: transform;
+    }
+    .h-name {
+      font-family: 'Lora', serif; font-size: 14px; font-weight: 400; letter-spacing: -0.01em;
+      color: var(--gray2, #8a8a8a); text-decoration: none; transition: color .2s;
+    }
+    .h-name:hover, .h-name.active { color: var(--ink, #f0f0f0); }
+    .h-nav { display: flex; gap: 28px; align-items: baseline; }
+    .h-link {
+      font-family: 'Lora', serif; font-size: 13px; font-weight: 300; font-style: italic; color: var(--gray2, #8a8a8a);
+      text-decoration: none; letter-spacing: .02em; position: relative; transition: color .2s;
+    }
+    .h-link::after {
+      content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 1px;
+      background: var(--ink, #f0f0f0); transform: scaleX(0); transition: transform .2s ease;
+    }
+    .h-link:hover, .h-link.active { color: var(--ink, #f0f0f0); }
+    .h-link:hover::after, .h-link.active::after { transform: scaleX(1); }
+
+    /* Stage holding the PDF */
+    .stage {
+      position: fixed;
+      inset: calc(env(safe-area-inset-top, 0px) + 78px) 0 24px 0;
+      display: grid;
+      place-items: center;
+      padding: clamp(18px, 3vw, 36px);
+    }
+
+    .pdf-wrap {
+      position: relative;
+      width: min(720px, 92vw);
+      height: 100%;
+      max-height: calc(100vh - env(safe-area-inset-top, 0px) - 110px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06);
+      background: #14110d;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .pdf-wrap embed,
+    .pdf-wrap iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #14110d;
+    }
+
+    .caption {
+      position: fixed;
+      bottom: max(env(safe-area-inset-bottom, 0px), 18px);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: 'Lora', Georgia, serif;
+      font-style: italic;
+      font-size: 12px;
+      color: var(--gray2, #8a8a8a);
+      letter-spacing: 0.02em;
+      text-align: center;
+      pointer-events: none;
+    }
+    .caption a {
+      pointer-events: auto;
+      color: var(--ink, #f0f0f0);
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      padding-bottom: 1px;
+    }
+    .caption a:hover { opacity: 0.7; }
+
+    @media (max-width: 700px) {
+      #header { padding: calc(env(safe-area-inset-top, 0px) + 18px) 18px 9px; }
+      .h-nav { gap: 16px; }
+      .stage { inset: calc(env(safe-area-inset-top, 0px) + 64px) 0 56px 0; padding: 12px; }
+      .caption { font-size: 11px; gap: 10px; }
+    }
+
+    @media (pointer: coarse) {
+      body { cursor: auto; }
+      a, button, a:hover, button:hover { cursor: auto !important; }
+      #cursor, #trail-canvas { display: none; }
+    }
+  </style>
+</head>
+<body data-book-cover-page>
+  <div id="safe-area-top"></div>
+  <div id="cursor"></div>
+  <canvas id="trail-canvas"></canvas>
+  <div id="page-out"></div>
+  <header id="header">
+    <a class="h-name" href="Zaydan%20Kabir%20Amanullah.html" data-page="Zaydan%20Kabir%20Amanullah.html">Zaydan Kabir Amanullah</a>
+    <nav class="h-nav">
+      <a class="h-link" href="work.html" data-page="work.html">Work</a>
+      <a class="h-link" href="index.html" data-page="index.html">About</a>
+    </nav>
+  </header>
+
+  <main class="stage">
+    <div class="pdf-wrap" aria-label="Book Cover Re-Design — My Year of Rest and Relaxation">
+      <object data="uploads/DESIGN%20173%20Assignment%205%20v.2%20PORT.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH"
+              type="application/pdf"
+              width="100%" height="100%">
+        <iframe src="uploads/DESIGN%20173%20Assignment%205%20v.2%20PORT.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH"
+                title="Book Cover Re-Design PDF"
+                loading="eager"></iframe>
+      </object>
+    </div>
+  </main>
+
+  <div class="caption">
+    <span>Book Cover Re-Design &middot; <em>My Year of Rest and Relaxation</em></span>
+    <a href="uploads/DESIGN%20173%20Assignment%205%20v.2%20PORT.pdf" target="_blank" rel="noopener noreferrer">Download&nbsp;PDF</a>
+  </div>
+
+  <script src="theme.js?v=20260506-manifesto-fix"></script>
+  <script>
+    const overlay = document.getElementById('page-out');
+    overlay.classList.add('revealing');
+    setTimeout(() => overlay.classList.remove('revealing'), 850);
+
+    const cursor = document.getElementById('cursor');
+    const trailCanvas = document.getElementById('trail-canvas');
+    const trailCtx = trailCanvas.getContext('2d');
+    const points = [];
+    let trailFrame = 0;
+
+    function resizeTrail() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      trailCanvas.width = Math.floor(window.innerWidth * dpr);
+      trailCanvas.height = Math.floor(window.innerHeight * dpr);
+      trailCanvas.style.width = window.innerWidth + 'px';
+      trailCanvas.style.height = window.innerHeight + 'px';
+      trailCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function trailColor() {
+      return document.documentElement.dataset.theme === 'light' ? '10,10,10' : '240,240,240';
+    }
+
+    function drawTrail() {
+      trailFrame = 0;
+      trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+      const now = Date.now();
+      trailCtx.lineCap = 'round';
+      trailCtx.lineJoin = 'round';
+      const rgb = trailColor();
+      for (let i = 1; i < points.length; i++) {
+        const age = (now - points[i].t) / 300;
+        const alpha = Math.max(0, 1 - age);
+        trailCtx.beginPath();
+        trailCtx.moveTo(points[i - 1].x, points[i - 1].y);
+        trailCtx.lineTo(points[i].x, points[i].y);
+        trailCtx.strokeStyle = `rgba(${rgb},${(alpha * 0.42).toFixed(3)})`;
+        trailCtx.lineWidth = (i / points.length) * 2.5;
+        trailCtx.stroke();
+      }
+      while (points.length && now - points[0].t > 300) points.shift();
+      if (points.length) trailFrame = requestAnimationFrame(drawTrail);
+    }
+
+    resizeTrail();
+    window.addEventListener('resize', resizeTrail);
+    document.addEventListener('mousemove', event => {
+      cursor.style.transform = `translate3d(${event.clientX}px,${event.clientY}px,0) translate(-50%,-50%)`;
+      points.push({ x: event.clientX, y: event.clientY, t: Date.now() });
+      if (points.length > 32) points.shift();
+      if (!trailFrame) trailFrame = requestAnimationFrame(drawTrail);
+    }, { passive: true });
+
+    document.querySelectorAll('a[data-page]').forEach(link => {
+      link.addEventListener('click', event => {
+        event.preventDefault();
+        overlay.classList.add('covering');
+        setTimeout(() => { window.location.href = link.getAttribute('href'); }, 460);
+      });
+    });
+  </script>
+</body>
+</html>
