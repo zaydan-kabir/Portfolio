@@ -470,19 +470,17 @@
       const fig = getVisibleFig();
       if (!fig) return;
       const isLight = document.documentElement.dataset.theme === 'light';
-      const isCompact = window.matchMedia('(max-width: 700px)').matches;
+      // Avoid drop-shadow entirely. The fig drawing fills most of the PNG
+      // canvas, so any projected shadow traces as a rectangular halo around
+      // the image. Use brightness/contrast to indicate the active state —
+      // those filters paint inside the shape only.
       const activeGlow = isLight
-        ? isCompact
-          ? 'drop-shadow(0 0 1px rgba(0,0,0,1)) drop-shadow(0 0 4px rgba(0,0,0,.78)) drop-shadow(0 5px 10px rgba(0,0,0,.2))'
-          : 'drop-shadow(0 0 1px rgba(0,0,0,1)) drop-shadow(0 0 5px rgba(0,0,0,.82)) drop-shadow(0 6px 12px rgba(0,0,0,.22))'
-        : 'drop-shadow(0 0 10px rgba(255,255,210,.28)) drop-shadow(0 12px 24px rgba(0,0,0,.3))';
+        ? 'brightness(0.7) contrast(1.18)'
+        : 'brightness(1.18) contrast(1.06)';
       fig.style.setProperty('pointer-events', active || bee.parked ? 'auto' : 'none', 'important');
       fig.style.setProperty('cursor', 'none', 'important');
       fig.style.setProperty(
         'filter',
-        // When the bee is not glowing, leave the fig with no filter at all.
-        // The fig drawing reaches near the canvas edges, so any drop-shadow
-        // would trace as a square halo behind the fig.
         active ? activeGlow : 'none',
         'important'
       );
