@@ -111,7 +111,7 @@
       cornerFig.setAttribute('aria-hidden', 'true');
       panel.appendChild(cornerFig);
     }
-    cornerFig.src = 'uploads/fig-transparent-cropped.png';
+    cornerFig.src = 'uploads/fig-transparent-cropped.png?v=20260510-cropped-fig';
 
     var style = document.createElement('style');
     style.textContent = [
