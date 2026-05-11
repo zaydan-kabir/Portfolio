@@ -20,6 +20,8 @@
       color: var(--ink, #f0f0f0);
       overflow: hidden;
       cursor: none;
+      -webkit-user-select: none;
+      user-select: none;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -283,6 +285,8 @@
       color: rgba(240,240,240,.88);
       font: italic clamp(15px, 1.25vw, 21px)/1.55 'Lora', Georgia, serif;
       text-align: center;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     html[data-theme="light"] .p2-quote-wrap {
@@ -301,6 +305,23 @@
       pointer-events: none;
       user-select: none;
       filter: drop-shadow(0 12px 24px rgba(0,0,0,.3));
+    }
+
+    #panel-2-fig.is-bee-cue,
+    #panel-2-uncut-fig.is-bee-cue {
+      animation: figBeeCue 1.18s cubic-bezier(.22,1,.36,1) infinite;
+      transform-origin: 50% 78%;
+      will-change: transform;
+    }
+
+    @keyframes figBeeCue {
+      0%, 72%, 100% { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+      9% { transform: translate3d(-3px,1px,0) rotate(-3deg) scale(1.025); }
+      18% { transform: translate3d(4px,-1px,0) rotate(3.2deg) scale(1.03); }
+      28% { transform: translate3d(-4px,0,0) rotate(-2.4deg) scale(1.02); }
+      39% { transform: translate3d(3px,1px,0) rotate(2deg) scale(1.018); }
+      51% { transform: translate3d(-2px,0,0) rotate(-1.1deg) scale(1.01); }
+      62% { transform: translate3d(1px,0,0) rotate(.7deg) scale(1.004); }
     }
 
     #panel-2-writing { display: none; }
@@ -415,6 +436,7 @@
       timer: 0,
       buzzHoldTimer: 0,
       buzzHoldStartedAt: 0,
+      figCueDismissed: false,
       lastMoveAt: 0
     };
 
@@ -443,6 +465,12 @@
       );
     }
 
+    function setFigCue(active) {
+      const fig = getVisibleFig();
+      if (!fig) return;
+      fig.classList.toggle('is-bee-cue', active && !bee.figCueDismissed);
+    }
+
     function resumeBeeCursor() {
       if (!bee.parked) return;
       bee.parked = false;
@@ -453,6 +481,7 @@
       clearTrail();
       document.body.classList.add('bee-cursor-active');
       setFigGlow(true);
+      setFigCue(true);
       beeCursor.classList.add('is-visible');
       beeCursor.classList.remove('is-parked');
       if (!bee.frame) bee.frame = requestAnimationFrame(renderBee);
@@ -462,10 +491,13 @@
       const fig = getVisibleFig();
       if (!fig) return;
       if (bee.parked) {
+        bee.figCueDismissed = true;
+        setFigCue(false);
         resumeBeeCursor();
         return;
       }
       if (!bee.active) return;
+      bee.figCueDismissed = true;
       const rect = fig.getBoundingClientRect();
       bee.parked = true;
       bee.active = false;
@@ -477,6 +509,7 @@
       beeCursor.classList.add('is-parked');
       beeCursor.style.transform = `translate3d(${bee.x}px,${bee.y}px,0) translate(-50%,-50%) rotate(${bee.angle}rad) scaleX(${bee.flip})`;
       document.body.classList.remove('bee-cursor-active');
+      setFigCue(false);
       setFigGlow(false);
       if (bee.frame) {
         cancelAnimationFrame(bee.frame);
@@ -692,6 +725,7 @@
       document.body.classList.add('bee-cursor-active');
       bindFigClick();
       setFigGlow(true);
+      setFigCue(true);
       beeCursor.classList.add('is-visible');
       beeCursor.classList.remove('is-parked');
       if (!bee.frame) bee.frame = requestAnimationFrame(renderBee);
