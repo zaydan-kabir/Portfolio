@@ -480,9 +480,10 @@
       fig.style.setProperty('cursor', 'none', 'important');
       fig.style.setProperty(
         'filter',
-        active
-          ? activeGlow
-          : 'drop-shadow(0 12px 24px rgba(0,0,0,.3))',
+        // When the bee is not glowing, leave the fig with no filter at all.
+        // The fig drawing reaches near the canvas edges, so any drop-shadow
+        // would trace as a square halo behind the fig.
+        active ? activeGlow : 'none',
         'important'
       );
     }
