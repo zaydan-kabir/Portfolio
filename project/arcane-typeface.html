@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arcane — Typeface Specimen</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #08070a;
+      color: #d8d3c4;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 28px;
+      border-bottom: 1px solid rgba(216, 211, 196, 0.14);
+      background: #0c0b0e;
+      flex: 0 0 auto;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    header .title {
+      font-size: 11px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: #d8d3c4;
+    }
+    header .title .sub {
+      color: rgba(216, 211, 196, 0.45);
+      margin-left: 12px;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 18px;
+      border: 1px solid rgba(216, 211, 196, 0.5);
+      color: #d8d3c4;
+      background: transparent;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s, border-color 0.18s;
+      position: relative;
+    }
+    .btn::before {
+      content:'';
+      position: absolute;
+      inset: 3px;
+      border: 1px solid rgba(216, 211, 196, 0.14);
+      pointer-events: none;
+    }
+    .btn:hover {
+      background: #d8d3c4;
+      color: #08070a;
+      border-color: #d8d3c4;
+    }
+    .btn:hover::before { border-color: rgba(8, 7, 10, 0.18); }
+    .btn .ext { opacity: 0.55; font-size: 9px; }
+    .btn.back { border-color: rgba(216, 211, 196, 0.22); color: rgba(216, 211, 196, 0.7); }
+    .btn.back:hover { background: rgba(216, 211, 196, 0.08); color: #d8d3c4; border-color: rgba(216, 211, 196, 0.5); }
+
+    .pdf-wrap {
+      flex: 1 1 auto;
+      background: #1c1b1f;
+      position: relative;
+      min-height: 70vh;
+    }
+    .pdf-wrap embed,
+    .pdf-wrap iframe,
+    .pdf-wrap object {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(216,211,196,0.6);
+      text-align: center;
+      padding: 20px;
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 14px 18px; }
+      header .title { font-size: 10px; letter-spacing: 0.22em; }
+      .btn { padding: 8px 14px; font-size: 9px; letter-spacing: 0.22em; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">
+      Arcane — Typeface Specimen
+      <span class="sub">v 0.1</span>
+    </div>
+    <div class="actions">
+      <a class="btn" href="uploads/Arcane.otf" download="Arcane.otf">Download <span class="ext">.otf</span></a>
+      <a class="btn" href="uploads/Arcane.ttf" download="Arcane.ttf">Download <span class="ext">.ttf</span></a>
+      <a class="btn back" href="index.html">← Return</a>
+    </div>
+  </header>
+
+  <div class="pdf-wrap">
+    <object data="uploads/Arcane%20Specimen.pdf#view=FitH" type="application/pdf">
+      <iframe src="uploads/Arcane%20Specimen.pdf" title="Arcane Typeface Specimen PDF"></iframe>
+      <div class="fallback">
+        <span>PDF preview unavailable in this browser.</span>
+        <a class="btn" href="uploads/Arcane%20Specimen.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+      </div>
+    </object>
+  </div>
+</body>
+</html>
