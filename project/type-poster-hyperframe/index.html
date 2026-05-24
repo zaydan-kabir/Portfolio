@@ -3,202 +3,245 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Type Poster HyperFrame Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <title>Arcane Type Poster HyperFrame Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #1d3eb5; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #d9cdb0; }
 
     [data-composition-id="type-poster-preview"] {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: #1d3eb5;
-      color: #050505;
-      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
+      background:
+        radial-gradient(ellipse at 50% 50%, #ede2c5 0%, #d9cdb0 70%, #c9bb9a 100%);
+      color: #1a2540;
+      font-family: 'Major Mono Display', 'Courier New', monospace;
       isolation: isolate;
     }
 
-    .burst {
+    /* Risograph ink — single navy-ish layer with a soft red registration shift */
+    .ink { color: #1a2540; }
+    .ink-shift {
       position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 78%;
-      aspect-ratio: 1;
-      transform: translate(-50%, -50%) rotate(0deg);
-      transform-origin: 50% 50%;
-      background: #ff3914;
-      clip-path: polygon(
-        50% 0%,
-        55.36% 37.07%,
-        85.36% 14.64%,
-        62.93% 44.64%,
-        100% 50%,
-        62.93% 55.36%,
-        85.36% 85.36%,
-        55.36% 62.93%,
-        50% 100%,
-        44.64% 62.93%,
-        14.64% 85.36%,
-        37.07% 55.36%,
-        0% 50%,
-        37.07% 44.64%,
-        14.64% 14.64%,
-        44.64% 37.07%
-      );
-      z-index: 2;
-      will-change: transform;
+      inset: 0;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+      opacity: 0.55;
     }
 
-    .display {
+    /* HANDS — stylized SVG silhouettes top + bottom */
+    .hand {
+      position: absolute;
+      width: 32%;
+      max-width: 360px;
+      z-index: 3;
+      filter: drop-shadow(1.5px 1.5px 0 rgba(214, 60, 50, 0.35));
+    }
+    .hand svg { width: 100%; height: auto; display: block; fill: #1a2540; }
+    .hand.top { top: -2%; left: 8%; transform-origin: 30% 0%; }
+    .hand.bottom { bottom: -4%; left: 6%; transform: scaleY(-1) rotate(8deg); transform-origin: 30% 100%; }
+
+    /* TRIANGLES — outlined, one up one down */
+    .tri {
+      position: absolute;
+      width: 7%;
+      aspect-ratio: 1;
+      z-index: 4;
+      will-change: transform;
+    }
+    .tri svg { width: 100%; height: 100%; overflow: visible; }
+    .tri svg polygon { fill: none; stroke: #1a2540; stroke-width: 3; }
+    .tri.up { top: 6%; left: 46%; }
+    .tri.down { top: 46%; left: 6%; }
+    .tri.small { width: 4.5%; top: 38%; right: 12%; }
+
+    /* ALPHABET BLOCK */
+    .alphabet {
       position: absolute;
       inset: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0;
-      z-index: 4;
+      gap: clamp(6px, 1.4vh, 18px);
+      z-index: 5;
       pointer-events: none;
+      padding: 0 8% 0 6%;
     }
-    .display .line {
-      position: relative;
-      font-family: 'Archivo Black', 'Helvetica Neue', Arial, sans-serif;
-      font-weight: 900;
-      font-size: clamp(70px, 17vw, 220px);
-      line-height: 0.86;
-      letter-spacing: -0.045em;
-      color: #050505;
-      text-align: center;
+    .alphabet .row {
+      font-family: 'Major Mono Display', 'Courier New', monospace;
+      font-size: clamp(22px, 4.6vw, 64px);
+      letter-spacing: 0.16em;
+      line-height: 1;
+      color: #1a2540;
       white-space: nowrap;
-      text-shadow: 0 1px 0 rgba(5,5,5,.12);
+      text-transform: lowercase;
     }
-    .display .line .l {
+    .alphabet .row.upper { text-transform: uppercase; letter-spacing: 0.18em; }
+    .alphabet .row.italic { font-style: italic; transform: skewX(-6deg); }
+    .alphabet .row .l {
       display: inline-block;
       will-change: transform, opacity;
     }
-    .display .line.line-2 { color: #050505; }
-    .display .line.line-3 { color: #050505; }
 
+    /* ARCANE vertical wordmark */
+    .arcane {
+      position: absolute;
+      right: 5%;
+      top: 50%;
+      transform: translateY(-50%) rotate(0deg);
+      writing-mode: vertical-rl;
+      font-family: 'Major Mono Display', 'Courier New', monospace;
+      font-size: clamp(20px, 2.4vw, 36px);
+      letter-spacing: 0.55em;
+      color: #1a2540;
+      z-index: 6;
+      text-transform: uppercase;
+    }
+    .arcane .l {
+      display: inline-block;
+      will-change: transform, opacity;
+    }
+
+    /* Credit / meta type — corner labels in mono */
     .credit {
       position: absolute;
       font-family: 'JetBrains Mono', 'Courier New', monospace;
       font-size: clamp(8px, 0.78vw, 11px);
-      letter-spacing: 0.04em;
+      letter-spacing: 0.08em;
       line-height: 1.4;
-      color: rgba(255,255,255,.92);
-      z-index: 6;
-      max-width: 26%;
+      color: rgba(26,37,64,.78);
+      z-index: 7;
+      max-width: 28%;
     }
-    .credit.tl { left: 5%;  top: 6.5%; }
-    .credit.tr { right: 5%; top: 6.5%; text-align: right; }
-    .credit.center-l {
-      left: 5%;
-      top: 50%;
-      transform: translateY(-50%);
-      max-width: 22%;
-    }
-    .credit.center-r {
-      right: 5%;
-      top: 50%;
-      transform: translateY(-50%);
-      text-align: right;
-      max-width: 22%;
-    }
-    .credit.bl { left: 5%;  bottom: 6.5%; }
-    .credit.br { right: 5%; bottom: 6.5%; text-align: right; }
-    .credit .em { color: #ffffff; font-weight: 500; }
+    .credit.tl { left: 4%;  top: 4%; }
+    .credit.tr { right: 4%; top: 4%; text-align: right; }
+    .credit.bl { left: 4%;  bottom: 4%; }
+    .credit.br { right: 4%; bottom: 4%; text-align: right; }
+    .credit .em { color: #1a2540; font-weight: 500; }
 
-    .stamp {
-      position: absolute;
-      right: 6%;
-      bottom: 18%;
-      transform: rotate(-7deg);
-      padding: 7px 14px 9px;
-      border: 2px solid #ffffff;
-      color: #ffffff;
-      font-family: 'JetBrains Mono', 'Courier New', monospace;
-      font-weight: 500;
-      font-size: clamp(10px, 1.05vw, 14px);
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      background: rgba(29,62,181,.4);
-      box-shadow: 1px 2px 0 rgba(5,5,5,.24);
-      z-index: 8;
-      white-space: nowrap;
-    }
-    .stamp::before {
-      content: '';
-      position: absolute;
-      inset: 3px;
-      border: 1px solid rgba(255,255,255,.45);
-      pointer-events: none;
-    }
-
+    /* Risograph grain + dust */
     .grain {
       position: absolute;
       inset: 0;
       z-index: 12;
       pointer-events: none;
-      opacity: 0.07;
+      opacity: 0.18;
       mix-blend-mode: multiply;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 160px 160px;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 220px 220px;
     }
-
     .vignette {
       position: absolute;
       inset: 0;
       z-index: 11;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 62%, rgba(5,5,5,.22) 100%);
+      background:
+        radial-gradient(ellipse at center, transparent 55%, rgba(80,55,30,.18) 100%);
+    }
+
+    /* Paper crease line */
+    .crease {
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      height: 1px;
+      background: rgba(26,37,64,0.06);
+      z-index: 1;
     }
 
     @media (max-aspect-ratio: 1/1) {
-      .display .line { font-size: clamp(60px, 19vw, 200px); }
-      .credit { font-size: 9px; max-width: 32%; }
-      .credit.center-l, .credit.center-r { display: none; }
-      .stamp { font-size: 10px; padding: 6px 12px; letter-spacing: 0.26em; }
+      .alphabet .row { font-size: clamp(18px, 6.2vw, 56px); }
+      .hand { width: 40%; }
+      .arcane { font-size: clamp(16px, 3.6vw, 28px); }
+      .credit { font-size: 9px; max-width: 38%; }
     }
   </style>
 </head>
 <body>
   <div data-composition-id="type-poster-preview" data-width="1280" data-height="982" data-duration="11" data-start="0" data-track-index="0">
-    <div class="burst"></div>
 
-    <div class="display">
-      <div class="line line-1">
-        <span class="l">T</span><span class="l">Y</span><span class="l">P</span><span class="l">E</span>
+    <div class="crease"></div>
+
+    <!-- HAND TOP: stylized reaching-down hand silhouette -->
+    <div class="hand top">
+      <svg viewBox="0 0 220 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- palm + fingers, geometric -->
+        <path d="
+          M40 0
+          L70 0  L72 90
+          L82 0  L100 0 L102 110
+          L112 0 L130 0 L132 115
+          L142 10 L158 14 L156 122
+          L172 80 L188 92 L168 150
+          L170 200 Q170 250 130 270
+          Q70 280 50 250
+          Q30 210 32 170
+          L20 140 Q12 110 22 90
+          L20 60 Q22 30 40 0 Z" />
+      </svg>
+    </div>
+
+    <!-- HAND BOTTOM: reaching-up hand silhouette -->
+    <div class="hand bottom">
+      <svg viewBox="0 0 220 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="
+          M40 0
+          L70 0  L72 90
+          L82 0  L100 0 L102 110
+          L112 0 L130 0 L132 115
+          L142 10 L158 14 L156 122
+          L172 80 L188 92 L168 150
+          L170 200 Q170 250 130 270
+          Q70 280 50 250
+          Q30 210 32 170
+          L20 140 Q12 110 22 90
+          L20 60 Q22 30 40 0 Z" />
+      </svg>
+    </div>
+
+    <!-- TRIANGLES -->
+    <div class="tri up">
+      <svg viewBox="0 0 100 100"><polygon points="50,8 92,90 8,90"/></svg>
+    </div>
+    <div class="tri down">
+      <svg viewBox="0 0 100 100"><polygon points="50,92 92,10 8,10"/></svg>
+    </div>
+    <div class="tri small">
+      <svg viewBox="0 0 100 100"><polygon points="50,8 92,90 8,90"/></svg>
+    </div>
+
+    <!-- ALPHABET -->
+    <div class="alphabet">
+      <div class="row upper line-1">
+        <span class="l">A</span><span class="l">B</span><span class="l">C</span><span class="l">D</span><span class="l">E</span><span class="l">F</span><span class="l">G</span><span class="l">H</span><span class="l">I</span><span class="l">J</span><span class="l">K</span><span class="l">L</span><span class="l">M</span><span class="l">N</span>
       </div>
-      <div class="line line-2">
-        <span class="l">D</span><span class="l">E</span><span class="l">S</span><span class="l">I</span><span class="l">G</span><span class="l">N</span>
+      <div class="row upper line-2">
+        <span class="l">O</span><span class="l">P</span><span class="l">Q</span><span class="l">R</span><span class="l">S</span><span class="l">T</span><span class="l">U</span><span class="l">V</span><span class="l">W</span><span class="l">X</span><span class="l">Y</span><span class="l">Z</span>
       </div>
-      <div class="line line-3">
-        <span class="l">P</span><span class="l">O</span><span class="l">S</span><span class="l">T</span><span class="l">E</span><span class="l">R</span>
+      <div class="row italic line-3">
+        <span class="l">a</span><span class="l">b</span><span class="l">c</span><span class="l">d</span><span class="l">e</span><span class="l">f</span><span class="l">g</span><span class="l">h</span><span class="l">i</span><span class="l">j</span><span class="l">k</span><span class="l">l</span><span class="l">m</span><span class="l">n</span>
       </div>
+      <div class="row italic line-4">
+        <span class="l">o</span><span class="l">p</span><span class="l">q</span><span class="l">r</span><span class="l">s</span><span class="l">t</span><span class="l">u</span><span class="l">v</span><span class="l">w</span><span class="l">x</span><span class="l">y</span><span class="l">z</span>
+      </div>
+    </div>
+
+    <!-- ARCANE vertical wordmark -->
+    <div class="arcane">
+      <span class="l">A</span><span class="l">R</span><span class="l">C</span><span class="l">A</span><span class="l">N</span><span class="l">E</span>
     </div>
 
     <div class="credit tl">
-      Specimen 04 / Plate 02<br>
-      <span class="em">A type-design poster</span>
+      Specimen 05 / Plate 01<br>
+      <span class="em">Arcane — a display face</span>
     </div>
 
     <div class="credit tr">
-      Free-to-View Preview<br>
+      Risograph Edition<br>
       <span class="em">©2026 ZKA Studio</span>
-    </div>
-
-    <div class="credit center-l">
-      Cobalt &amp; vermilion edition.<br>
-      Set in Archivo Black, locked<br>
-      to a single ink-burst behind.
-    </div>
-
-    <div class="credit center-r">
-      Type / Print / Graphic.<br>
-      Released this fall.<br>
-      <span class="em">— more soon.</span>
     </div>
 
     <div class="credit bl">
@@ -211,8 +254,6 @@
       <span class="em">Edition / Open</span>
     </div>
 
-    <div class="stamp">Coming Soon</div>
-
     <div class="vignette"></div>
     <div class="grain"></div>
 
@@ -221,68 +262,52 @@
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      tl.from('.burst', {
-        scale: 0,
-        rotation: -45,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'expo.out',
-        transformOrigin: '50% 50%'
-      }, 0.1);
+      // Hands swing into frame
+      tl.from('.hand.top', {
+        y: -180, rotation: -14, opacity: 0,
+        duration: 0.9, ease: 'expo.out'
+      }, 0.05)
+      .from('.hand.bottom', {
+        y: 180, rotation: 14, opacity: 0,
+        duration: 0.9, ease: 'expo.out'
+      }, 0.15);
 
-      tl.from('.line-1 .l', {
-        y: -120,
-        opacity: 0,
-        duration: 0.55,
-        ease: 'expo.out',
-        stagger: 0.045
-      }, 0.5);
+      // Triangles snap in + slow rotate
+      tl.from('.tri', {
+        scale: 0, opacity: 0,
+        duration: 0.5, ease: 'back.out(2)',
+        stagger: 0.08
+      }, 0.45);
 
-      tl.from('.line-2 .l', {
-        y: -90,
-        opacity: 0,
-        duration: 0.5,
-        ease: 'expo.out',
-        stagger: 0.04
-      }, 0.85);
+      // Alphabet rows stagger in
+      tl.from('.line-1 .l', { y: -40, opacity: 0, duration: 0.45, ease: 'expo.out', stagger: 0.025 }, 0.7)
+        .from('.line-2 .l', { y: -30, opacity: 0, duration: 0.45, ease: 'expo.out', stagger: 0.022 }, 0.95)
+        .from('.line-3 .l', { y: 30,  opacity: 0, duration: 0.45, ease: 'expo.out', stagger: 0.022 }, 1.2)
+        .from('.line-4 .l', { y: 40,  opacity: 0, duration: 0.45, ease: 'expo.out', stagger: 0.025 }, 1.4);
 
-      tl.from('.line-3 .l', {
-        y: 90,
-        opacity: 0,
-        duration: 0.5,
-        ease: 'expo.out',
-        stagger: 0.04
-      }, 1.2);
+      // ARCANE vertical letters
+      tl.from('.arcane .l', {
+        x: 20, opacity: 0,
+        duration: 0.5, ease: 'power3.out',
+        stagger: 0.08
+      }, 1.7);
 
-      tl.from('.credit.tl', { x: -16, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.55)
-        .from('.credit.tr', { x: 16, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.62)
-        .from('.credit.center-l', { x: -12, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.7)
-        .from('.credit.center-r', { x: 12, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.78)
-        .from('.credit.bl', { y: 12, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.85)
-        .from('.credit.br', { y: 12, opacity: 0, duration: 0.55, ease: 'power2.out' }, 1.92);
+      // Corner credits
+      tl.from('.credit.tl', { x: -12, opacity: 0, duration: 0.5, ease: 'power2.out' }, 2.1)
+        .from('.credit.tr', { x: 12,  opacity: 0, duration: 0.5, ease: 'power2.out' }, 2.18)
+        .from('.credit.bl', { y: 12,  opacity: 0, duration: 0.5, ease: 'power2.out' }, 2.26)
+        .from('.credit.br', { y: 12,  opacity: 0, duration: 0.5, ease: 'power2.out' }, 2.34);
 
-      tl.from('.stamp', {
-        opacity: 0,
-        scale: 0.4,
-        rotation: 22,
-        duration: 0.55,
-        ease: 'back.out(2.4)'
-      }, 2.2);
+      // Idle motion — hands breathe, triangles drift
+      tl.to('.hand.top',    { y: 8,  rotation: -2, duration: 4.0, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.6)
+        .to('.hand.bottom', { y: -8, rotation: 2,  duration: 4.0, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.6);
 
-      tl.to('.stamp', { rotation: -9, duration: 0.18, ease: 'sine.inOut' }, 2.75)
-        .to('.stamp', { rotation: -7, duration: 0.22, ease: 'sine.inOut' }, 2.93);
+      tl.to('.tri.up',    { rotation: 360, duration: 7.5, ease: 'none' }, 2.6)
+        .to('.tri.down',  { rotation: -360, duration: 7.5, ease: 'none' }, 2.6)
+        .to('.tri.small', { rotation: 360, duration: 5.5, ease: 'none' }, 2.6);
 
-      tl.to('.burst', {
-        rotation: 8,
-        duration: 6.0,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 1,
-        transformOrigin: '50% 50%'
-      }, 2.6);
-
-      tl.to('.line-1', { y: 4, duration: 4.0, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.6)
-        .to('.line-3', { y: -4, duration: 4.0, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.6);
+      // Alphabet subtle drift
+      tl.to('.alphabet', { y: -4, duration: 4.0, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.6);
 
       window.__timelines['type-poster-preview'] = tl;
 
