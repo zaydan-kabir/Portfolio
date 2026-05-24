@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Type Design Poster — Arcane · Zaydan Kabir Amanullah</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: #08070a;
+      color: #d8d3c4;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(ellipse at 50% 30%, #1a1612 0%, #0b0a09 55%, #000 100%);
+      position: relative;
+    }
+
+    /* Warm overhead spotlight wash */
+    .spotlight {
+      position: fixed;
+      left: 50%; top: -10%;
+      width: 140vmax; height: 100vmax;
+      transform: translateX(-50%);
+      background:
+        radial-gradient(ellipse at 50% 0%,
+          rgba(255, 200, 130, 0.16) 0%,
+          rgba(255, 200, 130, 0.06) 22%,
+          rgba(255, 200, 130, 0) 55%);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .vignette {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 2;
+      background: radial-gradient(ellipse at 50% 38%, transparent 55%, rgba(0,0,0,0.7) 100%);
+    }
+    .grain {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      opacity: 0.10;
+      mix-blend-mode: overlay;
+      z-index: 3;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 220px 220px;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      position: relative;
+      z-index: 10;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 30px 48px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 10px;
+      letter-spacing: 0.36em;
+      text-transform: uppercase;
+      color: rgba(216, 211, 196, 0.5);
+    }
+    header a {
+      color: rgba(216, 211, 196, 0.75);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(216, 211, 196, 0.18);
+      padding-bottom: 3px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    header a:hover { color: #d8d3c4; border-bottom-color: rgba(216, 211, 196, 0.6); }
+
+    /* ===== STAGE ===== */
+    .stage {
+      position: relative;
+      z-index: 4;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: clamp(24px, 5vh, 64px) 48px clamp(40px, 7vh, 80px);
+      display: grid;
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: clamp(24px, 5vh, 56px);
+    }
+
+    .frame {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+    }
+    .frame .poster {
+      display: block;
+      max-width: min(720px, 90vw);
+      max-height: 82vh;
+      width: auto;
+      height: auto;
+      background: #d9cdb0;
+      box-shadow:
+        0 0 0 1px rgba(255, 230, 180, 0.10),
+        0 6px 14px rgba(0,0,0,0.6),
+        0 28px 56px rgba(0,0,0,0.7),
+        0 80px 160px rgba(0,0,0,0.78),
+        0 0 110px rgba(232, 188, 116, 0.08);
+      cursor: zoom-in;
+    }
+    .frame .floor {
+      position: absolute;
+      left: 50%;
+      bottom: -18px;
+      width: 84%;
+      height: 28px;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse at center,
+        rgba(0,0,0,0.78) 0%,
+        rgba(0,0,0,0.4) 35%,
+        rgba(0,0,0,0) 70%);
+      filter: blur(8px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* ===== CAPTION ===== */
+    .caption {
+      width: 100%;
+      max-width: 720px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px 32px;
+      align-items: start;
+      padding-top: clamp(20px, 3.6vh, 36px);
+      border-top: 1px solid rgba(216, 211, 196, 0.14);
+    }
+    .caption .title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #d8d3c4;
+      line-height: 1.5;
+    }
+    .caption .title .sub {
+      display: block;
+      margin-top: 8px;
+      color: rgba(216, 211, 196, 0.55);
+      font-size: 10.5px;
+      letter-spacing: 0.28em;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 6px 22px;
+      font-size: 9.5px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(216, 211, 196, 0.55);
+      align-self: end;
+    }
+    .meta .v { color: #d8d3c4; }
+
+    .actions {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      border: 1px solid rgba(216, 211, 196, 0.5);
+      color: #d8d3c4;
+      background: rgba(20, 18, 14, 0.5);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: 0.36em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      cursor: pointer;
+      position: relative;
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border: 1px solid rgba(216, 211, 196, 0.14);
+      pointer-events: none;
+    }
+    .btn:hover {
+      background: #d8d3c4;
+      color: #08070a;
+      border-color: #d8d3c4;
+    }
+    .btn:hover::before { border-color: rgba(8, 7, 10, 0.18); }
+    .btn .ext { opacity: 0.55; font-size: 8.5px; }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.94);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 4vh 4vw;
+      cursor: zoom-out;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+    }
+    .lightbox .close {
+      position: absolute;
+      top: 22px; right: 28px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: rgba(216, 211, 196, 0.7);
+      cursor: pointer;
+      user-select: none;
+    }
+    .lightbox .close:hover { color: #d8d3c4; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      position: relative;
+      z-index: 10;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 30px 48px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(216, 211, 196, 0.35);
+      border-top: 1px solid rgba(216, 211, 196, 0.12);
+    }
+
+    @media (max-width: 720px) {
+      header, .stage, footer { padding-left: 22px; padding-right: 22px; }
+      .caption { grid-template-columns: 1fr; }
+      .meta { align-self: start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="spotlight"></div>
+  <div class="vignette"></div>
+
+  <header>
+    <span>Type Design Poster · Arcane · Plate 02</span>
+    <a href="index.html">← Return</a>
+  </header>
+
+  <main class="stage">
+    <div class="frame">
+      <img class="poster" id="poster"
+           src="uploads/Type%20Design%20Risograph%20Poster.png"
+           alt="Type Design Risograph Poster — Arcane">
+      <div class="floor"></div>
+    </div>
+
+    <div class="caption">
+      <div class="title">
+        Type Design Poster — Arcane
+        <span class="sub">Risograph print · Type, Print &amp; Graphic Design · 2026</span>
+      </div>
+      <div class="meta">
+        <span>Edition</span><span class="v">Open</span>
+        <span>Inks</span><span class="v">Navy + Vermilion</span>
+        <span>Sheet</span><span class="v">982 × 1280</span>
+        <span>Studio</span><span class="v">ZKA</span>
+      </div>
+      <div class="actions">
+        <a class="btn" href="uploads/Type%20Design%20Risograph%20Poster.png" target="_blank" rel="noopener noreferrer">Open full size <span class="ext">PNG</span></a>
+        <a class="btn" href="uploads/Type%20Design%20Risograph%20Poster.png" download="Type Design Poster — Arcane.png">Download <span class="ext">PNG</span></a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span>©2026 ZKA Studio</span>
+    <span>Specimen V · Plate 02</span>
+  </footer>
+
+  <div class="grain"></div>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <span class="close" id="lbClose">Close ✕</span>
+    <img alt="Type Design Risograph Poster — full view" />
+  </div>
+
+  <script>
+    const poster = document.getElementById('poster');
+    const lightbox = document.getElementById('lightbox');
+    const lbImg = lightbox.querySelector('img');
+    const lbClose = document.getElementById('lbClose');
+
+    function openLb() {
+      lbImg.src = poster.src;
+      lightbox.classList.add('open');
+      lightbox.setAttribute('aria-hidden', 'false');
+    }
+    function closeLb() {
+      lightbox.classList.remove('open');
+      lightbox.setAttribute('aria-hidden', 'true');
+    }
+    poster.addEventListener('click', openLb);
+    lightbox.addEventListener('click', closeLb);
+    lbClose.addEventListener('click', closeLb);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+  </script>
+</body>
+</html>
