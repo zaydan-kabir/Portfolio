@@ -6,7 +6,7 @@
   <title>Type Design Poster HyperFrame Preview</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #323639; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
 
     [data-composition-id="type-poster-preview"] {
       position: relative;
@@ -14,7 +14,7 @@
       height: 100vh;
       overflow: hidden;
       background:
-        radial-gradient(ellipse at 50% 42%, #3a3e42 0%, #2a2d30 60%, #1d1f21 100%);
+        radial-gradient(ellipse at 50% 45%, #0a0a0a 0%, #050505 60%, #000 100%);
       isolation: isolate;
       font-family: 'Helvetica Neue', Arial, sans-serif;
     }
@@ -24,8 +24,8 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: clamp(22px, 4.2vh, 34px);
-      background: linear-gradient(to bottom, #45494d, #3a3d41);
-      border-bottom: 1px solid #1d1f21;
+      background: linear-gradient(to bottom, #1a1a1a, #0d0d0d);
+      border-bottom: 1px solid #000;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -89,9 +89,9 @@
     .page {
       display: block;
       width: auto;
-      height: min(70vh, 58vw);
-      max-height: calc(100vh - 80px);
-      max-width: calc(100vw - 60px);
+      height: min(86vh, 74vw);
+      max-height: calc(100vh - 70px);
+      max-width: calc(100vw - 36px);
       object-fit: contain;
       background: #d9cdb0;
       box-shadow:
@@ -121,8 +121,8 @@
       position: absolute;
       left: 0; right: 0; bottom: 0;
       height: clamp(16px, 3vh, 22px);
-      background: linear-gradient(to top, #2a2d30, #34373a);
-      border-top: 1px solid #1d1f21;
+      background: linear-gradient(to top, #0d0d0d, #1a1a1a);
+      border-top: 1px solid #000;
       display: flex;
       align-items: center;
       justify-content: space-between;
