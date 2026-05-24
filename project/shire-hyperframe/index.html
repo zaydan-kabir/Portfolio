@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shire HyperFrame Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Bebas+Neue&family=Bowlby+One+SC&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
@@ -14,333 +14,354 @@
       width: 100vw;
       height: 100vh;
       overflow: hidden;
+      /* Warm aged-film grey */
       background:
-        radial-gradient(ellipse at 50% 55%, #0e2412 0%, #061309 70%, #000 100%);
-      color: #6cf088;
-      font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
+        radial-gradient(ellipse at 50% 45%, #b9b4a6 0%, #948d7d 60%, #5a554a 100%);
+      color: #1a1a1a;
+      font-family: 'Special Elite', 'Courier New', monospace;
       isolation: isolate;
+      filter: contrast(1.08) saturate(0.05);  /* desaturate to old film monochrome */
     }
 
-    /* Pip-Boy bezel */
-    .bezel {
+    /* Letterbox bars */
+    .bar-top, .bar-bot {
       position: absolute;
-      inset: 4% 5%;
-      border: 2px solid rgba(108, 240, 136, 0.55);
-      box-shadow:
-        inset 0 0 0 6px rgba(0, 0, 0, 0.5),
-        inset 0 0 0 7px rgba(108, 240, 136, 0.18),
-        0 0 24px rgba(108, 240, 136, 0.20);
-      z-index: 3;
-      pointer-events: none;
+      left: 0; right: 0;
+      height: 7%;
+      background: #000;
+      z-index: 25;
     }
-    .bezel::before,
-    .bezel::after {
-      content: '';
-      position: absolute;
-      left: 12px; right: 12px;
-      height: 2px;
-      background: rgba(108, 240, 136, 0.35);
-    }
-    .bezel::before { top: 38px; }
-    .bezel::after  { bottom: 38px; }
+    .bar-top { top: 0; }
+    .bar-bot { bottom: 0; }
 
-    .top-bar {
+    /* Slim film perforations on the very edge */
+    .perf {
       position: absolute;
-      top: 5.6%;
-      left: 7%;
-      right: 7%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: 'VT323', monospace;
-      font-size: clamp(14px, 1.5vw, 22px);
-      letter-spacing: 0.18em;
-      color: #8df8a4;
-      text-shadow: 0 0 8px rgba(108, 240, 136, 0.6);
-      z-index: 6;
-      text-transform: uppercase;
+      top: 7%;
+      bottom: 7%;
+      width: 14px;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          #000 0px, #000 6px,
+          transparent 6px, transparent 16px
+        );
+      z-index: 24;
     }
-    .top-bar .tab {
-      display: inline-block;
-      padding: 4px 14px;
-      border: 1.5px solid #6cf088;
-      background: rgba(108, 240, 136, 0.12);
-    }
-    .top-bar .meter {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.85em;
-    }
-    .top-bar .meter .bars {
-      display: inline-flex;
-      gap: 3px;
-    }
-    .top-bar .meter .bars i {
-      display: block;
-      width: 6px; height: 14px;
-      background: #6cf088;
-      box-shadow: 0 0 4px #6cf088;
-    }
-    .top-bar .meter .bars i:nth-child(n+6) {
-      opacity: 0.22;
-      box-shadow: none;
-      background: transparent;
-      border: 1px solid rgba(108, 240, 136, 0.4);
-    }
+    .perf.l { left: 0; }
+    .perf.r { right: 0; }
 
-    /* Vault badge on the left */
-    .vault-mark {
+    /* Inner frame */
+    .stage {
       position: absolute;
-      left: 8.5%;
-      top: 22%;
-      width: 28%;
-      max-width: 280px;
-      aspect-ratio: 1;
+      top: 7%; bottom: 7%;
+      left: 14px; right: 14px;
       z-index: 5;
+      overflow: hidden;
+    }
+
+    /* The drawn scene — cartoon Vault Boy + Shire title */
+    .scene {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      align-items: center;
+      padding: 4% 6%;
+      gap: 4%;
+    }
+
+    /* Vault-Boy style figure */
+    .vb {
+      width: 100%;
+      height: 92%;
+      max-height: 92%;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1.5px solid rgba(108, 240, 136, 0.5);
-      box-shadow: 0 0 14px rgba(108, 240, 136, 0.18) inset;
-      background: rgba(108, 240, 136, 0.04);
     }
-    .vault-mark::before {
-      content: '';
-      position: absolute;
-      inset: 6px;
-      border: 1px solid rgba(108, 240, 136, 0.28);
-    }
-    .vault-mark .num {
-      font-family: 'VT323', monospace;
-      font-size: clamp(56px, 9vw, 130px);
-      line-height: 1;
-      color: #c9ffd6;
-      text-shadow: 0 0 14px rgba(108, 240, 136, 0.7);
-    }
-    .vault-mark .label {
-      position: absolute;
-      top: 8px; left: 8px;
-      font-size: 11px;
-      letter-spacing: 0.32em;
-      color: rgba(108, 240, 136, 0.75);
-    }
-    .vault-mark .corner {
-      position: absolute;
-      bottom: 6px; right: 8px;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      color: rgba(108, 240, 136, 0.55);
+    .vb svg {
+      width: 100%;
+      height: 100%;
     }
 
-    /* Stats on the right */
-    .stats {
-      position: absolute;
-      right: 8.5%;
-      top: 21%;
-      width: 46%;
-      z-index: 5;
-      font-family: 'VT323', monospace;
-      color: #8df8a4;
-      text-shadow: 0 0 6px rgba(108, 240, 136, 0.45);
-    }
-    .stats h1 {
-      margin: 0 0 14px;
-      font-size: clamp(34px, 4.6vw, 64px);
-      letter-spacing: 0.06em;
-      line-height: 1;
-      text-transform: uppercase;
-      color: #c9ffd6;
-    }
-    .stats .sub {
-      font-size: clamp(13px, 1.3vw, 18px);
-      letter-spacing: 0.22em;
-      color: rgba(108, 240, 136, 0.75);
-      text-transform: uppercase;
-      margin-bottom: 22px;
-    }
-    .stats .row {
+    /* Right column: title block */
+    .title-block {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: clamp(8px, 1.2vh, 16px);
+    }
+    .pre {
+      font-family: 'Bebas Neue', 'Special Elite', sans-serif;
+      font-size: clamp(12px, 1.6vw, 22px);
+      letter-spacing: 0.42em;
+      color: #1a1a1a;
+      opacity: 0.78;
+    }
+    .title {
+      font-family: 'Bowlby One SC', 'Bebas Neue', Impact, sans-serif;
+      font-size: clamp(80px, 14vw, 200px);
+      letter-spacing: -0.01em;
+      line-height: 0.86;
+      color: #0c0c0c;
+      text-shadow: 3px 3px 0 rgba(0,0,0,0.18);
+      transform: skew(-2deg);
+    }
+    .sub {
+      font-family: 'Special Elite', monospace;
+      font-size: clamp(14px, 1.6vw, 22px);
+      line-height: 1.4;
+      color: #1a1a1a;
+      max-width: 92%;
+    }
+    .stars {
+      display: flex;
+      gap: 10px;
       align-items: center;
-      font-size: clamp(14px, 1.4vw, 19px);
-      letter-spacing: 0.12em;
-      padding: 6px 0;
-      border-bottom: 1px dotted rgba(108, 240, 136, 0.35);
-      text-transform: uppercase;
-    }
-    .stats .row .k { color: rgba(108, 240, 136, 0.75); }
-    .stats .row .v { color: #c9ffd6; }
-    .stats .row .bar {
-      display: inline-flex;
-      gap: 2px;
-      margin-left: 10px;
-    }
-    .stats .row .bar i {
-      width: 9px; height: 10px;
-      background: #6cf088;
-      box-shadow: 0 0 3px #6cf088;
-    }
-    .stats .row .bar i.off { background: transparent; border: 1px solid rgba(108, 240, 136, 0.35); box-shadow: none; }
-
-    /* PLEASE STAND BY */
-    .stand-by {
-      position: absolute;
-      left: 50%;
-      bottom: 11%;
-      transform: translateX(-50%);
+      font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(14px, 1.5vw, 20px);
-      letter-spacing: 0.4em;
-      color: #6cf088;
-      text-shadow: 0 0 10px rgba(108, 240, 136, 0.7);
-      z-index: 6;
-      animation: blink 1.6s steps(2, end) infinite;
-      text-transform: uppercase;
-      white-space: nowrap;
+      letter-spacing: 0.34em;
+      color: #1a1a1a;
+      margin-top: 6px;
     }
-    @keyframes blink {
-      0%, 60% { opacity: 1; }
-      61%, 100% { opacity: 0.25; }
+    .star {
+      display: inline-block;
+      width: 14px; height: 14px;
+      background: #1a1a1a;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
     }
 
-    .footer-bar {
+    /* Vault-Tec badge */
+    .badge {
       position: absolute;
-      bottom: 5.6%;
-      left: 7%;
-      right: 7%;
+      top: 9%; left: 3%;
+      width: clamp(80px, 9vw, 140px);
+      aspect-ratio: 1;
+      border: 3px solid #0c0c0c;
+      border-radius: 50%;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-size: clamp(12px, 1.2vw, 17px);
-      letter-spacing: 0.18em;
-      color: rgba(108, 240, 136, 0.75);
-      text-transform: uppercase;
-      z-index: 6;
-      font-family: 'VT323', monospace;
-    }
-
-    /* Scanlines */
-    .scanlines {
-      position: absolute;
-      inset: 0;
+      justify-content: center;
+      flex-direction: column;
+      font-family: 'Bebas Neue', sans-serif;
+      color: #0c0c0c;
+      background: rgba(255,255,255,0.06);
       z-index: 10;
-      pointer-events: none;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.35) 0px,
-        rgba(0, 0, 0, 0.35) 1px,
-        transparent 1px,
-        transparent 3px
-      );
-      mix-blend-mode: multiply;
-      opacity: 0.6;
+      transform: rotate(-6deg);
     }
-    .scanlines::after {
+    .badge::before {
       content: '';
       position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(108, 240, 136, 0) 0%,
-        rgba(108, 240, 136, 0.06) 50%,
-        rgba(108, 240, 136, 0) 100%);
-      animation: sweep 5.5s linear infinite;
+      inset: 5px;
+      border: 1.5px solid #0c0c0c;
+      border-radius: 50%;
     }
-    @keyframes sweep {
-      0%   { transform: translateY(-100%); }
-      100% { transform: translateY(100%); }
+    .badge .big { font-size: clamp(20px, 2.6vw, 36px); line-height: 1; letter-spacing: 0.04em; }
+    .badge .sml { font-size: clamp(8px, 0.9vw, 11px); letter-spacing: 0.3em; margin-top: 4px; }
+
+    /* "Approved by RobCo" stamp bottom-right */
+    .stamp {
+      position: absolute;
+      right: 5%; bottom: 10%;
+      transform: rotate(-8deg);
+      border: 2.5px solid #1a1a1a;
+      padding: 8px 16px 10px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(13px, 1.4vw, 19px);
+      letter-spacing: 0.32em;
+      color: #1a1a1a;
+      z-index: 10;
+      background: rgba(0,0,0,0.04);
+      text-align: center;
+    }
+    .stamp::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border: 1px solid rgba(26,26,26,0.45);
     }
 
-    /* Phosphor noise */
-    .noise {
+    /* Heavy film grain */
+    .grain {
       position: absolute;
       inset: 0;
-      z-index: 11;
+      z-index: 30;
       pointer-events: none;
-      opacity: 0.10;
-      mix-blend-mode: screen;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 180px 180px;
-      animation: jitter 0.7s steps(6, end) infinite;
+      opacity: 0.42;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 240px 240px;
+      animation: jitter 0.5s steps(4, end) infinite;
     }
     @keyframes jitter {
       0%   { transform: translate(0, 0); }
-      20%  { transform: translate(-1px, 1px); }
-      40%  { transform: translate(1px, -1px); }
-      60%  { transform: translate(-1px, -1px); }
-      80%  { transform: translate(1px, 1px); }
-      100% { transform: translate(0, 0); }
+      25%  { transform: translate(-2px, 1px); }
+      50%  { transform: translate(1px, -2px); }
+      75%  { transform: translate(-1px, -1px); }
+      100% { transform: translate(2px, 1px); }
     }
 
+    /* Scratches — vertical line streaks */
+    .scratches {
+      position: absolute;
+      inset: 0;
+      z-index: 31;
+      pointer-events: none;
+      opacity: 0.35;
+      mix-blend-mode: screen;
+      background:
+        linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.6) 18%, transparent 22%, transparent 60%, rgba(255,255,255,0.3) 71%, transparent 75%, transparent 88%, rgba(255,255,255,0.5) 94%, transparent 96%);
+      background-size: 2px 100%;
+      background-repeat: repeat-x;
+      animation: scratch-shift 1.8s steps(6, end) infinite;
+    }
+    @keyframes scratch-shift {
+      0% { background-position: 0 0; }
+      100% { background-position: 100% 0; }
+    }
+
+    /* Vignette / lens fall-off */
     .vignette {
       position: absolute;
       inset: 0;
-      z-index: 12;
+      z-index: 28;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.85) 100%);
+      background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%);
     }
-    .edge-glow {
+
+    /* Projector flicker */
+    .flicker {
       position: absolute;
       inset: 0;
-      z-index: 13;
+      z-index: 29;
       pointer-events: none;
-      box-shadow: inset 0 0 100px rgba(108, 240, 136, 0.10);
+      background: rgba(0,0,0,0);
+      animation: flicker 4s infinite;
+    }
+    @keyframes flicker {
+      0%, 100%       { background: rgba(0,0,0,0); }
+      4%             { background: rgba(0,0,0,0.18); }
+      5%             { background: rgba(0,0,0,0); }
+      37%            { background: rgba(0,0,0,0.08); }
+      38%            { background: rgba(0,0,0,0); }
+      74%            { background: rgba(255,255,255,0.06); }
+      75%            { background: rgba(0,0,0,0); }
+    }
+
+    /* Reel countdown — bottom-left */
+    .reel {
+      position: absolute;
+      left: 5%;
+      bottom: 10%;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(12px, 1.3vw, 18px);
+      letter-spacing: 0.32em;
+      color: #1a1a1a;
+      z-index: 10;
     }
 
     @media (max-aspect-ratio: 1/1) {
-      .vault-mark { left: 50%; top: 12%; transform: translateX(-50%); width: 50%; }
-      .stats { right: 7%; left: 7%; top: auto; bottom: 18%; width: auto; }
-      .top-bar { font-size: 12px; letter-spacing: 0.12em; }
-      .footer-bar { font-size: 10px; letter-spacing: 0.12em; }
+      .scene { grid-template-columns: 1fr; grid-template-rows: 1fr auto; padding: 6% 8%; gap: 2%; }
+      .vb { height: auto; max-height: 50%; }
+      .title-block { align-items: center; text-align: center; }
+      .title { transform: none; }
+      .badge { top: 8.5%; left: 6%; }
     }
   </style>
 </head>
 <body>
   <div data-composition-id="shire-preview" data-width="1280" data-height="982" data-duration="9" data-start="0" data-track-index="0">
 
-    <div class="bezel"></div>
+    <div class="bar-top"></div>
+    <div class="bar-bot"></div>
+    <div class="perf l"></div>
+    <div class="perf r"></div>
 
-    <div class="top-bar">
-      <span class="tab">STATS &nbsp;·&nbsp; INV &nbsp;·&nbsp; DATA &nbsp;·&nbsp; MAP &nbsp;·&nbsp; RADIO</span>
-      <span class="meter">
-        SIG
-        <span class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-      </span>
+    <div class="badge">
+      <span class="big">V/T</span>
+      <span class="sml">VAULT-TEC</span>
     </div>
 
-    <div class="vault-mark">
-      <span class="label">VAULT</span>
-      <span class="num">76</span>
-      <span class="corner">SHIRE — STANDARD ISSUE</span>
-    </div>
+    <div class="stage">
+      <div class="scene">
 
-    <div class="stats">
-      <h1>Shire</h1>
-      <div class="sub">RobCo Industries — Pip-Companion Build</div>
-      <div class="row"><span class="k">STATUS</span><span class="v">CURRENTLY BUILDING</span></div>
-      <div class="row"><span class="k">CLASS</span><span class="v">UI / UX SYSTEM</span></div>
-      <div class="row"><span class="k">RAD</span>
-        <span class="bar"><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i></span>
+        <!-- Vault-Boy style cartoon figure: bald, big eyes, thumbs up -->
+        <div class="vb">
+          <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <g fill="none" stroke="#0c0c0c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Head -->
+              <ellipse cx="200" cy="130" rx="110" ry="120" fill="#f0eadb"/>
+              <!-- Hair tuft / curl -->
+              <path d="M150 50 Q 165 30 185 42 Q 210 25 230 45 Q 250 30 268 50"
+                    stroke-width="7"/>
+              <!-- Eyes -->
+              <circle cx="160" cy="135" r="12" fill="#0c0c0c"/>
+              <circle cx="240" cy="135" r="12" fill="#0c0c0c"/>
+              <circle cx="156" cy="131" r="3" fill="#f0eadb"/>
+              <circle cx="236" cy="131" r="3" fill="#f0eadb"/>
+              <!-- Brows -->
+              <path d="M140 108 Q 160 100 180 110" stroke-width="6"/>
+              <path d="M220 110 Q 240 100 260 108" stroke-width="6"/>
+              <!-- Nose -->
+              <path d="M200 145 Q 200 170 210 178" stroke-width="5"/>
+              <!-- Smile -->
+              <path d="M150 190 Q 200 230 250 190" stroke-width="6"/>
+              <!-- Cheek line -->
+              <path d="M260 175 Q 275 185 270 200" stroke-width="3"/>
+              <!-- Ear -->
+              <path d="M85 130 Q 70 140 78 165 Q 88 175 96 168" stroke-width="5"/>
+              <!-- Neck -->
+              <path d="M170 240 L 168 270" stroke-width="6"/>
+              <path d="M230 240 L 232 270" stroke-width="6"/>
+              <!-- Collar / shoulders -->
+              <path d="M120 290 Q 200 268 280 290" stroke-width="6" fill="#d8d1bf"/>
+              <!-- Jumpsuit body -->
+              <path d="M120 290 L 110 480 L 290 480 L 280 290 Z" fill="#c4bca7" stroke-width="6"/>
+              <!-- Center seam -->
+              <path d="M200 290 L 200 480" stroke-width="4" stroke-dasharray="4 6"/>
+              <!-- Vault number patch -->
+              <rect x="155" y="345" width="90" height="50" fill="#f0eadb" stroke-width="4"/>
+              <text x="200" y="383" text-anchor="middle" font-family="Bowlby One SC, Bebas Neue, sans-serif" font-size="36" fill="#0c0c0c" stroke="none">76</text>
+              <!-- Thumbs-up arm (right) -->
+              <path d="M280 300 Q 340 290 360 240 Q 365 220 350 210 Q 335 205 332 220 Q 332 195 320 195 Q 305 195 308 215 Q 308 195 297 198 Q 285 202 290 225 Q 290 210 280 215 Q 270 220 275 240 L 290 260"
+                    fill="#f0eadb" stroke-width="5"/>
+              <!-- Left arm down -->
+              <path d="M120 295 Q 95 360 100 430 L 130 430 Q 132 370 140 310 Z" fill="#c4bca7" stroke-width="6"/>
+              <!-- Left hand -->
+              <ellipse cx="115" cy="440" rx="22" ry="18" fill="#f0eadb" stroke-width="5"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Title block -->
+        <div class="title-block">
+          <div class="pre">A VAULT-TEC PRESENTATION</div>
+          <div class="title">SHIRE</div>
+          <div class="sub">
+            <strong>Currently in development.</strong><br>
+            A handy little system for the post-war designer. UI/UX, system design, and a healthy dose of design thinking — all in one tidy package!
+          </div>
+          <div class="stars">
+            <span class="star"></span><span class="star"></span><span class="star"></span>
+            &nbsp; NEW &amp; IMPROVED
+          </div>
+        </div>
+
       </div>
-      <div class="row"><span class="k">HP</span>
-        <span class="bar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i></span>
-      </div>
-      <div class="row"><span class="k">SYS</span><span class="v">ONLINE — 2026.05.24</span></div>
-      <div class="row"><span class="k">AUTH</span><span class="v">Z. KABIR</span></div>
     </div>
 
-    <div class="stand-by">▶ PLEASE STAND BY</div>
+    <div class="reel">REEL 03 · 2:32 / 7:14</div>
 
-    <div class="footer-bar">
-      <span>&gt; SHIRE.EXE RUNNING</span>
-      <span>PIP-OS v2.6.2</span>
-      <span>ROBCO© 2077</span>
+    <div class="stamp">
+      Approved<br>by RobCo
     </div>
 
-    <div class="scanlines"></div>
-    <div class="noise"></div>
-    <div class="edge-glow"></div>
     <div class="vignette"></div>
+    <div class="flicker"></div>
+    <div class="grain"></div>
+    <div class="scratches"></div>
   </div>
 </body>
 </html>
