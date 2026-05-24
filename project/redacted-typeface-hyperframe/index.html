@@ -70,16 +70,6 @@
       text-shadow: 0 0 36px rgba(122, 130, 125, 0.22);
     }
     .hero .l { display: inline-block; will-change: transform, opacity; }
-    .hero .ghost {
-      position: absolute;
-      inset: 0;
-      color: #7A827D;
-      mix-blend-mode: screen;
-      opacity: 0.45;
-      transform: translate(4px, 3px);
-      pointer-events: none;
-      will-change: transform, opacity;
-    }
 
     .specimen {
       display: flex;
@@ -148,7 +138,6 @@
         <span class="main">
           <span class="l">A</span><span class="l">R</span><span class="l">C</span><span class="l">A</span><span class="l">N</span><span class="l">E</span>
         </span>
-        <span class="ghost" aria-hidden="true">ARCANE</span>
       </div>
 
       <div class="specimen">
@@ -186,9 +175,6 @@
       // Hero letters drop
       tl.from('.hero .main .l', { y: -120, opacity: 0, duration: 0.6, ease: 'expo.out', stagger: 0.07 }, 0.4);
 
-      // Red ink ghost
-      tl.from('.hero .ghost', { opacity: 0, duration: 0.5, ease: 'sine.out' }, 0.95);
-
       // Specimen rows stagger
       tl.from('.line-1 .l', { y: -18, opacity: 0, duration: 0.38, ease: 'expo.out', stagger: 0.02 }, 1.35)
         .from('.line-2 .l', { y: -18, opacity: 0, duration: 0.38, ease: 'expo.out', stagger: 0.02 }, 1.55)
@@ -207,9 +193,8 @@
         .to('.tri.bl', { rotation: -360, duration: 8, ease: 'none' }, 2.8)
         .to('.tri.br', { rotation:  360, duration: 8, ease: 'none' }, 2.8);
 
-      tl.to('.hero .main',  { y: -3, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.8)
-        .to('.hero .ghost', { x: 6, y: 4, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.8)
-        .to('.specimen',    { y: -2, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.8);
+      tl.to('.hero .main', { y: -3, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.8)
+        .to('.specimen',   { y: -2, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.8);
 
       window.__timelines['arcane-typeface-preview'] = tl;
 
