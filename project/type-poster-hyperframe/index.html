@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arcane Type Poster HyperFrame Preview</title>
+  <title>Type Design Poster HyperFrame Preview</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #0d0a06; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #323639; }
 
     [data-composition-id="type-poster-preview"] {
       position: relative;
@@ -14,237 +14,158 @@
       height: 100vh;
       overflow: hidden;
       background:
-        radial-gradient(ellipse at 50% 50%, #1a1109 0%, #0d0a06 70%, #050402 100%);
+        radial-gradient(ellipse at 50% 42%, #3a3e42 0%, #2a2d30 60%, #1d1f21 100%);
       isolation: isolate;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
     }
 
-    /* The poster itself, contained, centered */
-    .poster-wrap {
+    /* PDF viewer top toolbar */
+    .pdf-toolbar {
       position: absolute;
-      inset: 0;
+      top: 0; left: 0; right: 0;
+      height: clamp(22px, 4.2vh, 34px);
+      background: linear-gradient(to bottom, #45494d, #3a3d41);
+      border-bottom: 1px solid #1d1f21;
       display: flex;
       align-items: center;
-      justify-content: center;
-      z-index: 4;
-      will-change: transform, filter;
+      justify-content: space-between;
+      padding: 0 clamp(8px, 1.6vw, 16px);
+      color: #d6d8da;
+      font-size: clamp(8px, 0.85vw, 11px);
+      letter-spacing: 0.02em;
+      z-index: 10;
+      user-select: none;
     }
-    .poster {
-      position: relative;
-      height: 96%;
-      max-width: 96%;
-      aspect-ratio: 1 / 1.4;
-      will-change: transform, filter;
-      filter:
-        contrast(1.05)
-        saturate(0.92)
-        drop-shadow(0 12px 28px rgba(0,0,0,0.55))
-        drop-shadow(0 0 18px rgba(120, 60, 30, 0.18));
+    .pdf-toolbar .title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 60%;
     }
-    .poster img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      filter: brightness(0.96);
+    .pdf-toolbar .pages {
+      font-variant-numeric: tabular-nums;
+      color: #b9bbbd;
+    }
+    .pdf-toolbar .dots {
+      display: inline-flex;
+      gap: 5px;
+      margin-right: 10px;
+    }
+    .pdf-toolbar .dots span {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #6a6e72;
+      display: inline-block;
+    }
+    .pdf-toolbar .dots span:nth-child(1) { background: #ec6a5e; }
+    .pdf-toolbar .dots span:nth-child(2) { background: #f4be4f; }
+    .pdf-toolbar .dots span:nth-child(3) { background: #61c554; }
+    .pdf-toolbar .left { display: flex; align-items: center; min-width: 0; }
+
+    /* Soft halo behind the page */
+    .halo {
+      position: absolute;
+      left: 50%; top: 52%;
+      width: 70vmin; height: 70vmin;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(140, 110, 70, 0.18) 0%, rgba(140, 110, 70, 0) 65%);
+      z-index: 1;
+      pointer-events: none;
+      filter: blur(3px);
     }
 
-    /* Red registration ghost — the same image, shifted, multiplied — for risograph mis-print energy */
-    .ghost {
+    .page-stage {
       position: absolute;
       inset: 0;
-      pointer-events: none;
-      mix-blend-mode: screen;
-      opacity: 0.18;
-      will-change: transform, opacity;
+      padding-top: clamp(30px, 5.5vh, 44px);
+      display: grid;
+      place-items: center;
+      animation: rise 6s ease-in-out infinite;
+      will-change: transform;
+      z-index: 2;
     }
-    .ghost img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+
+    .page {
       display: block;
-      filter: hue-rotate(-30deg) saturate(2) brightness(1.4) sepia(0.6);
+      width: auto;
+      height: min(72vh, 60vw);
+      max-height: calc(100vh - 70px);
+      max-width: calc(100vw - 60px);
+      object-fit: contain;
+      background: #d9cdb0;
+      box-shadow:
+        0 30px 60px rgba(0,0,0,0.55),
+        0 6px 14px rgba(0,0,0,0.35),
+        0 0 0 1px rgba(0,0,0,0.35);
     }
 
-    /* Scrying-light beam from below — soft warm glow that breathes */
-    .glow {
-      position: absolute;
-      left: 50%;
-      bottom: -10%;
-      width: 70%;
-      height: 70%;
-      transform: translateX(-50%);
-      pointer-events: none;
-      z-index: 3;
-      background: radial-gradient(ellipse at 50% 100%, rgba(220, 130, 60, 0.28), rgba(220, 130, 60, 0) 65%);
-      mix-blend-mode: screen;
-      filter: blur(4px);
-      will-change: opacity, transform;
+    @keyframes rise {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50%      { transform: translateY(-6px) scale(1.005); }
     }
 
-    /* Edge darkness — pulls the poster into shadow */
-    .vignette {
-      position: absolute;
-      inset: 0;
-      z-index: 9;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse at center, transparent 38%, rgba(0,0,0,0.72) 100%);
-    }
-
-    /* Grain — heavier, candle-lit dust */
+    /* Subtle film grain over the whole composition */
     .grain {
       position: absolute;
       inset: 0;
-      z-index: 10;
       pointer-events: none;
-      opacity: 0.28;
+      opacity: 0.06;
       mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 240px 240px;
-      will-change: transform, opacity;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      z-index: 5;
     }
 
-    /* Flicker layer — warm pulse on top, like candlelight */
-    .flicker {
+    /* PDF viewer bottom status bar */
+    .pdf-status {
       position: absolute;
-      inset: 0;
-      z-index: 8;
-      pointer-events: none;
-      background: radial-gradient(ellipse at 50% 60%, rgba(255, 170, 90, 0.10), rgba(0,0,0,0) 60%);
-      mix-blend-mode: screen;
-      will-change: opacity;
+      left: 0; right: 0; bottom: 0;
+      height: clamp(16px, 3vh, 22px);
+      background: linear-gradient(to top, #2a2d30, #34373a);
+      border-top: 1px solid #1d1f21;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(8px, 1.6vw, 16px);
+      color: #9a9c9e;
+      font-size: clamp(7px, 0.7vw, 10px);
+      letter-spacing: 0.04em;
+      z-index: 10;
+      user-select: none;
     }
 
-    /* Smoke — slow drifting wisps over the poster */
-    .smoke {
-      position: absolute;
-      inset: -10%;
-      z-index: 7;
-      pointer-events: none;
-      opacity: 0.18;
-      mix-blend-mode: screen;
-      background:
-        radial-gradient(ellipse at 30% 70%, rgba(180, 150, 110, 0.5) 0%, rgba(0,0,0,0) 40%),
-        radial-gradient(ellipse at 70% 30%, rgba(140, 110, 80, 0.5) 0%, rgba(0,0,0,0) 45%),
-        radial-gradient(ellipse at 50% 50%, rgba(200, 170, 130, 0.35) 0%, rgba(0,0,0,0) 55%);
-      filter: blur(20px);
-      will-change: transform;
+    @media (prefers-reduced-motion: reduce) {
+      .page-stage { animation: none; }
     }
   </style>
 </head>
 <body>
-  <div data-composition-id="type-poster-preview" data-width="1280" data-height="982" data-duration="14" data-start="0" data-track-index="0">
-
-    <div class="glow"></div>
-
-    <div class="smoke"></div>
-
-    <div class="poster-wrap">
-      <div class="poster">
-        <img src="../uploads/Type%20Design%20Risograph%20Poster.png" alt="Type Design Risograph Poster — Arcane" />
-        <div class="ghost"><img src="../uploads/Type%20Design%20Risograph%20Poster.png" alt="" /></div>
+  <div data-composition-id="type-poster-preview" data-width="1280" data-height="982" data-duration="6" data-start="0" data-track-index="0">
+    <div class="pdf-toolbar">
+      <div class="left">
+        <span class="dots"><span></span><span></span><span></span></span>
+        <span class="title">Type Design Risograph Poster.pdf</span>
       </div>
+      <span class="pages">1 / 1</span>
     </div>
 
-    <div class="flicker"></div>
-    <div class="vignette"></div>
+    <div class="halo"></div>
+
+    <div class="page-stage">
+      <img class="page"
+           src="../uploads/Type%20Design%20Risograph%20Poster.png?v=20260524"
+           alt="Type Design Risograph Poster — Arcane"
+           decoding="async"
+           loading="eager"
+           fetchpriority="high">
+    </div>
+
     <div class="grain"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-    <script>
-      window.__timelines = window.__timelines || {};
-      const tl = gsap.timeline({ paused: true });
-
-      // Opening: poster rises from shadow, slowly resolves
-      tl.from('.poster', {
-        scale: 0.86,
-        opacity: 0,
-        filter: 'contrast(0.6) saturate(0) brightness(0.3) blur(8px) drop-shadow(0 0 0 rgba(0,0,0,0))',
-        duration: 2.2,
-        ease: 'expo.out'
-      }, 0);
-
-      tl.from('.glow', { opacity: 0, duration: 2.4, ease: 'sine.out' }, 0.3)
-        .from('.smoke', { opacity: 0, duration: 2.4, ease: 'sine.out' }, 0.6)
-        .from('.flicker', { opacity: 0, duration: 1.6, ease: 'sine.out' }, 1.0);
-
-      // Slow, ritual breathing — the poster sways and scales subtly
-      tl.to('.poster', {
-        scale: 1.025,
-        rotation: 0.6,
-        duration: 5.5,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 1
-      }, 2.4);
-
-      tl.to('.poster-wrap', {
-        y: -8,
-        duration: 5.5,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 1
-      }, 2.4);
-
-      // Registration ghost shifts — the red mis-print drifts in and out
-      tl.fromTo('.ghost',
-        { x: 0, y: 0, opacity: 0 },
-        { x: 6, y: -4, opacity: 0.28, duration: 3.2, ease: 'sine.inOut' },
-        2.0
-      );
-      tl.to('.ghost', {
-        x: -5, y: 3, opacity: 0.16,
-        duration: 4.0, ease: 'sine.inOut'
-      }, 5.2);
-      tl.to('.ghost', {
-        x: 2, y: -2, opacity: 0.22,
-        duration: 4.0, ease: 'sine.inOut'
-      }, 9.2);
-
-      // Glow breathes — slow candle expansion / contraction
-      tl.to('.glow', {
-        scale: 1.18,
-        opacity: 0.85,
-        duration: 3.5,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 3,
-        transformOrigin: '50% 100%'
-      }, 2.0);
-
-      // Candle flicker — sharp, irregular pulses on the warm overlay
-      const flickerTimes = [2.6, 3.1, 3.45, 4.2, 5.4, 6.1, 7.3, 8.0, 8.4, 9.6, 10.8, 11.5, 12.9];
-      flickerTimes.forEach((t, i) => {
-        const dip = 0.35 + Math.random() * 0.5;
-        tl.to('.flicker', { opacity: dip, duration: 0.06, ease: 'power1.out' }, t)
-          .to('.flicker', { opacity: 1,   duration: 0.18, ease: 'power2.inOut' }, t + 0.06);
-      });
-
-      // Smoke drifts diagonally and recycles
-      tl.to('.smoke', {
-        x: 40, y: -30,
-        duration: 12, ease: 'none'
-      }, 1.0);
-
-      // Grain shimmer — constant low-level seethe
-      tl.to('.grain', {
-        backgroundPosition: '240px 240px',
-        duration: 12, ease: 'none'
-      }, 0);
-
-      // Final settle — image holds, slight breath out
-      tl.to('.poster', {
-        scale: 1.0, rotation: 0,
-        duration: 1.4, ease: 'sine.inOut'
-      }, 12.6);
-
-      window.__timelines['type-poster-preview'] = tl;
-
-      if (!window.__hyperframes) {
-        tl.eventCallback('onComplete', () => tl.restart());
-        tl.play(0);
-      }
-    </script>
+    <div class="pdf-status">
+      <span>ZKA Studio — Specimen 05</span>
+      <span>100%</span>
+    </div>
   </div>
 </body>
 </html>
