@@ -14,64 +14,73 @@
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      /* Warm aged-film grey */
       background:
         radial-gradient(ellipse at 50% 45%, #b9b4a6 0%, #948d7d 60%, #5a554a 100%);
       color: #1a1a1a;
       font-family: 'Special Elite', 'Courier New', monospace;
       isolation: isolate;
-      filter: contrast(1.08) saturate(0.05);  /* desaturate to old film monochrome */
+      filter: contrast(1.08) saturate(0.05);
     }
 
-    /* Letterbox bars */
+    /* Letterbox */
     .bar-top, .bar-bot {
-      position: absolute;
-      left: 0; right: 0;
-      height: 7%;
-      background: #000;
-      z-index: 25;
+      position: absolute; left: 0; right: 0;
+      height: 7%; background: #000; z-index: 25;
     }
     .bar-top { top: 0; }
     .bar-bot { bottom: 0; }
 
-    /* Slim film perforations on the very edge */
+    /* Film perforations */
     .perf {
       position: absolute;
-      top: 7%;
-      bottom: 7%;
+      top: 7%; bottom: 7%;
       width: 14px;
-      background:
-        repeating-linear-gradient(
-          to bottom,
-          #000 0px, #000 6px,
-          transparent 6px, transparent 16px
-        );
+      background: repeating-linear-gradient(
+        to bottom, #000 0px, #000 6px, transparent 6px, transparent 16px);
       z-index: 24;
     }
     .perf.l { left: 0; }
     .perf.r { right: 0; }
 
-    /* Inner frame */
     .stage {
       position: absolute;
-      top: 7%; bottom: 7%;
-      left: 14px; right: 14px;
-      z-index: 5;
-      overflow: hidden;
+      top: 7%; bottom: 7%; left: 14px; right: 14px;
+      z-index: 5; overflow: hidden;
     }
 
-    /* The drawn scene — cartoon Vault Boy + Shire title */
+    /* Comic-burst rays radiating from center-right (action burst) */
+    .burst {
+      position: absolute;
+      left: 64%;
+      top: 50%;
+      width: 100vmin;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.42;
+      background:
+        repeating-conic-gradient(
+          from 0deg,
+          rgba(26,26,26,0.55) 0deg 5deg,
+          transparent 5deg 18deg
+        );
+      mask-image: radial-gradient(circle, transparent 18%, #000 30%, #000 60%, transparent 75%);
+      -webkit-mask-image: radial-gradient(circle, transparent 18%, #000 30%, #000 60%, transparent 75%);
+      animation: spin 60s linear infinite;
+    }
+    @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
     .scene {
       position: absolute;
       inset: 0;
       display: grid;
-      grid-template-columns: 1.05fr 1fr;
+      grid-template-columns: 1fr 1.05fr;
       align-items: center;
       padding: 4% 6%;
-      gap: 4%;
+      gap: 3%;
     }
 
-    /* Vault-Boy style figure */
     .vb {
       width: 100%;
       height: 92%;
@@ -79,50 +88,80 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+      z-index: 4;
+      animation: bob 3.6s ease-in-out infinite;
     }
-    .vb svg {
-      width: 100%;
-      height: 100%;
+    .vb svg { width: 100%; height: 100%; }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%      { transform: translateY(-10px) rotate(-1deg); }
     }
 
-    /* Right column: title block */
+    /* Title block */
     .title-block {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: flex-start;
-      gap: clamp(8px, 1.2vh, 16px);
+      gap: clamp(8px, 1.4vh, 18px);
+      position: relative;
+      z-index: 4;
     }
-    .pre {
-      font-family: 'Bebas Neue', 'Special Elite', sans-serif;
-      font-size: clamp(12px, 1.6vw, 22px);
-      letter-spacing: 0.42em;
-      color: #1a1a1a;
-      opacity: 0.78;
+    .marquee {
+      display: inline-block;
+      padding: 5px 14px 6px;
+      border: 2.5px solid #0c0c0c;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(13px, 1.5vw, 20px);
+      letter-spacing: 0.4em;
+      color: #0c0c0c;
+      background: rgba(255,255,255,0.05);
+      position: relative;
     }
+    .marquee::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border: 1px solid rgba(12,12,12,0.45);
+    }
+
     .title {
       font-family: 'Bowlby One SC', 'Bebas Neue', Impact, sans-serif;
       font-size: clamp(80px, 14vw, 200px);
       letter-spacing: -0.01em;
       line-height: 0.86;
       color: #0c0c0c;
-      text-shadow: 3px 3px 0 rgba(0,0,0,0.18);
+      text-shadow:
+        3px 3px 0 rgba(0,0,0,0.18),
+        6px 6px 0 rgba(0,0,0,0.08);
       transform: skew(-2deg);
+      animation: stamp 4.8s ease-out infinite;
+      transform-origin: 30% 100%;
     }
+    @keyframes stamp {
+      0%       { transform: skew(-2deg) scale(1); }
+      3%       { transform: skew(-2deg) scale(1.025) rotate(-0.6deg); }
+      8%       { transform: skew(-2deg) scale(1) rotate(0deg); }
+      100%     { transform: skew(-2deg) scale(1); }
+    }
+
     .sub {
       font-family: 'Special Elite', monospace;
       font-size: clamp(14px, 1.6vw, 22px);
-      line-height: 1.4;
+      line-height: 1.45;
       color: #1a1a1a;
-      max-width: 92%;
+      max-width: 95%;
     }
-    .stars {
+    .sub strong { font-weight: 400; border-bottom: 2px solid #0c0c0c; padding-bottom: 1px; }
+
+    .meta-row {
       display: flex;
-      gap: 10px;
+      gap: 22px;
       align-items: center;
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(14px, 1.5vw, 20px);
-      letter-spacing: 0.34em;
+      font-size: clamp(13px, 1.4vw, 18px);
+      letter-spacing: 0.32em;
       color: #1a1a1a;
       margin-top: 6px;
     }
@@ -131,6 +170,56 @@
       width: 14px; height: 14px;
       background: #1a1a1a;
       clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+    .meta-row .stars { display: inline-flex; gap: 6px; }
+    .meta-row .dot { display: inline-block; width: 4px; height: 4px; background: #1a1a1a; border-radius: 50%; }
+
+    /* Speech burst behind the thumbs-up — comic SFX */
+    .pow {
+      position: absolute;
+      top: 12%;
+      left: 32%;
+      width: clamp(80px, 11vw, 160px);
+      aspect-ratio: 1;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(-12deg);
+      animation: pow-bounce 1.6s ease-in-out infinite;
+    }
+    @keyframes pow-bounce {
+      0%, 100% { transform: rotate(-12deg) scale(1); }
+      50%      { transform: rotate(-12deg) scale(1.08); }
+    }
+    .pow svg { width: 100%; height: 100%; }
+    .pow .label {
+      position: absolute;
+      font-family: 'Bowlby One SC', Impact, sans-serif;
+      font-size: clamp(16px, 2.2vw, 30px);
+      letter-spacing: 0.05em;
+      color: #0c0c0c;
+      transform: rotate(8deg);
+    }
+
+    /* Bottom-left counter / corner mark */
+    .reel {
+      position: absolute;
+      left: 5%; bottom: 10%;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(12px, 1.3vw, 18px);
+      letter-spacing: 0.32em;
+      color: #1a1a1a;
+      z-index: 10;
+    }
+    .reel-right {
+      position: absolute;
+      right: 5%; bottom: 10%;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(12px, 1.3vw, 18px);
+      letter-spacing: 0.32em;
+      color: #1a1a1a;
+      z-index: 10;
     }
 
     /* Heavy film grain */
@@ -153,7 +242,6 @@
       100% { transform: translate(2px, 1px); }
     }
 
-    /* Scratches — vertical line streaks */
     .scratches {
       position: absolute;
       inset: 0;
@@ -172,21 +260,15 @@
       100% { background-position: 100% 0; }
     }
 
-    /* Vignette / lens fall-off */
     .vignette {
       position: absolute;
-      inset: 0;
-      z-index: 28;
-      pointer-events: none;
+      inset: 0; z-index: 28; pointer-events: none;
       background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%);
     }
 
-    /* Projector flicker */
     .flicker {
       position: absolute;
-      inset: 0;
-      z-index: 29;
-      pointer-events: none;
+      inset: 0; z-index: 29; pointer-events: none;
       background: rgba(0,0,0,0);
       animation: flicker 4s infinite;
     }
@@ -200,23 +282,12 @@
       75%            { background: rgba(0,0,0,0); }
     }
 
-    /* Reel countdown — bottom-left */
-    .reel {
-      position: absolute;
-      left: 5%;
-      bottom: 10%;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(12px, 1.3vw, 18px);
-      letter-spacing: 0.32em;
-      color: #1a1a1a;
-      z-index: 10;
-    }
-
     @media (max-aspect-ratio: 1/1) {
       .scene { grid-template-columns: 1fr; grid-template-rows: 1fr auto; padding: 6% 8%; gap: 2%; }
       .vb { height: auto; max-height: 50%; }
       .title-block { align-items: center; text-align: center; }
       .title { transform: none; }
+      .pow { display: none; }
     }
   </style>
 </head>
@@ -227,6 +298,8 @@
     <div class="bar-bot"></div>
     <div class="perf l"></div>
     <div class="perf r"></div>
+
+    <div class="burst"></div>
 
     <div class="stage">
       <div class="scene">
@@ -244,143 +317,37 @@
               </style>
             </defs>
 
-            <!-- ============ BODY (drawn behind head so head sits on top) ============ -->
-            <!-- Torso / jumpsuit -->
-            <path class="suit" d="
-              M 130 320
-              Q 130 300 150 295
-              L 200 282
-              Q 230 276 260 282
-              L 310 295
-              Q 330 300 330 320
-              L 340 510
-              L 120 510
-              Z" />
-            <path class="stroke" d="
-              M 130 320
-              Q 130 300 150 295
-              L 200 282
-              Q 230 276 260 282
-              L 310 295
-              Q 330 300 330 320
-              L 340 510
-              L 120 510
-              L 130 320 Z" />
+            <path class="suit" d="M 130 320 Q 130 300 150 295 L 200 282 Q 230 276 260 282 L 310 295 Q 330 300 330 320 L 340 510 L 120 510 Z"/>
+            <path class="stroke" d="M 130 320 Q 130 300 150 295 L 200 282 Q 230 276 260 282 L 310 295 Q 330 300 330 320 L 340 510 L 120 510 L 130 320 Z"/>
 
-            <!-- Collar V -->
             <path class="suit-d" d="M 190 285 L 230 325 L 270 285 Z"/>
             <path class="stroke-thin" d="M 190 285 L 230 325 L 270 285"/>
-
-            <!-- Center seam -->
             <path class="stroke-thin" stroke-dasharray="5 7" d="M 230 330 L 230 505"/>
 
-            <!-- Left arm (down, with hand on hip) -->
-            <path class="suit" d="
-              M 132 322
-              Q 100 360 96 430
-              Q 95 460 116 470
-              Q 140 478 148 455
-              Q 154 410 162 360
-              Z"/>
-            <path class="stroke" d="
-              M 132 322
-              Q 100 360 96 430
-              Q 95 460 116 470
-              Q 140 478 148 455"/>
-            <!-- Left glove -->
+            <path class="suit" d="M 132 322 Q 100 360 96 430 Q 95 460 116 470 Q 140 478 148 455 Q 154 410 162 360 Z"/>
+            <path class="stroke" d="M 132 322 Q 100 360 96 430 Q 95 460 116 470 Q 140 478 148 455"/>
             <ellipse class="skin" cx="124" cy="468" rx="26" ry="20"/>
             <path class="stroke" d="M 102 460 Q 102 488 124 488 Q 150 488 148 460"/>
             <path class="stroke-thin" d="M 110 472 L 138 472"/>
 
-            <!-- Right arm — raised, ending in a thumbs-up -->
-            <path class="suit" d="
-              M 320 305
-              Q 360 280 372 230
-              Q 376 200 360 195
-              Q 348 195 348 215
-              L 346 240
-              L 322 285
-              Z"/>
-            <path class="stroke" d="
-              M 320 305
-              Q 360 280 372 230
-              Q 376 200 360 195
-              Q 348 195 348 215
-              L 346 240"/>
+            <path class="suit" d="M 320 305 Q 360 280 372 230 Q 376 200 360 195 Q 348 195 348 215 L 346 240 L 322 285 Z"/>
+            <path class="stroke" d="M 320 305 Q 360 280 372 230 Q 376 200 360 195 Q 348 195 348 215 L 346 240"/>
 
-            <!-- Hand / thumbs-up -->
             <g transform="translate(348 180) rotate(-15)">
-              <!-- Fist -->
-              <path class="skin" d="
-                M 0 0
-                Q -4 -32 24 -34
-                Q 50 -34 50 -8
-                Q 50 8 44 18
-                L 40 36
-                Q 36 50 14 50
-                Q -6 50 -6 32 Z"/>
-              <path class="stroke" d="
-                M 0 0
-                Q -4 -32 24 -34
-                Q 50 -34 50 -8
-                Q 50 8 44 18
-                L 40 36
-                Q 36 50 14 50
-                Q -6 50 -6 32"/>
-              <!-- Thumb sticking up -->
-              <path class="skin" d="
-                M 16 -8
-                Q 8 -40 22 -56
-                Q 38 -64 44 -50
-                Q 46 -32 38 -16 Z"/>
-              <path class="stroke" d="
-                M 16 -8
-                Q 8 -40 22 -56
-                Q 38 -64 44 -50
-                Q 46 -32 38 -16"/>
-              <!-- Knuckle creases -->
+              <path class="skin" d="M 0 0 Q -4 -32 24 -34 Q 50 -34 50 -8 Q 50 8 44 18 L 40 36 Q 36 50 14 50 Q -6 50 -6 32 Z"/>
+              <path class="stroke" d="M 0 0 Q -4 -32 24 -34 Q 50 -34 50 -8 Q 50 8 44 18 L 40 36 Q 36 50 14 50 Q -6 50 -6 32"/>
+              <path class="skin" d="M 16 -8 Q 8 -40 22 -56 Q 38 -64 44 -50 Q 46 -32 38 -16 Z"/>
+              <path class="stroke" d="M 16 -8 Q 8 -40 22 -56 Q 38 -64 44 -50 Q 46 -32 38 -16"/>
               <path class="stroke-thin" d="M 4 6 Q 24 14 44 4"/>
               <path class="stroke-thin" d="M 6 22 Q 24 30 42 22"/>
             </g>
 
-            <!-- ============ HEAD ============ -->
-            <!-- Head shape -->
-            <path class="skin" d="
-              M 230 60
-              Q 350 60 350 175
-              Q 350 270 270 290
-              Q 260 295 230 295
-              Q 200 295 190 290
-              Q 110 270 110 175
-              Q 110 60 230 60 Z"/>
-            <path class="stroke" d="
-              M 230 60
-              Q 350 60 350 175
-              Q 350 270 270 290
-              Q 260 295 230 295
-              Q 200 295 190 290
-              Q 110 270 110 175
-              Q 110 60 230 60 Z"/>
+            <path class="skin" d="M 230 60 Q 350 60 350 175 Q 350 270 270 290 Q 260 295 230 295 Q 200 295 190 290 Q 110 270 110 175 Q 110 60 230 60 Z"/>
+            <path class="stroke" d="M 230 60 Q 350 60 350 175 Q 350 270 270 290 Q 260 295 230 295 Q 200 295 190 290 Q 110 270 110 175 Q 110 60 230 60 Z"/>
 
-            <!-- Hair — side-parted with a curl -->
-            <path class="ink" d="
-              M 150 78
-              Q 175 50 215 55
-              Q 250 35 290 60
-              Q 325 60 332 105
-              Q 310 90 280 92
-              Q 260 75 235 86
-              Q 215 70 195 86
-              Q 175 72 156 95
-              Q 150 100 150 78 Z"/>
-            <!-- Forehead curl -->
-            <path class="ink" d="
-              M 248 88
-              Q 268 80 280 95
-              Q 286 110 270 116
-              Q 256 116 252 104 Z"/>
+            <path class="ink" d="M 150 78 Q 175 50 215 55 Q 250 35 290 60 Q 325 60 332 105 Q 310 90 280 92 Q 260 75 235 86 Q 215 70 195 86 Q 175 72 156 95 Q 150 100 150 78 Z"/>
+            <path class="ink" d="M 248 88 Q 268 80 280 95 Q 286 110 270 116 Q 256 116 252 104 Z"/>
 
-            <!-- Ears -->
             <path class="skin" d="M 106 165 Q 90 178 96 200 Q 104 215 118 210 Z"/>
             <path class="stroke" d="M 106 165 Q 90 178 96 200 Q 104 215 118 210"/>
             <path class="stroke-thin" d="M 104 180 Q 108 192 116 196"/>
@@ -389,53 +356,57 @@
             <path class="stroke" d="M 354 165 Q 370 178 364 200 Q 356 215 342 210"/>
             <path class="stroke-thin" d="M 356 180 Q 352 192 344 196"/>
 
-            <!-- Eyebrows -->
             <path class="stroke" stroke-width="8" d="M 168 152 Q 195 142 220 154"/>
             <path class="stroke" stroke-width="8" d="M 248 154 Q 273 142 300 152"/>
 
-            <!-- Eyes -->
             <circle class="ink" cx="194" cy="180" r="14"/>
             <circle class="ink" cx="274" cy="180" r="14"/>
-            <!-- Highlights -->
             <circle cx="190" cy="175" r="3.5" fill="#f3ecda"/>
             <circle cx="270" cy="175" r="3.5" fill="#f3ecda"/>
 
-            <!-- Nose -->
             <path class="stroke" d="M 234 190 Q 234 222 246 232 Q 240 240 230 238"/>
 
-            <!-- Smile with teeth -->
             <path class="skin" d="M 178 252 Q 234 290 290 252 Q 280 268 234 274 Q 188 268 178 252 Z"/>
             <path class="stroke" d="M 178 252 Q 234 290 290 252"/>
             <path class="stroke-thin" d="M 192 256 Q 234 268 276 256"/>
-            <!-- Tooth divider -->
             <path class="stroke-thin" d="M 226 254 L 226 268"/>
             <path class="stroke-thin" d="M 244 254 L 244 268"/>
 
-            <!-- Cheek line -->
             <path class="stroke-thin" d="M 300 222 Q 314 234 308 246"/>
-
-            <!-- Chin shadow -->
             <path class="stroke-thin" d="M 210 280 Q 230 287 252 280"/>
           </svg>
         </div>
 
+        <!-- Comic SFX burst on the thumbs-up -->
+        <div class="pow">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <polygon points="60,2 70,28 96,16 84,42 116,52 86,62 110,90 78,84 84,114 60,90 36,114 42,84 10,90 34,62 4,52 36,42 24,16 50,28"
+                     fill="none" stroke="#0c0c0c" stroke-width="4" stroke-linejoin="round"/>
+          </svg>
+          <span class="label">NICE!</span>
+        </div>
+
         <div class="title-block">
-          <div class="pre">Coming soon to a screen near you</div>
+          <div class="marquee">Now Showing</div>
           <div class="title">SHIRE</div>
           <div class="sub">
             <strong>Currently in development.</strong><br>
-            A handy little system for the modern designer. UI/UX, system design, and a healthy dose of design thinking — all in one tidy package!
+            A handy little system for the modern designer — UI/UX, system design, and a healthy dose of design thinking.
           </div>
-          <div class="stars">
-            <span class="star"></span><span class="star"></span><span class="star"></span>
-            &nbsp; NEW &amp; IMPROVED
+          <div class="meta-row">
+            <span class="stars"><span class="star"></span><span class="star"></span><span class="star"></span></span>
+            <span class="dot"></span>
+            <span>FEATURE PRESENTATION</span>
+            <span class="dot"></span>
+            <span>REEL 03</span>
           </div>
         </div>
 
       </div>
     </div>
 
-    <div class="reel">REEL 03 · 2:32 / 7:14</div>
+    <div class="reel">EST. 2026</div>
+    <div class="reel-right">Z. KABIR</div>
 
     <div class="vignette"></div>
     <div class="flicker"></div>
