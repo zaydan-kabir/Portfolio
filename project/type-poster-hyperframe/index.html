@@ -62,22 +62,23 @@
     .pdf-toolbar .dots span:nth-child(3) { background: #61c554; }
     .pdf-toolbar .left { display: flex; align-items: center; min-width: 0; }
 
-    /* Soft halo behind the page */
+    /* Soft warm halo behind the page — matches book cover composition */
     .halo {
       position: absolute;
       left: 50%; top: 52%;
-      width: 70vmin; height: 70vmin;
+      width: 90vmin; height: 90vmin;
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(140, 110, 70, 0.18) 0%, rgba(140, 110, 70, 0) 65%);
-      z-index: 1;
+      background: radial-gradient(circle, rgba(214, 168, 96, 0.16) 0%, rgba(214, 168, 96, 0) 60%);
+      z-index: 0;
       pointer-events: none;
-      filter: blur(3px);
+      filter: blur(2px);
     }
 
     .page-stage {
       position: absolute;
       inset: 0;
       padding-top: clamp(30px, 5.5vh, 44px);
+      padding-bottom: clamp(20px, 3.6vh, 28px);
       display: grid;
       place-items: center;
       animation: rise 6s ease-in-out infinite;
@@ -88,15 +89,14 @@
     .page {
       display: block;
       width: auto;
-      height: min(72vh, 60vw);
-      max-height: calc(100vh - 70px);
+      height: min(70vh, 58vw);
+      max-height: calc(100vh - 80px);
       max-width: calc(100vw - 60px);
       object-fit: contain;
       background: #d9cdb0;
       box-shadow:
-        0 30px 60px rgba(0,0,0,0.55),
-        0 6px 14px rgba(0,0,0,0.35),
-        0 0 0 1px rgba(0,0,0,0.35);
+        0 40px 80px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(0,0,0,0.4);
     }
 
     @keyframes rise {
@@ -144,7 +144,7 @@
     <div class="pdf-toolbar">
       <div class="left">
         <span class="dots"><span></span><span></span><span></span></span>
-        <span class="title">Type Design Risograph Poster.pdf</span>
+        <span class="title">Type Design Poster.pdf</span>
       </div>
       <span class="pages">1 / 1</span>
     </div>
