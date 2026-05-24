@@ -15,7 +15,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #d9cdb0; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
 
     [data-composition-id="arcane-typeface-preview"] {
       position: relative;
@@ -23,8 +23,8 @@
       height: 100vh;
       overflow: hidden;
       background:
-        radial-gradient(ellipse at 50% 42%, #ede2c5 0%, #d9cdb0 60%, #b8a87f 100%);
-      color: #1a2540;
+        radial-gradient(ellipse at 50% 42%, #1a1a1a 0%, #0a0a0a 60%, #000 100%);
+      color: #d8d3c4;
       font-family: 'Arcane', serif;
       isolation: isolate;
     }
@@ -38,7 +38,7 @@
       will-change: transform;
     }
     .tri svg { width: 100%; height: 100%; overflow: visible; }
-    .tri svg polygon { fill: none; stroke: #1a2540; stroke-width: 3; }
+    .tri svg polygon { fill: none; stroke: rgba(216,211,196,0.7); stroke-width: 3; }
     .tri.tl { top: 7%;  left: 7%; }
     .tri.tr { top: 7%;  right: 7%; }
     .tri.bl { bottom: 7%; left: 7%; }
@@ -63,18 +63,19 @@
       font-size: clamp(80px, 17vw, 240px);
       letter-spacing: 0.05em;
       line-height: 0.9;
-      color: #1a2540;
+      color: #d8d3c4;
       text-transform: uppercase;
       white-space: nowrap;
       text-align: center;
+      text-shadow: 0 0 32px rgba(196, 74, 53, 0.18);
     }
     .hero .l { display: inline-block; will-change: transform, opacity; }
     .hero .ghost {
       position: absolute;
       inset: 0;
-      color: #c1281d;
-      mix-blend-mode: multiply;
-      opacity: 0.3;
+      color: #c44a35;
+      mix-blend-mode: screen;
+      opacity: 0.35;
       transform: translate(4px, 3px);
       pointer-events: none;
       will-change: transform, opacity;
@@ -90,7 +91,7 @@
       font-family: 'Arcane', serif;
       font-size: clamp(20px, 3.2vw, 42px);
       letter-spacing: 0.16em;
-      color: #1a2540;
+      color: #d8d3c4;
       white-space: nowrap;
       line-height: 1;
     }
@@ -105,7 +106,7 @@
       font-size: clamp(8px, 0.78vw, 11px);
       letter-spacing: 0.18em;
       line-height: 1.4;
-      color: rgba(26,37,64,.7);
+      color: rgba(216, 211, 196, 0.55);
       z-index: 7;
       text-transform: uppercase;
     }
@@ -113,15 +114,15 @@
     .meta.tr { right: 16%; top: 6.5%; text-align: right; }
     .meta.bl { left: 16%; bottom: 6.5%; }
     .meta.br { right: 16%; bottom: 6.5%; text-align: right; }
-    .meta .em { color: #1a2540; font-weight: 600; }
+    .meta .em { color: #d8d3c4; font-weight: 600; }
 
     .grain {
       position: absolute;
       inset: 0;
       z-index: 12;
       pointer-events: none;
-      opacity: 0.2;
-      mix-blend-mode: multiply;
+      opacity: 0.10;
+      mix-blend-mode: overlay;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 220px 220px;
     }
@@ -130,7 +131,7 @@
       inset: 0;
       z-index: 11;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 55%, rgba(80,55,30,.22) 100%);
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.6) 100%);
     }
   </style>
 </head>
