@@ -3,341 +3,237 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Redacted Typeface HyperFrame Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Special+Elite&display=swap" rel="stylesheet" />
+  <title>Typeface — Arcane HyperFrame Preview</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #ece6d8; }
+    @font-face {
+      font-family: 'ZKA Arcane';
+      src: url('../uploads/ZKAFont.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: block;
+    }
 
-    [data-composition-id="redacted-typeface-preview"] {
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #d9cdb0; }
+
+    [data-composition-id="arcane-typeface-preview"] {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
       background:
-        radial-gradient(ellipse at 50% 42%, #f1ecdf 0%, #ece6d8 48%, #d4cdb9 100%);
-      color: #1a1a1a;
-      font-family: 'Special Elite', 'Courier Prime', 'Courier New', monospace;
+        radial-gradient(ellipse at 50% 45%, #ede2c5 0%, #d9cdb0 65%, #c4b692 100%);
+      color: #1a2540;
+      font-family: 'ZKA Arcane', 'Major Mono Display', 'Courier New', monospace;
       isolation: isolate;
     }
 
-    .sheet {
+    /* Triangles top + bottom corners (from the poster vocabulary) */
+    .tri {
       position: absolute;
-      inset: 7% 8.5% 9%;
+      width: 6.5%;
+      aspect-ratio: 1;
       z-index: 4;
-      display: flex;
-      flex-direction: column;
-      gap: clamp(10px, 1.6vw, 22px);
-    }
-
-    .top-row,
-    .bottom-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      font-size: clamp(10px, 1.05vw, 14px);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(26,26,26,.66);
-    }
-
-    .body {
-      display: flex;
-      flex-direction: column;
-      gap: clamp(10px, 1.4vw, 18px);
-      flex: 1;
-      justify-content: center;
-    }
-
-    .label {
-      font-size: clamp(11px, 1.05vw, 14px);
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: rgba(26,26,26,.62);
-    }
-
-    .line {
-      position: relative;
-      display: inline-block;
-      max-width: 100%;
-      overflow: visible;
-      white-space: nowrap;
-    }
-    .line .reveal {
-      display: inline-block;
-      overflow: hidden;
-      white-space: nowrap;
-      max-width: 100%;
-      vertical-align: top;
-      will-change: clip-path;
-    }
-    .line .reveal.hidden-clip { clip-path: inset(0 100% 0 0); }
-
-    .hero {
-      font-size: clamp(28px, 4.3vw, 64px);
-      letter-spacing: -0.005em;
-      line-height: 1.1;
-      color: #1a1a1a;
-    }
-    .hero .reveal { white-space: normal; max-width: 100%; }
-
-    .sub {
-      font-size: clamp(13px, 1.45vw, 20px);
-      letter-spacing: 0.02em;
-      line-height: 1.45;
-      color: rgba(26,26,26,.85);
-    }
-    .sub .key {
-      display: inline-block;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(26,26,26,.6);
-      margin-right: 0.6em;
-      font-size: 0.86em;
-    }
-
-    .redact {
-      position: relative;
-      display: inline-block;
-      vertical-align: baseline;
-    }
-    .redact .redact-bar {
-      position: absolute;
-      left: -0.18em;
-      right: auto;
-      top: -0.16em;
-      bottom: -0.18em;
-      width: 0;
-      background: #050505;
-      transform-origin: left center;
-      will-change: width;
-      pointer-events: none;
-      filter: url(#bar-grunge);
-      z-index: 2;
-    }
-    .redact.angle-1 .redact-bar { transform: rotate(-0.6deg); }
-    .redact.angle-2 .redact-bar { transform: rotate(0.4deg); }
-    .redact.angle-3 .redact-bar { transform: rotate(-0.3deg); }
-    .redact.angle-4 .redact-bar { transform: rotate(0.5deg); }
-
-    .stamp-wrap {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%) rotate(-9deg);
-      z-index: 9;
-      pointer-events: none;
       will-change: transform;
-      filter: drop-shadow(0 4px 0 rgba(193,40,29,0.06));
     }
+    .tri svg { width: 100%; height: 100%; overflow: visible; }
+    .tri svg polygon { fill: none; stroke: #1a2540; stroke-width: 2.5; }
+    .tri.up    { top: 7%;  left: 7%; }
+    .tri.down  { top: 7%;  right: 7%; }
+    .tri.up-b  { bottom: 7%; left: 7%; }
+    .tri.down-b{ bottom: 7%; right: 7%; }
 
-    .stamp {
-      position: relative;
-      padding: clamp(8px, 1.1vw, 14px) clamp(20px, 2.6vw, 36px) clamp(10px, 1.3vw, 16px);
-      border: clamp(3px, 0.32vw, 5px) solid #c1281d;
-      box-shadow:
-        inset 0 0 0 clamp(3px, 0.34vw, 5px) #ece6d8,
-        inset 0 0 0 clamp(4px, 0.42vw, 6px) #c1281d;
-      color: #c1281d;
-      font-family: 'Anton', 'Oswald', Impact, sans-serif;
-      font-size: clamp(28px, 4.6vw, 64px);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      line-height: 1;
+    /* HERO wordmark in the actual ZKA Arcane font */
+    .hero {
+      position: absolute;
+      left: 0; right: 0;
+      top: 36%;
+      transform: translateY(-50%);
+      text-align: center;
+      font-family: 'ZKA Arcane', serif;
+      font-size: clamp(72px, 16vw, 220px);
+      letter-spacing: 0.06em;
+      line-height: 0.9;
+      color: #1a2540;
+      z-index: 5;
       white-space: nowrap;
-      background: rgba(236,230,216,0.05);
-      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 200' preserveAspectRatio='none'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7 0.05' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 5 -1.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-              mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 200' preserveAspectRatio='none'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7 0.05' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 5 -1.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      -webkit-mask-size: 100% 100%;
-              mask-size: 100% 100%;
-      -webkit-mask-repeat: no-repeat;
-              mask-repeat: no-repeat;
+      text-transform: uppercase;
+    }
+    .hero .l {
+      display: inline-block;
+      will-change: transform, opacity;
     }
 
+    /* Specimen rows showing the full set */
+    .specimen {
+      position: absolute;
+      left: 0; right: 0;
+      bottom: 16%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(6px, 1.2vh, 14px);
+      z-index: 5;
+      padding: 0 5%;
+    }
+    .specimen .row {
+      font-family: 'ZKA Arcane', serif;
+      font-size: clamp(20px, 3.4vw, 44px);
+      letter-spacing: 0.18em;
+      color: #1a2540;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .specimen .row.upper { text-transform: uppercase; }
+    .specimen .row.lower { text-transform: lowercase; }
+    .specimen .row .l {
+      display: inline-block;
+      will-change: transform, opacity;
+    }
+
+    /* Mono meta labels in corners */
+    .meta {
+      position: absolute;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: clamp(8px, 0.78vw, 11px);
+      letter-spacing: 0.12em;
+      line-height: 1.4;
+      color: rgba(26,37,64,.7);
+      z-index: 7;
+      text-transform: uppercase;
+    }
+    .meta.tl { left: 16%; top: 6.2%; }
+    .meta.tr { right: 16%; top: 6.2%; text-align: right; }
+    .meta.bl { left: 16%; bottom: 6.2%; }
+    .meta.br { right: 16%; bottom: 6.2%; text-align: right; }
+    .meta .em { color: #1a2540; font-weight: 600; }
+
+    /* Risograph grain + vignette */
     .grain {
       position: absolute;
       inset: 0;
       z-index: 12;
       pointer-events: none;
-      opacity: 0.18;
+      opacity: 0.2;
       mix-blend-mode: multiply;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 160px 160px;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 220px 220px;
     }
-
     .vignette {
       position: absolute;
       inset: 0;
       z-index: 11;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 60%, rgba(40,30,10,0.28) 100%);
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(80,55,30,.20) 100%);
     }
 
-    .paper-edge {
+    /* Red ink registration ghost on the hero */
+    .hero .ghost {
       position: absolute;
-      inset: 0;
-      z-index: 14;
+      left: 0; right: 0; top: 0;
+      color: #c1281d;
+      mix-blend-mode: multiply;
+      opacity: 0.25;
+      transform: translate(3px, 2px);
       pointer-events: none;
-      box-shadow: inset 0 0 0 6px rgba(26,26,26,0.04), inset 0 0 80px rgba(60,38,12,0.18);
+      will-change: transform, opacity;
     }
 
     @media (max-aspect-ratio: 1/1) {
-      .hero { font-size: clamp(28px, 6.8vw, 60px); }
-      .sub { font-size: clamp(12px, 2.4vw, 18px); }
-      .top-row, .bottom-row { font-size: 10px; letter-spacing: 0.12em; }
+      .hero { font-size: clamp(56px, 18vw, 160px); }
+      .specimen .row { font-size: clamp(16px, 4.6vw, 32px); }
+      .meta { font-size: 9px; }
+      .meta.tl, .meta.bl { left: 6%; }
+      .meta.tr, .meta.br { right: 6%; }
     }
   </style>
 </head>
 <body>
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <defs>
-      <filter id="bar-grunge" x="-3%" y="-18%" width="106%" height="136%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.9 0.05" numOctaves="2" seed="9" result="noise"/>
-        <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 7 -2.0"/>
-        <feComposite in2="SourceGraphic" operator="in"/>
-        <feMorphology operator="dilate" radius="0.4"/>
-      </filter>
-    </defs>
-  </svg>
+  <div data-composition-id="arcane-typeface-preview" data-width="982" data-height="1280" data-duration="11" data-start="0" data-track-index="0">
 
-  <div data-composition-id="redacted-typeface-preview" data-width="982" data-height="1280" data-duration="12" data-start="0" data-track-index="0">
-    <div class="sheet">
-      <div class="top-row">
-        <span class="line"><span class="reveal hidden-clip" data-line>Subject File · 04 / 05 / 2026</span></span>
-        <span class="line"><span class="reveal hidden-clip" data-line>Confidential — Draft 03</span></span>
+    <div class="tri up">     <svg viewBox="0 0 100 100"><polygon points="50,8 92,90 8,90"/></svg></div>
+    <div class="tri down">   <svg viewBox="0 0 100 100"><polygon points="50,92 92,10 8,10"/></svg></div>
+    <div class="tri up-b">   <svg viewBox="0 0 100 100"><polygon points="50,8 92,90 8,90"/></svg></div>
+    <div class="tri down-b"> <svg viewBox="0 0 100 100"><polygon points="50,92 92,10 8,10"/></svg></div>
+
+    <div class="hero">
+      <span class="layer main">
+        <span class="l">A</span><span class="l">R</span><span class="l">C</span><span class="l">A</span><span class="l">N</span><span class="l">E</span>
+      </span>
+      <span class="ghost" aria-hidden="true">ARCANE</span>
+    </div>
+
+    <div class="specimen">
+      <div class="row upper line-1">
+        <span class="l">A</span><span class="l">B</span><span class="l">C</span><span class="l">D</span><span class="l">E</span><span class="l">F</span><span class="l">G</span><span class="l">H</span><span class="l">I</span><span class="l">J</span><span class="l">K</span><span class="l">L</span><span class="l">M</span><span class="l">N</span>
       </div>
-
-      <div class="body">
-        <span class="line label"><span class="reveal hidden-clip" data-line>Project Name</span></span>
-
-        <span class="line hero">
-          <span class="redact" data-redact-hero>
-            <span class="reveal hidden-clip" data-line>Zaydan's New TypeFace</span>
-            <span class="redact-bar"></span>
-          </span>
-        </span>
-
-        <span class="line sub">
-          <span class="key">Status</span><span class="redact angle-1" data-redact-value>
-            <span class="reveal hidden-clip" data-line>in development — release pending review.</span>
-            <span class="redact-bar"></span>
-          </span>
-        </span>
-
-        <span class="line sub">
-          <span class="key">Designer</span><span class="redact angle-2" data-redact-value>
-            <span class="reveal hidden-clip" data-line>Zaydan Kabir Amanullah</span>
-            <span class="redact-bar"></span>
-          </span>
-        </span>
-
-        <span class="line sub">
-          <span class="key">Distribution</span><span class="redact angle-3" data-redact-value>
-            <span class="reveal hidden-clip" data-line>internal only — do not transmit.</span>
-            <span class="redact-bar"></span>
-          </span>
-        </span>
-
-        <span class="line sub">
-          <span class="key">Note</span><span class="redact angle-4" data-redact-value>
-            <span class="reveal hidden-clip" data-line>further details withheld at this time.</span>
-            <span class="redact-bar"></span>
-          </span>
-        </span>
+      <div class="row upper line-2">
+        <span class="l">O</span><span class="l">P</span><span class="l">Q</span><span class="l">R</span><span class="l">S</span><span class="l">T</span><span class="l">U</span><span class="l">V</span><span class="l">W</span><span class="l">X</span><span class="l">Y</span><span class="l">Z</span>
       </div>
-
-      <div class="bottom-row">
-        <span class="line"><span class="reveal hidden-clip" data-line>File 04 · Page 01</span></span>
-        <span class="line"><span class="reveal hidden-clip" data-line>End — pending review</span></span>
+      <div class="row lower line-3">
+        <span class="l">a</span><span class="l">b</span><span class="l">c</span><span class="l">d</span><span class="l">e</span><span class="l">f</span><span class="l">g</span><span class="l">h</span><span class="l">i</span><span class="l">j</span><span class="l">k</span><span class="l">l</span><span class="l">m</span><span class="l">n</span>
+      </div>
+      <div class="row lower line-4">
+        <span class="l">o</span><span class="l">p</span><span class="l">q</span><span class="l">r</span><span class="l">s</span><span class="l">t</span><span class="l">u</span><span class="l">v</span><span class="l">w</span><span class="l">x</span><span class="l">y</span><span class="l">z</span>
       </div>
     </div>
 
-    <div class="stamp-wrap">
-      <div class="stamp"><span class="word">Access&nbsp;Denied</span></div>
-    </div>
+    <div class="meta tl">Specimen 05<br><span class="em">Plate 02</span></div>
+    <div class="meta tr">Display / Display<br><span class="em">©2026 ZKA</span></div>
+    <div class="meta bl">Typeface — Arcane<br><span class="em">designed by Z. Kabir</span></div>
+    <div class="meta br">Edition / Open<br><span class="em">v 0.1</span></div>
 
     <div class="vignette"></div>
     <div class="grain"></div>
-    <div class="paper-edge"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      const lines = gsap.utils.toArray('[data-line]');
+      // Triangles snap in from corners
+      tl.from('.tri', {
+        scale: 0, opacity: 0,
+        duration: 0.6, ease: 'back.out(2.2)',
+        stagger: 0.08
+      }, 0.1);
 
-      tl.to(lines.slice(0, 2), {
-        clipPath: 'inset(0 0% 0 0)',
-        duration: 0.55,
-        ease: 'steps(18)',
-        stagger: 0.18
-      }, 0.15);
+      // Hero ARCANE letters drop in one by one
+      tl.from('.hero .main .l', {
+        y: -120, opacity: 0,
+        duration: 0.65, ease: 'expo.out',
+        stagger: 0.07
+      }, 0.4);
 
-      tl.to(lines[2], {
-        clipPath: 'inset(0 0% 0 0)',
-        duration: 0.4,
-        ease: 'steps(12)'
-      }, 0.7);
+      // Red ink registration drifts in
+      tl.from('.hero .ghost', {
+        opacity: 0, x: 0, y: 0,
+        duration: 0.6, ease: 'sine.out'
+      }, 0.95);
 
-      tl.to(lines[3], {
-        clipPath: 'inset(0 0% 0 0)',
-        duration: 1.05,
-        ease: 'steps(28)'
-      }, 1.0);
+      // Specimen rows reveal
+      tl.from('.line-1 .l', { y: -20, opacity: 0, duration: 0.4, ease: 'expo.out', stagger: 0.022 }, 1.4)
+        .from('.line-2 .l', { y: -20, opacity: 0, duration: 0.4, ease: 'expo.out', stagger: 0.022 }, 1.6)
+        .from('.line-3 .l', { y:  20, opacity: 0, duration: 0.4, ease: 'expo.out', stagger: 0.022 }, 1.8)
+        .from('.line-4 .l', { y:  20, opacity: 0, duration: 0.4, ease: 'expo.out', stagger: 0.022 }, 2.0);
 
-      tl.to(lines.slice(4, 8), {
-        clipPath: 'inset(0 0% 0 0)',
-        duration: 0.85,
-        ease: 'steps(28)',
-        stagger: 0.36
-      }, 2.05);
+      // Corner meta
+      tl.from('.meta.tl', { x: -10, opacity: 0, duration: 0.5, ease: 'power2.out' }, 2.4)
+        .from('.meta.tr', { x:  10, opacity: 0, duration: 0.5, ease: 'power2.out' }, 2.46)
+        .from('.meta.bl', { y:  10, opacity: 0, duration: 0.5, ease: 'power2.out' }, 2.52)
+        .from('.meta.br', { y:  10, opacity: 0, duration: 0.5, ease: 'power2.out' }, 2.58);
 
-      tl.to(lines.slice(8, 10), {
-        clipPath: 'inset(0 0% 0 0)',
-        duration: 0.5,
-        ease: 'steps(16)',
-        stagger: 0.16
-      }, 3.65);
+      // Idle: triangles slowly rotate; hero breathes; ghost drifts
+      tl.to('.tri.up',     { rotation:  360, duration: 8, ease: 'none' }, 2.8)
+        .to('.tri.down',   { rotation: -360, duration: 8, ease: 'none' }, 2.8)
+        .to('.tri.up-b',   { rotation: -360, duration: 8, ease: 'none' }, 2.8)
+        .to('.tri.down-b', { rotation:  360, duration: 8, ease: 'none' }, 2.8);
 
-      const valueRedactions = gsap.utils.toArray('[data-redact-value] .redact-bar');
-      tl.to(valueRedactions, {
-        width: '100%',
-        duration: 0.32,
-        ease: 'expo.out',
-        stagger: 0.14
-      }, 4.4);
+      tl.to('.hero .main', { y: -4, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.8);
+      tl.to('.hero .ghost', { x: 6, y: 4, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.8);
+      tl.to('.specimen', { y: -3, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.8);
 
-      tl.to('[data-redact-hero] .redact-bar', {
-        width: '100%',
-        duration: 0.42,
-        ease: 'expo.out'
-      }, 5.4);
-
-      tl.from('.stamp-wrap', {
-        scale: 2.6,
-        opacity: 0,
-        rotation: 24,
-        duration: 0.32,
-        ease: 'power4.in'
-      }, 5.95);
-
-      tl.fromTo('.stamp-wrap', { rotation: 24 }, {
-        rotation: -9,
-        duration: 0.18,
-        ease: 'power4.out'
-      }, 6.27);
-
-      tl.fromTo('.stamp-wrap', { scale: 1.18 }, {
-        scale: 1,
-        duration: 0.22,
-        ease: 'back.out(2.4)'
-      }, 6.33);
-
-      tl.to('.stamp-wrap', { rotation: -7.5, duration: 0.14, ease: 'sine.inOut' }, 6.65)
-        .to('.stamp-wrap', { rotation: -9,   duration: 0.18, ease: 'sine.inOut' }, 6.79);
-
-      window.__timelines['redacted-typeface-preview'] = tl;
+      window.__timelines['arcane-typeface-preview'] = tl;
 
       if (!window.__hyperframes) {
         tl.eventCallback('onComplete', () => tl.restart());
