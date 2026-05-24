@@ -144,20 +144,34 @@
       <span class="sub">v 0.1</span>
     </div>
     <div class="actions">
-      <a class="btn" href="uploads/Arcane.otf" download="Arcane.otf">Download <span class="ext">.otf</span></a>
-      <a class="btn" href="uploads/Arcane.ttf" download="Arcane.ttf">Download <span class="ext">.ttf</span></a>
+      <a class="btn" href="uploads/Arcane.otf?v=2" download="Arcane.otf">Download <span class="ext">.otf</span></a>
+      <a class="btn" href="uploads/Arcane.ttf?v=2" download="Arcane.ttf">Download <span class="ext">.ttf</span></a>
       <a class="btn back" href="index.html">← Return</a>
     </div>
   </header>
 
   <div class="pdf-wrap">
-    <object data="uploads/Arcane%20Specimen.pdf?v=20260524-grey#view=FitH" type="application/pdf">
-      <iframe src="uploads/Arcane%20Specimen.pdf?v=20260524-grey" title="Arcane Typeface Specimen PDF"></iframe>
-      <div class="fallback">
-        <span>PDF preview unavailable in this browser.</span>
-        <a class="btn" href="uploads/Arcane%20Specimen.pdf?v=20260524-grey" target="_blank" rel="noopener noreferrer">Open PDF</a>
-      </div>
-    </object>
+    <iframe class="pdf-iframe"
+            src="uploads/Arcane-Specimen-v2.pdf#view=FitH&toolbar=1"
+            title="Arcane Typeface Specimen PDF"
+            allowfullscreen></iframe>
+    <div class="fallback" id="pdfFallback" hidden>
+      <span>PDF preview isn't supported on this device.</span>
+      <a class="btn" href="uploads/Arcane-Specimen-v2.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+    </div>
   </div>
+  <script>
+    // iOS Safari can't render PDFs inline — show fallback link.
+    (function() {
+      var ua = navigator.userAgent || '';
+      var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+      if (isIOS) {
+        var f = document.querySelector('.pdf-iframe');
+        if (f) f.style.display = 'none';
+        var fb = document.getElementById('pdfFallback');
+        if (fb) fb.hidden = false;
+      }
+    })();
+  </script>
 </body>
 </html>
