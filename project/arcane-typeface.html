@@ -9,18 +9,15 @@
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
       margin: 0;
-      height: 100%;
       background: #000;
       color: #d8d3c4;
       font-family: 'JetBrains Mono', 'Courier New', monospace;
       -webkit-font-smoothing: antialiased;
     }
     body {
-      display: flex;
-      flex-direction: column;
       min-height: 100vh;
       background:
-        radial-gradient(ellipse at 50% 30%, #1a1a1a 0%, #0a0a0a 60%, #000 100%);
+        radial-gradient(ellipse at 50% 24%, #1e1e20 0%, #0a0a0a 60%, #000 100%);
       position: relative;
     }
     body::before {
@@ -36,16 +33,17 @@
     }
 
     header {
-      position: relative;
-      z-index: 2;
+      position: sticky;
+      top: 0;
+      z-index: 10;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 16px 28px;
       border-bottom: 1px solid rgba(216, 211, 196, 0.14);
-      background: rgba(10, 10, 10, 0.78);
-      backdrop-filter: blur(6px);
-      flex: 0 0 auto;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       gap: 16px;
       flex-wrap: wrap;
     }
@@ -82,7 +80,7 @@
       position: relative;
     }
     .btn::before {
-      content:'';
+      content: '';
       position: absolute;
       inset: 3px;
       border: 1px solid rgba(216, 211, 196, 0.14);
@@ -98,42 +96,63 @@
     .btn.back { border-color: rgba(216, 211, 196, 0.22); color: rgba(216, 211, 196, 0.7); }
     .btn.back:hover { background: rgba(216, 211, 196, 0.08); color: #d8d3c4; border-color: rgba(216, 211, 196, 0.5); }
 
+    /* Page is naturally scrollable. PDF block has a generous height. */
     .pdf-wrap {
       position: relative;
       z-index: 1;
-      flex: 1 1 auto;
-      background: #2e2e30;
-      min-height: 70vh;
-      box-shadow: inset 0 1px 0 rgba(0,0,0,0.6);
+      padding: 28px clamp(16px, 4vw, 48px) 48px;
     }
-    .pdf-wrap embed,
-    .pdf-wrap iframe,
-    .pdf-wrap object {
-      width: 100%;
-      height: 100%;
-      border: 0;
+    .pdf-iframe {
       display: block;
+      width: 100%;
+      height: calc(2 * (100vw - 96px) * 1.294 + 40px); /* two letter pages stacked, plus padding */
+      max-height: 2200px;
+      min-height: 1400px;
+      border: 0;
+      background: #2e2e30;
+      box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(216, 211, 196, 0.10);
     }
+
     .fallback {
-      position: absolute;
-      inset: 0;
-      display: flex;
+      position: relative;
+      z-index: 1;
+      display: none;
       align-items: center;
       justify-content: center;
       flex-direction: column;
       gap: 14px;
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(216,211,196,0.6);
+      padding: 80px 24px;
       text-align: center;
-      padding: 20px;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(216, 211, 196, 0.6);
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      padding: 28px clamp(16px, 4vw, 48px) 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(216, 211, 196, 0.4);
+      border-top: 1px solid rgba(216, 211, 196, 0.12);
     }
 
     @media (max-width: 640px) {
-      header { padding: 14px 18px; }
+      header { padding: 12px 18px; }
       header .title { font-size: 10px; letter-spacing: 0.22em; }
       .btn { padding: 8px 14px; font-size: 9px; letter-spacing: 0.22em; }
+      .pdf-iframe {
+        height: calc(2 * (100vw - 32px) * 1.294 + 40px);
+        min-height: 1100px;
+      }
     }
   </style>
 </head>
@@ -144,32 +163,39 @@
       <span class="sub">v 0.1</span>
     </div>
     <div class="actions">
-      <a class="btn" href="uploads/Arcane.otf?v=2" download="Arcane.otf">Download <span class="ext">.otf</span></a>
-      <a class="btn" href="uploads/Arcane.ttf?v=2" download="Arcane.ttf">Download <span class="ext">.ttf</span></a>
+      <a class="btn" href="uploads/Arcane.otf?v=3" download="Arcane.otf">Download <span class="ext">.otf</span></a>
+      <a class="btn" href="uploads/Arcane.ttf?v=3" download="Arcane.ttf">Download <span class="ext">.ttf</span></a>
+      <a class="btn" href="uploads/Arcane-Specimen-v3.pdf" target="_blank" rel="noopener noreferrer">Open <span class="ext">.pdf</span></a>
       <a class="btn back" href="index.html">← Return</a>
     </div>
   </header>
 
-  <div class="pdf-wrap">
+  <section class="pdf-wrap">
     <iframe class="pdf-iframe"
-            src="uploads/Arcane-Specimen-v2.pdf#view=FitH&toolbar=1"
+            src="uploads/Arcane-Specimen-v3.pdf#view=FitH&toolbar=1"
             title="Arcane Typeface Specimen PDF"
             allowfullscreen></iframe>
-    <div class="fallback" id="pdfFallback" hidden>
+    <div class="fallback" id="pdfFallback">
       <span>PDF preview isn't supported on this device.</span>
-      <a class="btn" href="uploads/Arcane-Specimen-v2.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+      <a class="btn" href="uploads/Arcane-Specimen-v3.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
     </div>
-  </div>
+  </section>
+
+  <footer>
+    <span>©2026 ZKA Studio</span>
+    <span>Arcane · v 0.1 · open edition</span>
+  </footer>
+
   <script>
-    // iOS Safari can't render PDFs inline — show fallback link.
-    (function() {
+    // iOS Safari can't render PDFs inline — show fallback link instead.
+    (function () {
       var ua = navigator.userAgent || '';
       var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
       if (isIOS) {
         var f = document.querySelector('.pdf-iframe');
         if (f) f.style.display = 'none';
         var fb = document.getElementById('pdfFallback');
-        if (fb) fb.hidden = false;
+        if (fb) fb.style.display = 'flex';
       }
     })();
   </script>
