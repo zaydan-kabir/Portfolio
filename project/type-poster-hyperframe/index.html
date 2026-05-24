@@ -14,56 +14,20 @@
       height: 100vh;
       overflow: hidden;
       background:
-        radial-gradient(ellipse at 50% 36%, #161310 0%, #0a0907 55%, #000 100%);
+        radial-gradient(ellipse at 50% 45%, #0a0a0a 0%, #050505 60%, #000 100%);
       isolation: isolate;
     }
 
-    /* Warm overhead spotlight — gallery wash */
-    .spotlight {
-      position: absolute;
-      left: 50%; top: -10%;
-      width: 140vmin; height: 140vmin;
-      transform: translateX(-50%);
-      background:
-        radial-gradient(ellipse at 50% 0%,
-          rgba(255, 200, 130, 0.20) 0%,
-          rgba(255, 200, 130, 0.08) 22%,
-          rgba(255, 200, 130, 0) 55%);
-      z-index: 0;
-      pointer-events: none;
-      filter: blur(1px);
-    }
-
-    /* Soft warm halo immediately behind the poster */
+    /* Soft warm halo behind the poster */
     .halo {
       position: absolute;
-      left: 50%; top: 48%;
-      width: 100vmin; height: 100vmin;
+      left: 50%; top: 50%;
+      width: 95vmin; height: 95vmin;
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle,
-        rgba(232, 188, 116, 0.20) 0%,
-        rgba(232, 188, 116, 0.08) 35%,
-        rgba(232, 188, 116, 0) 62%);
+      background: radial-gradient(circle, rgba(214, 168, 96, 0.16) 0%, rgba(214, 168, 96, 0) 60%);
       z-index: 0;
       pointer-events: none;
-      filter: blur(3px);
-    }
-
-    /* Floor shadow — long, soft */
-    .floor-shadow {
-      position: absolute;
-      left: 50%;
-      bottom: 6%;
-      width: 70vmin;
-      height: 28px;
-      transform: translateX(-50%);
-      background: radial-gradient(ellipse at center,
-        rgba(0,0,0,0.7) 0%,
-        rgba(0,0,0,0.4) 35%,
-        rgba(0,0,0,0) 70%);
-      filter: blur(8px);
-      z-index: 1;
-      pointer-events: none;
+      filter: blur(2px);
     }
 
     .page-stage {
@@ -71,113 +35,58 @@
       inset: 0;
       display: grid;
       place-items: center;
-      padding: clamp(16px, 3vh, 28px);
-      animation: rise 7s ease-in-out infinite;
+      padding: clamp(12px, 2.4vh, 22px);
+      animation: rise 6s ease-in-out infinite;
       will-change: transform;
       z-index: 2;
-    }
-
-    /* The actual poster with a fine mat-board border feel */
-    .page-frame {
-      position: relative;
-      display: inline-block;
-      padding: 0;
-      will-change: transform;
     }
 
     .page {
       display: block;
       width: auto;
-      height: min(92vh, 80vw);
-      max-height: calc(100vh - 32px);
-      max-width: calc(100vw - 32px);
+      height: min(96vh, 84vw);
+      max-height: calc(100vh - 24px);
+      max-width: calc(100vw - 24px);
       object-fit: contain;
       background: #d9cdb0;
       box-shadow:
-        /* Crisp inner edge */
-        0 0 0 1px rgba(255, 230, 180, 0.10),
-        /* Tight contact shadow */
-        0 4px 10px rgba(0,0,0,0.55),
-        /* Mid-depth shadow */
-        0 18px 36px rgba(0,0,0,0.65),
-        /* Long, soft ambient shadow */
-        0 60px 120px rgba(0,0,0,0.75),
-        /* Subtle warm glow bleed */
-        0 0 80px rgba(232, 188, 116, 0.08);
-    }
-
-    /* Light sweep across the poster — gentle gloss */
-    .gloss {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(115deg,
-        rgba(255, 240, 210, 0) 35%,
-        rgba(255, 240, 210, 0.06) 48%,
-        rgba(255, 240, 210, 0) 62%);
-      pointer-events: none;
-      mix-blend-mode: screen;
-      animation: sweep 9s ease-in-out infinite;
-      will-change: transform, opacity;
+        0 40px 80px rgba(0,0,0,0.78),
+        0 0 0 1px rgba(255, 230, 180, 0.08);
     }
 
     @keyframes rise {
       0%, 100% { transform: translateY(0) scale(1); }
-      50%      { transform: translateY(-7px) scale(1.006); }
+      50%      { transform: translateY(-6px) scale(1.005); }
     }
 
-    @keyframes sweep {
-      0%   { transform: translateX(-15%); opacity: 0; }
-      30%  { opacity: 1; }
-      70%  { opacity: 1; }
-      100% { transform: translateX(15%);  opacity: 0; }
-    }
-
-    /* Film grain */
+    /* Subtle film grain over the whole composition */
     .grain {
       position: absolute;
       inset: 0;
       pointer-events: none;
-      opacity: 0.08;
+      opacity: 0.07;
       mix-blend-mode: overlay;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 200px 200px;
       z-index: 5;
     }
 
-    /* Deep edge vignette so the corners disappear into black */
-    .vignette {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 6;
-      background: radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(0,0,0,0.55) 100%);
-    }
-
     @media (prefers-reduced-motion: reduce) {
       .page-stage { animation: none; }
-      .gloss { animation: none; opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <div data-composition-id="type-poster-preview" data-width="1280" data-height="982" data-duration="9" data-start="0" data-track-index="0">
-    <div class="spotlight"></div>
+  <div data-composition-id="type-poster-preview" data-width="1280" data-height="982" data-duration="6" data-start="0" data-track-index="0">
     <div class="halo"></div>
-    <div class="floor-shadow"></div>
-
     <div class="page-stage">
-      <div class="page-frame">
-        <img class="page"
-             src="../uploads/Type%20Design%20Risograph%20Poster.png?v=20260524"
-             alt="Type Design Poster — Arcane"
-             decoding="async"
-             loading="eager"
-             fetchpriority="high">
-        <div class="gloss"></div>
-      </div>
+      <img class="page"
+           src="../uploads/Type%20Design%20Risograph%20Poster.png?v=20260524"
+           alt="Type Design Poster — Arcane"
+           decoding="async"
+           loading="eager"
+           fetchpriority="high">
     </div>
-
-    <div class="vignette"></div>
     <div class="grain"></div>
   </div>
 </body>
