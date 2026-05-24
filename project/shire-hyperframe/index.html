@@ -133,56 +133,6 @@
       clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
     }
 
-    /* Vault-Tec badge */
-    .badge {
-      position: absolute;
-      top: 9%; left: 3%;
-      width: clamp(80px, 9vw, 140px);
-      aspect-ratio: 1;
-      border: 3px solid #0c0c0c;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      font-family: 'Bebas Neue', sans-serif;
-      color: #0c0c0c;
-      background: rgba(255,255,255,0.06);
-      z-index: 10;
-      transform: rotate(-6deg);
-    }
-    .badge::before {
-      content: '';
-      position: absolute;
-      inset: 5px;
-      border: 1.5px solid #0c0c0c;
-      border-radius: 50%;
-    }
-    .badge .big { font-size: clamp(20px, 2.6vw, 36px); line-height: 1; letter-spacing: 0.04em; }
-    .badge .sml { font-size: clamp(8px, 0.9vw, 11px); letter-spacing: 0.3em; margin-top: 4px; }
-
-    /* "Approved by RobCo" stamp bottom-right */
-    .stamp {
-      position: absolute;
-      right: 5%; bottom: 10%;
-      transform: rotate(-8deg);
-      border: 2.5px solid #1a1a1a;
-      padding: 8px 16px 10px;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(13px, 1.4vw, 19px);
-      letter-spacing: 0.32em;
-      color: #1a1a1a;
-      z-index: 10;
-      background: rgba(0,0,0,0.04);
-      text-align: center;
-    }
-    .stamp::after {
-      content: '';
-      position: absolute;
-      inset: 3px;
-      border: 1px solid rgba(26,26,26,0.45);
-    }
-
     /* Heavy film grain */
     .grain {
       position: absolute;
@@ -267,7 +217,6 @@
       .vb { height: auto; max-height: 50%; }
       .title-block { align-items: center; text-align: center; }
       .title { transform: none; }
-      .badge { top: 8.5%; left: 6%; }
     }
   </style>
 </head>
@@ -279,69 +228,203 @@
     <div class="perf l"></div>
     <div class="perf r"></div>
 
-    <div class="badge">
-      <span class="big">V/T</span>
-      <span class="sml">VAULT-TEC</span>
-    </div>
-
     <div class="stage">
       <div class="scene">
 
-        <!-- Vault-Boy style cartoon figure: bald, big eyes, thumbs up -->
         <div class="vb">
-          <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <g fill="none" stroke="#0c0c0c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-              <!-- Head -->
-              <ellipse cx="200" cy="130" rx="110" ry="120" fill="#f0eadb"/>
-              <!-- Hair tuft / curl -->
-              <path d="M150 50 Q 165 30 185 42 Q 210 25 230 45 Q 250 30 268 50"
-                    stroke-width="7"/>
-              <!-- Eyes -->
-              <circle cx="160" cy="135" r="12" fill="#0c0c0c"/>
-              <circle cx="240" cy="135" r="12" fill="#0c0c0c"/>
-              <circle cx="156" cy="131" r="3" fill="#f0eadb"/>
-              <circle cx="236" cy="131" r="3" fill="#f0eadb"/>
-              <!-- Brows -->
-              <path d="M140 108 Q 160 100 180 110" stroke-width="6"/>
-              <path d="M220 110 Q 240 100 260 108" stroke-width="6"/>
-              <!-- Nose -->
-              <path d="M200 145 Q 200 170 210 178" stroke-width="5"/>
-              <!-- Smile -->
-              <path d="M150 190 Q 200 230 250 190" stroke-width="6"/>
-              <!-- Cheek line -->
-              <path d="M260 175 Q 275 185 270 200" stroke-width="3"/>
-              <!-- Ear -->
-              <path d="M85 130 Q 70 140 78 165 Q 88 175 96 168" stroke-width="5"/>
-              <!-- Neck -->
-              <path d="M170 240 L 168 270" stroke-width="6"/>
-              <path d="M230 240 L 232 270" stroke-width="6"/>
-              <!-- Collar / shoulders -->
-              <path d="M120 290 Q 200 268 280 290" stroke-width="6" fill="#d8d1bf"/>
-              <!-- Jumpsuit body -->
-              <path d="M120 290 L 110 480 L 290 480 L 280 290 Z" fill="#c4bca7" stroke-width="6"/>
-              <!-- Center seam -->
-              <path d="M200 290 L 200 480" stroke-width="4" stroke-dasharray="4 6"/>
-              <!-- Vault number patch -->
-              <rect x="155" y="345" width="90" height="50" fill="#f0eadb" stroke-width="4"/>
-              <text x="200" y="383" text-anchor="middle" font-family="Bowlby One SC, Bebas Neue, sans-serif" font-size="36" fill="#0c0c0c" stroke="none">76</text>
-              <!-- Thumbs-up arm (right) -->
-              <path d="M280 300 Q 340 290 360 240 Q 365 220 350 210 Q 335 205 332 220 Q 332 195 320 195 Q 305 195 308 215 Q 308 195 297 198 Q 285 202 290 225 Q 290 210 280 215 Q 270 220 275 240 L 290 260"
-                    fill="#f0eadb" stroke-width="5"/>
-              <!-- Left arm down -->
-              <path d="M120 295 Q 95 360 100 430 L 130 430 Q 132 370 140 310 Z" fill="#c4bca7" stroke-width="6"/>
-              <!-- Left hand -->
-              <ellipse cx="115" cy="440" rx="22" ry="18" fill="#f0eadb" stroke-width="5"/>
+          <svg viewBox="0 0 460 540" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <style>
+                .skin { fill: #f3ecda; }
+                .suit { fill: #b8b0a0; }
+                .suit-d { fill: #8d8678; }
+                .ink { fill: #0c0c0c; }
+                .stroke { fill: none; stroke: #0c0c0c; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+                .stroke-thin { fill: none; stroke: #0c0c0c; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+              </style>
+            </defs>
+
+            <!-- ============ BODY (drawn behind head so head sits on top) ============ -->
+            <!-- Torso / jumpsuit -->
+            <path class="suit" d="
+              M 130 320
+              Q 130 300 150 295
+              L 200 282
+              Q 230 276 260 282
+              L 310 295
+              Q 330 300 330 320
+              L 340 510
+              L 120 510
+              Z" />
+            <path class="stroke" d="
+              M 130 320
+              Q 130 300 150 295
+              L 200 282
+              Q 230 276 260 282
+              L 310 295
+              Q 330 300 330 320
+              L 340 510
+              L 120 510
+              L 130 320 Z" />
+
+            <!-- Collar V -->
+            <path class="suit-d" d="M 190 285 L 230 325 L 270 285 Z"/>
+            <path class="stroke-thin" d="M 190 285 L 230 325 L 270 285"/>
+
+            <!-- Center seam -->
+            <path class="stroke-thin" stroke-dasharray="5 7" d="M 230 330 L 230 505"/>
+
+            <!-- Left arm (down, with hand on hip) -->
+            <path class="suit" d="
+              M 132 322
+              Q 100 360 96 430
+              Q 95 460 116 470
+              Q 140 478 148 455
+              Q 154 410 162 360
+              Z"/>
+            <path class="stroke" d="
+              M 132 322
+              Q 100 360 96 430
+              Q 95 460 116 470
+              Q 140 478 148 455"/>
+            <!-- Left glove -->
+            <ellipse class="skin" cx="124" cy="468" rx="26" ry="20"/>
+            <path class="stroke" d="M 102 460 Q 102 488 124 488 Q 150 488 148 460"/>
+            <path class="stroke-thin" d="M 110 472 L 138 472"/>
+
+            <!-- Right arm — raised, ending in a thumbs-up -->
+            <path class="suit" d="
+              M 320 305
+              Q 360 280 372 230
+              Q 376 200 360 195
+              Q 348 195 348 215
+              L 346 240
+              L 322 285
+              Z"/>
+            <path class="stroke" d="
+              M 320 305
+              Q 360 280 372 230
+              Q 376 200 360 195
+              Q 348 195 348 215
+              L 346 240"/>
+
+            <!-- Hand / thumbs-up -->
+            <g transform="translate(348 180) rotate(-15)">
+              <!-- Fist -->
+              <path class="skin" d="
+                M 0 0
+                Q -4 -32 24 -34
+                Q 50 -34 50 -8
+                Q 50 8 44 18
+                L 40 36
+                Q 36 50 14 50
+                Q -6 50 -6 32 Z"/>
+              <path class="stroke" d="
+                M 0 0
+                Q -4 -32 24 -34
+                Q 50 -34 50 -8
+                Q 50 8 44 18
+                L 40 36
+                Q 36 50 14 50
+                Q -6 50 -6 32"/>
+              <!-- Thumb sticking up -->
+              <path class="skin" d="
+                M 16 -8
+                Q 8 -40 22 -56
+                Q 38 -64 44 -50
+                Q 46 -32 38 -16 Z"/>
+              <path class="stroke" d="
+                M 16 -8
+                Q 8 -40 22 -56
+                Q 38 -64 44 -50
+                Q 46 -32 38 -16"/>
+              <!-- Knuckle creases -->
+              <path class="stroke-thin" d="M 4 6 Q 24 14 44 4"/>
+              <path class="stroke-thin" d="M 6 22 Q 24 30 42 22"/>
             </g>
+
+            <!-- ============ HEAD ============ -->
+            <!-- Head shape -->
+            <path class="skin" d="
+              M 230 60
+              Q 350 60 350 175
+              Q 350 270 270 290
+              Q 260 295 230 295
+              Q 200 295 190 290
+              Q 110 270 110 175
+              Q 110 60 230 60 Z"/>
+            <path class="stroke" d="
+              M 230 60
+              Q 350 60 350 175
+              Q 350 270 270 290
+              Q 260 295 230 295
+              Q 200 295 190 290
+              Q 110 270 110 175
+              Q 110 60 230 60 Z"/>
+
+            <!-- Hair — side-parted with a curl -->
+            <path class="ink" d="
+              M 150 78
+              Q 175 50 215 55
+              Q 250 35 290 60
+              Q 325 60 332 105
+              Q 310 90 280 92
+              Q 260 75 235 86
+              Q 215 70 195 86
+              Q 175 72 156 95
+              Q 150 100 150 78 Z"/>
+            <!-- Forehead curl -->
+            <path class="ink" d="
+              M 248 88
+              Q 268 80 280 95
+              Q 286 110 270 116
+              Q 256 116 252 104 Z"/>
+
+            <!-- Ears -->
+            <path class="skin" d="M 106 165 Q 90 178 96 200 Q 104 215 118 210 Z"/>
+            <path class="stroke" d="M 106 165 Q 90 178 96 200 Q 104 215 118 210"/>
+            <path class="stroke-thin" d="M 104 180 Q 108 192 116 196"/>
+
+            <path class="skin" d="M 354 165 Q 370 178 364 200 Q 356 215 342 210 Z"/>
+            <path class="stroke" d="M 354 165 Q 370 178 364 200 Q 356 215 342 210"/>
+            <path class="stroke-thin" d="M 356 180 Q 352 192 344 196"/>
+
+            <!-- Eyebrows -->
+            <path class="stroke" stroke-width="8" d="M 168 152 Q 195 142 220 154"/>
+            <path class="stroke" stroke-width="8" d="M 248 154 Q 273 142 300 152"/>
+
+            <!-- Eyes -->
+            <circle class="ink" cx="194" cy="180" r="14"/>
+            <circle class="ink" cx="274" cy="180" r="14"/>
+            <!-- Highlights -->
+            <circle cx="190" cy="175" r="3.5" fill="#f3ecda"/>
+            <circle cx="270" cy="175" r="3.5" fill="#f3ecda"/>
+
+            <!-- Nose -->
+            <path class="stroke" d="M 234 190 Q 234 222 246 232 Q 240 240 230 238"/>
+
+            <!-- Smile with teeth -->
+            <path class="skin" d="M 178 252 Q 234 290 290 252 Q 280 268 234 274 Q 188 268 178 252 Z"/>
+            <path class="stroke" d="M 178 252 Q 234 290 290 252"/>
+            <path class="stroke-thin" d="M 192 256 Q 234 268 276 256"/>
+            <!-- Tooth divider -->
+            <path class="stroke-thin" d="M 226 254 L 226 268"/>
+            <path class="stroke-thin" d="M 244 254 L 244 268"/>
+
+            <!-- Cheek line -->
+            <path class="stroke-thin" d="M 300 222 Q 314 234 308 246"/>
+
+            <!-- Chin shadow -->
+            <path class="stroke-thin" d="M 210 280 Q 230 287 252 280"/>
           </svg>
         </div>
 
-        <!-- Title block -->
         <div class="title-block">
-          <div class="pre">A VAULT-TEC PRESENTATION</div>
+          <div class="pre">Coming soon to a screen near you</div>
           <div class="title">SHIRE</div>
           <div class="sub">
             <strong>Currently in development.</strong><br>
-            A handy little system for the post-war designer. UI/UX, system design, and a healthy dose of design thinking — all in one tidy package!
+            A handy little system for the modern designer. UI/UX, system design, and a healthy dose of design thinking — all in one tidy package!
           </div>
           <div class="stars">
             <span class="star"></span><span class="star"></span><span class="star"></span>
@@ -353,10 +436,6 @@
     </div>
 
     <div class="reel">REEL 03 · 2:32 / 7:14</div>
-
-    <div class="stamp">
-      Approved<br>by RobCo
-    </div>
 
     <div class="vignette"></div>
     <div class="flicker"></div>
