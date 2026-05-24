@@ -96,22 +96,22 @@
     .btn.back { border-color: rgba(216, 211, 196, 0.22); color: rgba(216, 211, 196, 0.7); }
     .btn.back:hover { background: rgba(216, 211, 196, 0.08); color: #d8d3c4; border-color: rgba(216, 211, 196, 0.5); }
 
-    /* Page is naturally scrollable. PDF block has a generous height. */
+    /* Page is naturally scrollable. PDF block sized so the page fits the viewport (with toolbar) — user can see more without big scroll. */
     .pdf-wrap {
       position: relative;
       z-index: 1;
-      padding: 28px clamp(16px, 4vw, 48px) 48px;
+      padding: 20px clamp(16px, 4vw, 48px) 36px;
     }
     .pdf-iframe {
       display: block;
       width: 100%;
-      height: calc(2 * (100vw - 96px) * 1.294 + 40px); /* two letter pages stacked, plus padding */
-      max-height: 2200px;
-      min-height: 1400px;
+      height: calc(100vh - 140px);
+      min-height: 520px;
+      max-height: 900px;
       border: 0;
       background: #2e2e30;
       box-shadow:
-        0 30px 60px rgba(0, 0, 0, 0.5),
+        0 24px 50px rgba(0, 0, 0, 0.55),
         0 0 0 1px rgba(216, 211, 196, 0.10);
     }
 
@@ -150,8 +150,8 @@
       header .title { font-size: 10px; letter-spacing: 0.22em; }
       .btn { padding: 8px 14px; font-size: 9px; letter-spacing: 0.22em; }
       .pdf-iframe {
-        height: calc(2 * (100vw - 32px) * 1.294 + 40px);
-        min-height: 1100px;
+        height: calc(100vh - 180px);
+        min-height: 480px;
       }
     }
   </style>
@@ -165,19 +165,19 @@
     <div class="actions">
       <a class="btn" href="uploads/Arcane.otf?v=3" download="Arcane.otf">Download <span class="ext">.otf</span></a>
       <a class="btn" href="uploads/Arcane.ttf?v=3" download="Arcane.ttf">Download <span class="ext">.ttf</span></a>
-      <a class="btn" href="uploads/Arcane-Specimen-v3.pdf" target="_blank" rel="noopener noreferrer">Open <span class="ext">.pdf</span></a>
+      <a class="btn" href="uploads/Arcane-Specimen-v4.pdf" target="_blank" rel="noopener noreferrer">Open <span class="ext">.pdf</span></a>
       <a class="btn back" href="index.html">← Return</a>
     </div>
   </header>
 
   <section class="pdf-wrap">
     <iframe class="pdf-iframe"
-            src="uploads/Arcane-Specimen-v3.pdf#view=FitH&toolbar=1"
+            src="uploads/Arcane-Specimen-v4.pdf#view=FitH&toolbar=1"
             title="Arcane Typeface Specimen PDF"
             allowfullscreen></iframe>
     <div class="fallback" id="pdfFallback">
       <span>PDF preview isn't supported on this device.</span>
-      <a class="btn" href="uploads/Arcane-Specimen-v3.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+      <a class="btn" href="uploads/Arcane-Specimen-v4.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
     </div>
   </section>
 
