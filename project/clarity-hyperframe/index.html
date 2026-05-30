@@ -16,6 +16,38 @@
       color: rgba(255,255,255,.74);
       font-family: Georgia, 'Times New Roman', serif;
     }
+    /* Floating gradient blobs — matches Book Cover / Type Design Poster tiles */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      mix-blend-mode: multiply;
+      opacity: 0.78;
+      will-change: transform;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .blob.b1 { width: 56vmin; height: 56vmin; left: -10%; top: -8%;
+      background: radial-gradient(circle, #ff5fa3 0%, #ff2e85 55%, transparent 72%);
+      animation: drift-1 18s ease-in-out infinite; }
+    .blob.b2 { width: 64vmin; height: 64vmin; right: -12%; top: 15%;
+      background: radial-gradient(circle, #ffb84a 0%, #ff7e36 55%, transparent 72%);
+      animation: drift-2 22s ease-in-out infinite; }
+    .blob.b3 { width: 50vmin; height: 50vmin; left: 18%; bottom: -10%;
+      background: radial-gradient(circle, #7d6cff 0%, #5d4aff 55%, transparent 72%);
+      animation: drift-3 26s ease-in-out infinite; }
+    .blob.b4 { width: 44vmin; height: 44vmin; right: 8%; bottom: -6%;
+      background: radial-gradient(circle, #2ed8b6 0%, #14b591 55%, transparent 72%);
+      animation: drift-4 20s ease-in-out infinite; }
+    .blob.b5 { width: 38vmin; height: 38vmin; left: 42%; top: 28%;
+      background: radial-gradient(circle, #ff6f3c 0%, #ff3c1e 55%, transparent 72%);
+      animation: drift-5 16s ease-in-out infinite; opacity: 0.55; }
+    @keyframes drift-1 { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(20vmin,14vmin) scale(1.1);} 66%{transform:translate(8vmin,28vmin) scale(0.95);} }
+    @keyframes drift-2 { 0%,100%{transform:translate(0,0) scale(1);} 40%{transform:translate(-22vmin,18vmin) scale(1.08);} 75%{transform:translate(-10vmin,-8vmin) scale(0.92);} }
+    @keyframes drift-3 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(14vmin,-22vmin) scale(1.15);} }
+    @keyframes drift-4 { 0%,100%{transform:translate(0,0) scale(1);} 40%{transform:translate(-16vmin,-18vmin) scale(0.9);} 75%{transform:translate(6vmin,-10vmin) scale(1.1);} }
+    @keyframes drift-5 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-18vmin,12vmin) scale(1.2);} }
+
     .stage {
       position: relative;
       width: 100%;
@@ -24,6 +56,7 @@
       align-items: center;
       justify-content: center;
       padding: 1.5%;
+      z-index: 2;
     }
     .laptop {
       position: relative;
@@ -278,6 +311,11 @@
 </head>
 <body>
   <div data-composition-id="clarity-preview" data-width="1512" data-height="982" data-duration="8" data-start="0" data-track-index="0">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="blob b4"></div>
+    <div class="blob b5"></div>
     <div class="stage">
       <div class="laptop">
         <div class="lid">
