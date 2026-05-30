@@ -6,28 +6,90 @@
   <title>Type Design Poster HyperFrame Preview</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #f3e8e0; }
 
     [data-composition-id="type-poster-preview"] {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background:
-        radial-gradient(ellipse at 50% 45%, #120808 0%, #070303 60%, #000 100%);
+      background: linear-gradient(180deg, #f7ecdf 0%, #ecd9d2 100%);
       isolation: isolate;
     }
 
-    /* Soft warm halo behind the poster */
-    .halo {
+    /* Floating gradient blobs */
+    .blob {
       position: absolute;
-      left: 50%; top: 50%;
-      width: 95vmin; height: 95vmin;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(255, 120, 96, 0.22) 0%, rgba(255, 120, 96, 0) 60%);
-      z-index: 0;
+      border-radius: 50%;
+      filter: blur(60px);
+      mix-blend-mode: multiply;
+      opacity: 0.78;
+      will-change: transform;
+      z-index: 1;
       pointer-events: none;
-      filter: blur(2px);
+    }
+    .blob.b1 {
+      width: 56vmin; height: 56vmin;
+      left: -10%; top: -8%;
+      background: radial-gradient(circle, #ff5fa3 0%, #ff2e85 55%, transparent 72%);
+      animation: drift-1 18s ease-in-out infinite;
+    }
+    .blob.b2 {
+      width: 64vmin; height: 64vmin;
+      right: -12%; top: 15%;
+      background: radial-gradient(circle, #ffb84a 0%, #ff7e36 55%, transparent 72%);
+      animation: drift-2 22s ease-in-out infinite;
+    }
+    .blob.b3 {
+      width: 50vmin; height: 50vmin;
+      left: 18%; bottom: -10%;
+      background: radial-gradient(circle, #7d6cff 0%, #5d4aff 55%, transparent 72%);
+      animation: drift-3 26s ease-in-out infinite;
+    }
+    .blob.b4 {
+      width: 44vmin; height: 44vmin;
+      right: 8%; bottom: -6%;
+      background: radial-gradient(circle, #2ed8b6 0%, #14b591 55%, transparent 72%);
+      animation: drift-4 20s ease-in-out infinite;
+    }
+    .blob.b5 {
+      width: 38vmin; height: 38vmin;
+      left: 42%; top: 28%;
+      background: radial-gradient(circle, #ff6f3c 0%, #ff3c1e 55%, transparent 72%);
+      animation: drift-5 16s ease-in-out infinite;
+      opacity: 0.55;
+    }
+
+    @keyframes drift-1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%      { transform: translate(20vmin, 14vmin) scale(1.1); }
+      66%      { transform: translate(8vmin, 28vmin) scale(0.95); }
+    }
+    @keyframes drift-2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      40%      { transform: translate(-22vmin, 18vmin) scale(1.08); }
+      75%      { transform: translate(-10vmin, -8vmin) scale(0.92); }
+    }
+    @keyframes drift-3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50%      { transform: translate(14vmin, -22vmin) scale(1.15); }
+    }
+    @keyframes drift-4 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      40%      { transform: translate(-16vmin, -18vmin) scale(0.9); }
+      75%      { transform: translate(6vmin, -10vmin) scale(1.1); }
+    }
+    @keyframes drift-5 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50%      { transform: translate(-18vmin, 12vmin) scale(1.2); }
+    }
+
+    .wash {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 50% 48%, rgba(255,245,235,0.32) 0%, rgba(255,245,235,0) 60%);
     }
 
     .page-stage {
@@ -35,31 +97,32 @@
       inset: 0;
       display: grid;
       place-items: center;
-      padding: clamp(12px, 2.4vh, 22px);
-      animation: rise 6s ease-in-out infinite;
+      padding: clamp(18px, 4vh, 34px);
+      animation: bob 7s ease-in-out infinite;
       will-change: transform;
-      z-index: 2;
+      z-index: 4;
     }
 
     .page {
       display: block;
       width: auto;
-      height: min(96vh, 84vw);
-      max-height: calc(100vh - 24px);
-      max-width: calc(100vw - 24px);
+      height: min(92vh, 80vw);
+      max-height: calc(100vh - 32px);
+      max-width: calc(100vw - 32px);
       object-fit: contain;
-      background: #f3d9d2;
+      background: #d9cdb0;
+      border-radius: 4px;
       box-shadow:
-        0 40px 80px rgba(0,0,0,0.78),
-        0 0 0 1px rgba(255, 200, 190, 0.10);
+        0 50px 100px rgba(80, 30, 60, 0.42),
+        0 12px 24px rgba(80, 30, 60, 0.22),
+        0 0 0 1px rgba(255, 250, 240, 0.35);
     }
 
-    @keyframes rise {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50%      { transform: translateY(-6px) scale(1.005); }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%      { transform: translateY(-10px) rotate(-0.3deg); }
     }
 
-    /* Subtle film grain over the whole composition */
     .grain {
       position: absolute;
       inset: 0;
@@ -68,20 +131,25 @@
       mix-blend-mode: overlay;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 200px 200px;
-      z-index: 5;
+      z-index: 8;
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .page-stage { animation: none; }
+      .page-stage, .blob { animation: none; }
     }
   </style>
 </head>
 <body>
   <div data-composition-id="type-poster-preview" data-width="1280" data-height="982" data-duration="6" data-start="0" data-track-index="0">
-    <div class="halo"></div>
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="blob b4"></div>
+    <div class="blob b5"></div>
+    <div class="wash"></div>
     <div class="page-stage">
       <img class="page"
-           src="../uploads/type-design-poster-copy.png?v=20260524-copy"
+           src="../uploads/type-design-poster-copy.png?v=20260529-blobs"
            alt="Type Design Poster — Arcane"
            decoding="async"
            loading="eager"
