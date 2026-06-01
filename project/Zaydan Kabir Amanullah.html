@@ -117,7 +117,8 @@
       z-index: 9500;
       display: flex; align-items: center; justify-content: center;
       transition: opacity 0.75s ease;
-      /* Swallow every click/touch so users can't bypass the intro. */
+      /* Sits above the page so nav clicks underneath are blocked — but the
+         screen itself still receives click events so users can opt to skip. */
       pointer-events: auto;
       cursor: none;
       user-select: none;
@@ -1469,8 +1470,13 @@ const zaydanAnimationReady = (() => {
   // do not let the final logo moment happen before the assets exist.
   zaydanAnimationReady.then(() => setTimeout(playIntro, 150));
 
-  // Intro plays in full — no click/key skip. The screen covers everything at
-  // z-index 9500 and auto-dismisses after landWordmark()'s hold.
+  // Skip on click or key — the animation still auto-plays in full if untouched.
+  screen.addEventListener('click', dismiss);
+  document.addEventListener('keydown', function skip(e) {
+    if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
+      dismiss(); document.removeEventListener('keydown', skip);
+    }
+  });
 })();
 </script>
 </body>
