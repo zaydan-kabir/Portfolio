@@ -462,7 +462,7 @@
 
   <main class="work-grid">
     <a class="grid-item" href="https://www.figma.com/proto/3dCviEDLEf30MnsgTHKnNu/Team-6?node-id=4437-308&amp;starting-point-node-id=4361%3A131" data-project-link="clarity" target="_blank" rel="noopener noreferrer" aria-label="Open Clarity Figma prototype">
-      <iframe src="clarity-hyperframe/index.html?v=20260529-blobs" title="Clarity animated preview" aria-hidden="true"></iframe>
+      <iframe data-src="clarity-hyperframe/index.html?v=20260529-blobs" title="Clarity animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay">
         <span class="item-name">Clarity</span>
         <span class="item-subtitle">Game Design, UI Design, Design Thinking</span>
@@ -470,32 +470,32 @@
     </a>
 
     <a class="grid-item" href="https://youtu.be/Q-NRXm59fLE" data-project-link="interstellar-automata" target="_blank" rel="noopener noreferrer" aria-label="Open Interstellar Automata video">
-      <iframe src="interstellar-automata-hyperframe/index.html" title="Interstellar Automata animated preview" aria-hidden="true"></iframe>
+      <iframe data-src="interstellar-automata-hyperframe/index.html" title="Interstellar Automata animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Interstellar Automata</span><span class="item-subtitle">Product Design</span></div>
     </a>
 
     <a class="grid-item" href="design-manifesto.html" target="_blank" rel="noopener noreferrer" data-project-link="design-manifesto" aria-label="Open Design Manifesto">
-      <iframe src="design-manifesto-hyperframe/index.html?v=20260508-bee-fig" title="Design Manifesto animated preview" aria-hidden="true"></iframe>
+      <iframe data-src="design-manifesto-hyperframe/index.html?v=20260508-bee-fig" title="Design Manifesto animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Design Manifesto</span><span class="item-subtitle">Creative Coding, UI Design</span></div>
     </a>
 
     <a class="grid-item" href="https://stanfordpoliticalreview.org/2026/04/22/animal-liberation-indigeneity-and-morality/" target="_blank" rel="noopener noreferrer" data-project-link="animal-liberation" aria-label="Read Animal Liberation, Indigeneity, and Morality at Stanford Political Review">
-      <iframe src="animal-liberation-hyperframe/index.html" title="Animal Liberation, Indigeneity, and Morality animated preview" aria-hidden="true"></iframe>
+      <iframe data-src="animal-liberation-hyperframe/index.html" title="Animal Liberation, Indigeneity, and Morality animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Animal Liberation, Indigeneity, and Morality</span><span class="item-subtitle">Stanford Political Review: Social Justice &amp; Law Paper</span></div>
     </a>
 
     <a class="grid-item" href="book-cover-redesign.html" target="_blank" rel="noopener noreferrer" data-project-link="book-cover-redesign" aria-label="Open Book Cover Re-Design — My Year of Rest and Relaxation">
-      <iframe src="book-cover-redesign-hyperframe/index.html?v=20260529-blobs" title="Book Cover Re-Design animated preview" aria-hidden="true"></iframe>
+      <iframe data-src="book-cover-redesign-hyperframe/index.html?v=20260529-blobs" title="Book Cover Re-Design animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Book Cover Re-Design</span><span class="item-subtitle">Digital Design, Graphic Design, Type Design</span></div>
     </a>
 
     <a class="grid-item" href="arcane-typeface.html?v=20260524-glyphs3" target="_blank" rel="noopener noreferrer" data-project-link="redacted-typeface" aria-label="Open Arcane typeface specimen PDF">
-      <iframe src="redacted-typeface-hyperframe/index.html?v=20260524-arcane-noghost" title="Arcane typeface animated preview" aria-hidden="true"></iframe>
+      <iframe data-src="redacted-typeface-hyperframe/index.html?v=20260524-arcane-noghost" title="Arcane typeface animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Typeface — Arcane</span><span class="item-subtitle">Type Design &amp; Web Design</span></div>
     </a>
 
     <a class="grid-item" href="uploads/Type%20Design%20Poster%20copy.pdf" target="_blank" rel="noopener noreferrer" data-project-link="type-poster" aria-label="Open Type Design Poster PDF">
-      <iframe src="type-poster-hyperframe/index.html?v=20260531-preview" title="Type Design Poster animated preview" aria-hidden="true"></iframe>
+      <iframe data-src="type-poster-hyperframe/index.html?v=20260531-preview" title="Type Design Poster animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Type Design Poster</span><span class="item-subtitle">Type Design, Print Design, Graphic Design</span></div>
     </a>
 
@@ -626,6 +626,24 @@
       stackMarquee.addEventListener('pointerup', endStackDrag);
       stackMarquee.addEventListener('pointercancel', endStackDrag);
     }
+  </script>
+
+  <script>
+    // Defer all hyperframe iframes until the rest of the page (fonts, images,
+    // tile chrome) has fully loaded — only then start their animations.
+    (function () {
+      function activateHyperframes() {
+        document.querySelectorAll('iframe[data-src]').forEach(function (f) {
+          var s = f.getAttribute('data-src');
+          if (s) { f.setAttribute('src', s); f.removeAttribute('data-src'); }
+        });
+      }
+      if (document.readyState === 'complete') {
+        activateHyperframes();
+      } else {
+        window.addEventListener('load', activateHyperframes, { once: true });
+      }
+    })();
   </script>
 </body>
 </html>
