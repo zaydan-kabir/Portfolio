@@ -388,6 +388,20 @@
       }
     }
   </style>
+  <style id="force-cursor-none">
+    /* Defensive: never let the OS cursor reappear (I-beam, pointer, grab, etc.) */
+    html, body, html *, html *::before, html *::after,
+    a, a:hover, a:active, a:focus, a:visited,
+    button, button:hover, button:active, button:focus, button:disabled,
+    input, input:hover, input:focus, input:active, input::placeholder,
+    textarea, textarea:hover, textarea:focus, textarea:active,
+    select, select:hover, select:focus,
+    label, summary, details, [role="button"], [tabindex],
+    iframe, img, video, canvas, svg, svg *,
+    ::selection, ::-moz-selection,
+    *:hover, *:active, *:focus, *:focus-visible, *:focus-within,
+    *::before, *::after { cursor: none !important; }
+  </style>
 </head>
 <body data-manifesto-page>
   <div id="safe-area-top"></div>
