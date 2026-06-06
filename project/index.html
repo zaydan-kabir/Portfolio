@@ -689,8 +689,9 @@
   })();
 
   // ── Img-box cursor labels ─────────────────────────────────────────
-  const imgLabels = { 'box-0': 'Magdalen College, Oxford', 'box-1': 'Community is everything', 'box-2': 'Looking for inspiration' };
+  const imgLabels = { 'box-0': 'Magdalen College, Oxford', 'box-2': 'Looking for inspiration' };
   document.querySelectorAll('.img-box').forEach(el => {
+    if (!imgLabels[el.id]) return;
     el.addEventListener('mouseenter', () => { cursorLabel.textContent = imgLabels[el.id]||''; document.body.classList.add('img-hover'); });
     el.addEventListener('mouseleave', () => { document.body.classList.remove('img-hover'); cursorLabel.textContent = ''; });
   });
