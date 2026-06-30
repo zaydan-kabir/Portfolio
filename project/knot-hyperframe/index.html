@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Knot HyperFrame Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #ffffff; }
+
+  [data-composition-id="knot-preview"] {
+    position: relative;
+    width: 100vw; height: 100vh;
+    background:
+      radial-gradient(ellipse at 50% 60%, rgba(20,20,20,.05) 0%, rgba(20,20,20,0) 60%),
+      #ffffff;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  /* isometric scene container — locked aspect, scaled to fit */
+  .scene {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+  }
+  .stage {
+    position: relative;
+    width: min(72vmin, 92%);
+    aspect-ratio: 1 / 1;
+    transform-style: preserve-3d;
+  }
+
+  /* ---- Ground shadow ---- */
+  .ground {
+    position: absolute;
+    left: 14%; top: 56%;
+    width: 72%; height: 22%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(20,20,20,.08) 0%, rgba(20,20,20,0) 65%);
+    z-index: 0;
+  }
+
+  /* ---- YOUR APP (top-left green square) ---- */
+  .your-app {
+    position: absolute;
+    left: 4%; top: 6%;
+    width: 26%; aspect-ratio: 1 / 1;
+    background: #c2f2c8;
+    border: 2.5px solid #0a0a0a;
+    border-radius: 14%;
+    box-shadow: 6px 8px 0 #0a0a0a;
+    display: grid; place-items: center;
+    transform: rotate(-1deg);
+    z-index: 6;
+    animation: float-a 6s ease-in-out infinite;
+  }
+  .your-app span {
+    font-weight: 800;
+    font-size: clamp(14px, 2.8vmin, 28px);
+    color: #0a0a0a;
+    letter-spacing: .04em;
+    line-height: 1;
+    text-align: center;
+  }
+
+  /* ---- Knot logo (center black square with k) ---- */
+  .knot {
+    position: absolute;
+    left: 38%; top: 30%;
+    width: 28%; aspect-ratio: 1 / 1;
+    background: #0a0a0a;
+    border: 2.5px solid #0a0a0a;
+    border-radius: 14%;
+    box-shadow: 8px 10px 0 #0a0a0a;
+    display: grid; place-items: center;
+    z-index: 7;
+    animation: float-b 7s ease-in-out infinite;
+  }
+  .knot .k {
+    color: #fff;
+    font-weight: 800;
+    font-size: clamp(36px, 9vmin, 80px);
+    line-height: 1;
+    transform: translateY(-0.04em);
+  }
+
+  /* ---- Phone (right) with merchant tiles ---- */
+  .phone {
+    position: absolute;
+    right: 2%; top: 24%;
+    width: 30%; aspect-ratio: 9 / 17;
+    background: #fff;
+    border: 2.5px solid #0a0a0a;
+    border-radius: 16% / 9%;
+    box-shadow: 7px 10px 0 #0a0a0a;
+    padding: 9% 8%;
+    z-index: 6;
+    animation: float-c 6.5s ease-in-out infinite;
+  }
+  .phone::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 4%;
+    width: 22%; height: 4%;
+    border-radius: 999px;
+    background: #0a0a0a;
+    transform: translateX(-50%);
+  }
+  .phone-grid {
+    width: 100%; height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8%;
+    padding-top: 14%;
+  }
+  .merchant {
+    border: 2px solid #0a0a0a;
+    border-radius: 18%;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: clamp(12px, 2.4vmin, 22px);
+    color: #fff;
+    letter-spacing: -0.02em;
+    overflow: hidden;
+    position: relative;
+  }
+  .m-amazon { background: #ffeacd; color: #0a0a0a; }
+  .m-amazon::after { content: ''; position: absolute; left: 14%; right: 14%; bottom: 24%; height: 18%; background: linear-gradient(90deg, #ff9900, #ffb84d); border-radius: 60%; }
+  .m-amazon::before { content: 'a'; font-family: 'Inter'; font-weight: 800; font-size: 200%; line-height: 1; color: #0a0a0a; transform: translateY(-6%); }
+  .m-target { background: #e60020; }
+  .m-target::after { content: ''; width: 56%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #e60020 0%, #e60020 22%, #fff 22%, #fff 38%, #e60020 38%, #e60020 56%, #fff 56%, #fff 72%, #e60020 72%); }
+  .m-walmart { background: #0072ce; }
+  .m-walmart::after { content: '✺'; color: #ffc220; font-size: 220%; line-height: 1; }
+  .m-uber { background: #0a0a0a; }
+  .m-uber::after { content: 'Uber'; color: #fff; font-size: 120%; font-weight: 800; letter-spacing: -0.02em; }
+
+  /* ---- Floating product cards (left) ---- */
+  .cards {
+    position: absolute;
+    left: 2%; top: 38%;
+    width: 38%;
+    display: flex;
+    flex-direction: column;
+    gap: 4%;
+    z-index: 8;
+  }
+  .card {
+    background: #fff;
+    border: 2.5px solid #0a0a0a;
+    border-radius: 16px;
+    box-shadow: 5px 7px 0 #0a0a0a;
+    padding: 5% 6%;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4%;
+    align-items: center;
+    position: relative;
+    transform-origin: center left;
+    animation: card-in 9s ease-in-out infinite;
+  }
+  .card:nth-child(1) { animation-delay: 0s; }
+  .card:nth-child(2) { animation-delay: 0.35s; }
+  .card:nth-child(3) { animation-delay: 0.7s; }
+  .card .icon {
+    width: clamp(20px, 3.4vmin, 36px);
+    aspect-ratio: 1;
+    display: grid; place-items: center;
+    font-size: clamp(14px, 2.4vmin, 26px);
+  }
+  .card .text {
+    line-height: 1.1;
+  }
+  .card .title {
+    font-size: clamp(9px, 1.55vmin, 14px);
+    font-weight: 700;
+    color: #0a0a0a;
+    letter-spacing: -0.01em;
+  }
+  .card .price {
+    font-size: clamp(8px, 1.3vmin, 12px);
+    color: rgba(10,10,10,.6);
+    margin-top: 3px;
+    font-weight: 600;
+  }
+  .badge {
+    position: absolute;
+    right: -8%; bottom: -18%;
+    transform: rotate(-3deg);
+    padding: 4px 10px;
+    border: 2px solid #0a0a0a;
+    border-radius: 999px;
+    font-size: clamp(8px, 1.3vmin, 11px);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    background: #fff;
+    color: #0a0a0a;
+  }
+  .badge.hsa { background: #cfe9ff; }
+  .badge.shipped { background: #ffd1f0; }
+  .badge.delivered { background: #c4f3c8; }
+
+  /* ---- Connector lines (SVG overlay) ---- */
+  .wires {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    overflow: visible;
+  }
+  .wire {
+    fill: none;
+    stroke: #0a0a0a;
+    stroke-width: 0.6;
+    stroke-linecap: round;
+    stroke-dasharray: 1.6 2.4;
+    stroke-dashoffset: 0;
+    vector-effect: non-scaling-stroke;
+    animation: dash 4s linear infinite;
+  }
+  .wires .wire { stroke-width: 2.2; }
+  .wire.r { animation-direction: reverse; }
+
+  /* ---- Pulse dot moving along wire (data flow) ---- */
+  .pulse {
+    position: absolute;
+    width: 1.4vmin; height: 1.4vmin;
+    border-radius: 50%;
+    background: #0a0a0a;
+    box-shadow: 0 0 0 4px rgba(10,10,10,.12);
+    z-index: 9;
+  }
+  .pulse-a {
+    left: 30%; top: 23%;
+    animation: pulse-a 4.2s ease-in-out infinite;
+  }
+  .pulse-b {
+    right: 30%; top: 33%;
+    animation: pulse-b 4.6s ease-in-out infinite;
+  }
+
+  @keyframes dash {
+    to { stroke-dashoffset: -60; }
+  }
+  @keyframes float-a {
+    0%, 100% { transform: rotate(-1deg) translateY(0); }
+    50%      { transform: rotate(-1deg) translateY(-6px); }
+  }
+  @keyframes float-b {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-4px) scale(1.015); }
+  }
+  @keyframes float-c {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-5px); }
+  }
+  @keyframes card-in {
+    0%   { transform: translateX(0); opacity: 1; }
+    50%  { transform: translateX(2%) translateY(-3px); opacity: 1; }
+    100% { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes pulse-a {
+    0%   { left: 30%; top: 23%; opacity: 0; }
+    8%   { opacity: 1; }
+    50%  { left: 47%; top: 40%; opacity: 1; }
+    92%  { opacity: 1; }
+    100% { left: 30%; top: 23%; opacity: 0; }
+  }
+  @keyframes pulse-b {
+    0%   { right: 30%; top: 33%; opacity: 0; }
+    8%   { opacity: 1; }
+    50%  { right: 47%; top: 40%; opacity: 1; }
+    92%  { opacity: 1; }
+    100% { right: 30%; top: 33%; opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .your-app, .knot, .phone, .card, .wire, .pulse { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div data-composition-id="knot-preview" data-width="1280" data-height="982" data-duration="6" data-start="0" data-track-index="0">
+    <div class="scene">
+      <div class="stage">
+        <div class="ground"></div>
+
+        <svg class="wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <!-- YOUR APP -> knot logo -->
+          <path class="wire"   d="M 22 22 C 30 30, 40 32, 48 40" />
+          <!-- knot logo -> phone -->
+          <path class="wire r" d="M 60 40 C 70 36, 80 36, 86 32" />
+          <!-- cards -> knot logo -->
+          <path class="wire"   d="M 20 56 C 30 50, 40 46, 46 44" />
+        </svg>
+
+        <div class="your-app"><span>YOUR<br>APP</span></div>
+
+        <div class="knot"><span class="k">k</span></div>
+
+        <div class="phone">
+          <div class="phone-grid">
+            <div class="merchant m-amazon"></div>
+            <div class="merchant m-target"></div>
+            <div class="merchant m-walmart"></div>
+            <div class="merchant m-uber"></div>
+          </div>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <div class="icon">✈︎</div>
+            <div class="text">
+              <div class="title">Plush Foam Travel Neck Pillow — Green</div>
+              <div class="price">$12.56</div>
+            </div>
+            <div class="badge hsa">HSA Eligible</div>
+          </div>
+          <div class="card">
+            <div class="icon">👕</div>
+            <div class="text">
+              <div class="title">Men's Merino Wool Crew Sweater</div>
+              <div class="price">$186.75</div>
+            </div>
+            <div class="badge shipped">Shipped</div>
+          </div>
+          <div class="card">
+            <div class="icon">🍴</div>
+            <div class="text">
+              <div class="title">Chicken Tender Dinner Basket</div>
+              <div class="price">$12.98</div>
+            </div>
+            <div class="badge delivered">Delivered</div>
+          </div>
+        </div>
+
+        <span class="pulse pulse-a"></span>
+        <span class="pulse pulse-b"></span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
