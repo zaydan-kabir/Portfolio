@@ -4,159 +4,62 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Knot HyperFrame Preview</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@700&display=swap" rel="stylesheet" />
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
-  html, body { width:100%; height:100%; overflow:hidden; background:#000; }
-
-  [data-composition-id="knot-preview"] {
-    position: relative;
-    width: 100vw; height: 100vh;
-    overflow: hidden;
-    background:
-      radial-gradient(ellipse at 50% 42%, #1a1a1a 0%, #050505 60%, #000 100%);
-    isolation: isolate;
-    display: grid;
-    place-items: center;
-  }
-
-  .layer {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    pointer-events: none;
-  }
-
-  .mark {
-    font-family: 'DM Sans', system-ui, sans-serif;
-    font-weight: 700;
-    font-size: clamp(72px, 22vmin, 260px);
-    letter-spacing: -0.045em;
-    line-height: 1;
-    color: #ffffff;
-    will-change: filter, transform;
-  }
-  .mark.base { filter: url(#liquid-w); }
-  .mark.r-shift {
-    color: #ff5a5a;
-    filter: url(#liquid-r);
-    transform: translate(-4px, 1px);
-    mix-blend-mode: screen;
-    opacity: .78;
-  }
-  .mark.b-shift {
-    color: #4d90ff;
-    filter: url(#liquid-b);
-    transform: translate(4px, -1px);
-    mix-blend-mode: screen;
-    opacity: .78;
-  }
-
-  /* Rotating conic sheen — angle:70 in shader ≈ starting angle here */
-  .sheen {
-    position: absolute;
-    left: 50%; top: 50%;
-    width: 220vmax; height: 220vmax;
-    transform: translate(-50%, -50%);
-    background:
-      conic-gradient(from 70deg,
-        rgba(255,255,255,0) 0deg,
-        rgba(255,255,255,.11) 42deg,
-        rgba(255,255,255,0) 92deg,
-        rgba(255,255,255,.06) 210deg,
-        rgba(255,255,255,0) 300deg);
-    mix-blend-mode: overlay;
-    animation: spin 24s linear infinite;
-    z-index: 4;
-    pointer-events: none;
-  }
-  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-
-  /* Metallic contour glow ring behind the mark */
-  .halo {
-    position: absolute;
-    left: 50%; top: 50%;
-    width: 70vmin; height: 30vmin;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(ellipse, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 60%);
-    filter: blur(30px);
-    z-index: 1;
-    pointer-events: none;
-    animation: pulse 6s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: .8; transform: translate(-50%, -50%) scale(1); }
-    50%     { opacity: 1;  transform: translate(-50%, -50%) scale(1.06); }
-  }
-
-  .grain {
-    position: absolute;
-    inset: 0;
-    z-index: 8;
-    pointer-events: none;
-    opacity: .07;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
-    background-size: 220px 220px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .sheen, .halo { animation: none; }
-    .mark.base, .mark.r-shift, .mark.b-shift { filter: none; }
-  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+  #root { width: 100vw; height: 100vh; display: block; }
+  #root canvas { display: block; width: 100% !important; height: 100% !important; }
 </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "@paper-design/shaders-react": "https://esm.sh/@paper-design/shaders-react?deps=react@18.3.1,react-dom@18.3.1&bundle"
+  }
+}
+</script>
 </head>
 <body>
-  <div data-composition-id="knot-preview"
-       data-width="1280" data-height="720" data-duration="6"
-       data-start="0" data-track-index="0">
+  <div id="root"></div>
+  <script type="module">
+    import React, { useState, useEffect } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { LiquidMetal } from '@paper-design/shaders-react';
 
-    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-      <defs>
-        <filter id="liquid-w" x="-25%" y="-50%" width="150%" height="200%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.008 0.014" numOctaves="2" seed="3">
-            <animate attributeName="baseFrequency"
-                     dur="14s"
-                     values="0.008 0.014;0.014 0.019;0.008 0.014"
-                     repeatCount="indefinite"/>
-          </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" scale="22"
-                             xChannelSelector="R" yChannelSelector="G"/>
-        </filter>
+    function App() {
+      const [size, setSize] = useState({
+        w: window.innerWidth || 1280,
+        h: window.innerHeight || 720
+      });
+      useEffect(() => {
+        const onResize = () => setSize({ w: window.innerWidth, h: window.innerHeight });
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+      }, []);
+      return React.createElement(LiquidMetal, {
+        width: size.w,
+        height: size.h,
+        image: 'https://shaders.paper.design/images/logos/diamond.svg',
+        colorBack: '#000000',
+        colorTint: '#ffffff',
+        shape: undefined,
+        repetition: 2.5,
+        softness: 0.33,
+        shiftRed: -0.2,
+        shiftBlue: -0.14,
+        distortion: 0.15,
+        contour: 0.4,
+        angle: 70,
+        speed: 1,
+        scale: 0.76,
+        fit: 'contain'
+      });
+    }
 
-        <filter id="liquid-r" x="-25%" y="-50%" width="150%" height="200%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.009 0.015" numOctaves="2" seed="7">
-            <animate attributeName="baseFrequency"
-                     dur="14s"
-                     values="0.009 0.015;0.015 0.020;0.009 0.015"
-                     repeatCount="indefinite"/>
-          </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" scale="26"
-                             xChannelSelector="R" yChannelSelector="G"/>
-        </filter>
-
-        <filter id="liquid-b" x="-25%" y="-50%" width="150%" height="200%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.007 0.013" numOctaves="2" seed="11">
-            <animate attributeName="baseFrequency"
-                     dur="14s"
-                     values="0.007 0.013;0.013 0.018;0.007 0.013"
-                     repeatCount="indefinite"/>
-          </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" scale="20"
-                             xChannelSelector="R" yChannelSelector="G"/>
-        </filter>
-      </defs>
-    </svg>
-
-    <div class="halo"></div>
-    <div class="sheen"></div>
-
-    <div class="layer"><span class="mark r-shift">knot</span></div>
-    <div class="layer"><span class="mark b-shift">knot</span></div>
-    <div class="layer"><span class="mark base">knot</span></div>
-
-    <div class="grain"></div>
-  </div>
+    createRoot(document.getElementById('root')).render(React.createElement(App));
+  </script>
 </body>
 </html>
