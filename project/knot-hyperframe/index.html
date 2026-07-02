@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Knot HyperFrame Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@800&display=swap" rel="stylesheet" />
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
@@ -29,20 +30,46 @@
     import { createRoot } from 'react-dom/client';
     import { LiquidMetal } from '@paper-design/shaders-react';
 
+    // Render "knot" once into an offscreen canvas and hand the shader
+    // a data-URL image whose alpha channel = the wordmark silhouette.
+    async function makeKnotDataUrl() {
+      try { await document.fonts.load('800 640px "Inter"'); } catch (_) {}
+      try { await document.fonts.ready; } catch (_) {}
+      const w = 1600, h = 900;
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#000';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = '800 640px "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif';
+      ctx.letterSpacing = '-0.04em';
+      ctx.fillText('knot', w / 2, h / 2 + 30);
+      return c.toDataURL('image/png');
+    }
+
     function App() {
       const [size, setSize] = useState({
         w: window.innerWidth || 1280,
         h: window.innerHeight || 720
       });
+      const [image, setImage] = useState(null);
+
       useEffect(() => {
+        let alive = true;
+        makeKnotDataUrl().then(url => { if (alive) setImage(url); });
         const onResize = () => setSize({ w: window.innerWidth, h: window.innerHeight });
         window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
+        return () => { alive = false; window.removeEventListener('resize', onResize); };
       }, []);
+
+      if (!image) return null;
+
       return React.createElement(LiquidMetal, {
         width: size.w,
         height: size.h,
-        image: 'https://shaders.paper.design/images/logos/diamond.svg',
+        image,
         colorBack: '#000000',
         colorTint: '#ffffff',
         shape: undefined,
