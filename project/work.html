@@ -767,17 +767,20 @@
       // Pause off-screen preview iframes. Many tiles animate at once (canvas,
       // WebGL, dither) and only a couple are visible in the tall grid at any
       // time; letting them all run continuously is what makes the page lag.
-      // display:none suspends an iframe's requestAnimationFrame; a generous
-      // rootMargin resumes each tile just before it scrolls into view. The
-      // grid tracks keep the tile sized, so hiding the inner iframe doesn't
-      // shift layout.
+      // display:none on the iframe suspends its requestAnimationFrame; a
+      // generous rootMargin resumes each just before it scrolls into view.
+      // NOTE: observe the TILE (.grid-item), not the iframe — a display:none
+      // iframe has no box, so observing it would never fire again to restore
+      // it (that's what hid the bottom Knot tile permanently). The tile keeps
+      // its grid box, so it always reports re-entry.
       if ('IntersectionObserver' in window) {
         var io = new IntersectionObserver(function (entries) {
           entries.forEach(function (en) {
-            en.target.style.display = en.isIntersecting ? '' : 'none';
+            var f = en.target.querySelector('iframe');
+            if (f) f.style.display = en.isIntersecting ? '' : 'none';
           });
         }, { rootMargin: '400px 0px' });
-        document.querySelectorAll('.grid-item iframe').forEach(function (f) { io.observe(f); });
+        document.querySelectorAll('.grid-item').forEach(function (t) { io.observe(t); });
       }
     })();
   </script>
