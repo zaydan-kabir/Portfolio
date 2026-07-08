@@ -303,18 +303,16 @@
       position: relative; overflow: hidden; background: var(--tile); text-decoration: none; display: block; border-radius: 6px;
       box-shadow: var(--tile-shadow); isolation: isolate;
     }
-    /* Re-flowed after the Arcane tile was removed — explicit rows so the three
-       upper columns each fill exactly 6 rows (no holes), then two full-width
-       anchors. Order: Clarity, Interstellar, Design Manifesto, Animal Liberation,
-       Book Cover, Type Poster, Knot, Umbrella. */
+    /* Explicit rows so the three upper columns each fill exactly 6 rows (no
+       holes), then Knot as the full-width anchor. Order: Clarity, Interstellar,
+       Design Manifesto, Animal Liberation, Book Cover, Type Poster, Knot. */
     .grid-item:nth-child(1) { grid-column: 1 / span 5; grid-row: 1 / span 3; }        /* Clarity */
     .grid-item:nth-child(2) { grid-column: 6 / span 4; grid-row: 1 / span 4; }        /* Interstellar Automata */
     .grid-item:nth-child(3) { grid-column: 6 / span 4; grid-row: 5 / span 2; }        /* Design Manifesto */
     .grid-item:nth-child(4) { grid-column: 10 / span 3; grid-row: 1 / span 2; }       /* Animal Liberation, Indigeneity, and Morality */
     .grid-item:nth-child(5) { grid-column: 1 / span 5; grid-row: 4 / span 3; }        /* Book Cover Re-Design */
     .grid-item:nth-child(6) { grid-column: 10 / span 3; grid-row: 3 / span 4; }       /* Type Design Poster */
-    .grid-item:nth-child(7) { grid-column: 1 / span 7; grid-row: 7 / span 3; }        /* Currently Building @ Knot */
-    .grid-item:nth-child(8) { grid-column: 8 / span 5; grid-row: 7 / span 3; }        /* Umbrella */
+    .grid-item:nth-child(7) { grid-column: 1 / -1; grid-row: 7 / span 2; }            /* Currently Building @ Knot — full-width anchor */
 
     .grid-item img, .grid-item iframe {
       width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.08) saturate(.92) contrast(.96);
@@ -431,9 +429,8 @@
       .grid-item:nth-child(3) { grid-column: 4 / span 3; grid-row: span 2; }   /* Design Manifesto */
       .grid-item:nth-child(4) { grid-column: 4 / span 3; grid-row: span 2; }   /* Animal Liberation */
       .grid-item:nth-child(5) { grid-column: 1 / span 3; grid-row: span 4; }   /* Book Cover */
-      .grid-item:nth-child(6) { grid-column: 4 / span 3; grid-row: span 2; }   /* [redacted] typeface */
-      .grid-item:nth-child(7) { grid-column: 4 / span 3; grid-row: span 2; }   /* Type Design Poster */
-      .grid-item:nth-child(8) { grid-column: 1 / span 6; grid-row: span 3; }   /* Currently Building: Shire */
+      .grid-item:nth-child(6) { grid-column: 4 / span 3; grid-row: span 4; }   /* Type Design Poster */
+      .grid-item:nth-child(7) { grid-column: 1 / span 6; grid-row: span 2; }   /* Knot — full-width anchor */
     }
     @media (max-width: 560px) {
       #header { padding-left: 18px; padding-right: 18px; }
@@ -455,8 +452,6 @@
       .grid-item:nth-child(6) { grid-column: 2; grid-row: span 3; }
       /* Knot — full width anchor */
       .grid-item:nth-child(7) { grid-column: 1 / span 2; grid-row: span 2; }
-      /* Umbrella — full width, tall */
-      .grid-item:nth-child(8) { grid-column: 1 / span 2; grid-row: span 3; }
       .grid-overlay { min-width: 140px; max-width: calc(100% - 20px); padding: 7px 10px 9px; }
       .item-name { font-size: clamp(11px, 3.2vw, 14px); }
       .item-subtitle { font-size: clamp(9px, 2.4vw, 11px); }
@@ -583,11 +578,6 @@
       <div class="grid-overlay"><span class="item-name">Currently Building @ Knot</span><span class="item-subtitle">Design Engineering, Product Design, API Integration</span></div>
     </a>
 
-    <a class="grid-item" href="zaydan-umbrella.html" target="_blank" rel="noopener noreferrer" data-project-link="zaydan-umbrella" aria-label="Open Zaydan Umbrella animation">
-      <iframe id="umbrella-frame" data-src="zaydan-umbrella.html?v=20260708-perf&speed=0.7" title="Zaydan Umbrella animated preview" aria-hidden="true"></iframe>
-      <div class="grid-overlay"><span class="item-name">Umbrella</span><span class="item-subtitle">Creative Coding, Type Design</span></div>
-    </a>
-
   </main>
 
   <div class="work-footer-strip"><span>more work soon</span></div>
@@ -630,25 +620,6 @@
       document.getElementById('work-popup-close').addEventListener('click', () => { popup.style.display = 'none'; });
       popup.addEventListener('click', e => { if (e.target === popup) popup.style.display = 'none'; });
     })();
-
-    // Keep the umbrella tile in sync with the site color mode. Observing our
-    // OWN <html data-theme> (always allowed) and pushing it into the iframe with
-    // postMessage (works cross-origin) is far more reliable than having the
-    // frame read the parent — which browsers block for file:// and cross-origin.
-    (function () {
-      const frame = document.getElementById('umbrella-frame');
-      if (!frame) return;
-      const root = document.documentElement;
-      const send = () => {
-        const t = root.getAttribute('data-theme');
-        if ((t === 'light' || t === 'dark') && frame.contentWindow) {
-          frame.contentWindow.postMessage({ theme: t }, '*');
-        }
-      };
-      new MutationObserver(send).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
-      frame.addEventListener('load', send); // push once the animation is live
-      send();
-    })();
   </script>
 
   <script>
@@ -657,24 +628,9 @@
     setTimeout(() => overlay.classList.remove('revealing'), 600);
 
     const cursor = document.getElementById('cursor');
-    const umbrellaSection = document.querySelector('[data-project-link="zaydan-umbrella"]');
-    // Recompute the cursor color every move from the pointer position (like the
-    // profile page's cursorColorAt) rather than mouseenter/leave, which is
-    // unreliable over a pointer-events:none iframe. Over the umbrella tile the
-    // cursor contrasts the inverted canvas: white in light mode, black in dark.
     document.addEventListener('mousemove', e => {
       cursor.style.left = e.clientX + 'px';
       cursor.style.top  = e.clientY + 'px';
-      let overUmbrella = false;
-      if (umbrellaSection) {
-        const r = umbrellaSection.getBoundingClientRect();
-        overUmbrella = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-      }
-      if (overUmbrella) {
-        cursor.style.background = document.documentElement.dataset.theme === 'light' ? '#fff' : '#000';
-      } else {
-        cursor.style.background = ''; // revert to the themed --ink from CSS
-      }
     });
 
     const canvas = document.getElementById('trail-canvas');
@@ -687,20 +643,12 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const now = Date.now();
       const trailRgb = getComputedStyle(document.documentElement).getPropertyValue('--trail-rgb').trim() || '240,240,240';
-      // Over the umbrella tile the canvas is inverted, so the normal ink-colored
-      // trail would vanish into it. Use the contrasting color there (white in
-      // light mode, black in dark mode), matching the cursor.
-      const light = document.documentElement.dataset.theme === 'light';
-      const invRgb = light ? '255,255,255' : '0,0,0';
-      const umb = umbrellaSection ? umbrellaSection.getBoundingClientRect() : null;
-      const overUmb = (x, y) => umb && x >= umb.left && x <= umb.right && y >= umb.top && y <= umb.bottom;
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       for (let i = 1; i < pts.length; i++) {
         const age = (now - pts[i].t) / 300;
         const a = Math.max(0, 1 - age);
-        const rgb = overUmb(pts[i].x, pts[i].y) ? invRgb : trailRgb;
         ctx.beginPath(); ctx.moveTo(pts[i-1].x, pts[i-1].y); ctx.lineTo(pts[i].x, pts[i].y);
-        ctx.strokeStyle = `rgba(${rgb},${a * 0.34})`; ctx.lineWidth = (i / pts.length) * 2.5; ctx.stroke();
+        ctx.strokeStyle = `rgba(${trailRgb},${a * 0.34})`; ctx.lineWidth = (i / pts.length) * 2.5; ctx.stroke();
       }
       while (pts.length && now - pts[0].t > 300) pts.shift();
       requestAnimationFrame(drawTrail);
