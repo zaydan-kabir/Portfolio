@@ -359,6 +359,25 @@
       display: flex; justify-content: space-between; gap: 18px;
     }
 
+    /* Umbrella footer banner — the dithered-rain animation as a short, full-width
+       strip closing out the work section. Decorative: clicks/scroll pass through. */
+    .work-umbrella {
+      padding: 0 clamp(18px, 3vw, 42px) clamp(42px, 6vw, 92px);
+    }
+    .work-umbrella-inner {
+      position: relative; display: block; text-decoration: none;
+      border-radius: 6px; overflow: hidden; box-shadow: var(--tile-shadow); isolation: isolate;
+    }
+    .work-umbrella-frame {
+      display: block; width: 100%; height: clamp(220px, 30vw, 400px);
+      border: 0; background: var(--bg); pointer-events: none;
+    }
+    .work-umbrella-label {
+      position: absolute; left: 16px; bottom: 14px; z-index: 2;
+      font-size: 12px; letter-spacing: 0.02em; color: var(--muted);
+      pointer-events: none;
+    }
+
     @media (max-width: 900px) {
       #header { padding-left: 24px; padding-right: 24px; }
       .work-bio p { max-width: 100%; }
@@ -526,13 +545,15 @@
       <div class="grid-overlay"><span class="item-name">Currently Building @ Knot</span><span class="item-subtitle">Design Engineering, Product Design, API Integration</span></div>
     </a>
 
-    <a class="grid-item" href="zaydan-umbrella.html" target="_blank" rel="noopener noreferrer" data-project-link="zaydan-umbrella" aria-label="Open Zaydan Umbrella — dithered rain animation">
-      <iframe data-src="zaydan-umbrella.html" title="Zaydan Umbrella animated preview" aria-hidden="true"></iframe>
-      <div class="grid-overlay"><span class="item-name">Umbrella</span><span class="item-subtitle">Creative Coding, Generative Type, Canvas</span></div>
-    </a>
-
     <div class="work-footer-strip"><span>more work soon</span></div>
   </main>
+
+  <section class="work-umbrella" aria-label="Umbrella — dithered rain animation">
+    <a class="work-umbrella-inner" href="zaydan-umbrella.html" target="_blank" rel="noopener noreferrer" data-project-link="zaydan-umbrella" aria-label="Open Zaydan Umbrella — dithered rain animation">
+      <iframe class="work-umbrella-frame" data-src="zaydan-umbrella.html" title="Zaydan Umbrella animation" aria-hidden="true" tabindex="-1"></iframe>
+      <span class="work-umbrella-label">Umbrella — Creative Coding, Generative Type, Canvas</span>
+    </a>
+  </section>
 
   <script>
     const overlay = document.getElementById('page-out');
