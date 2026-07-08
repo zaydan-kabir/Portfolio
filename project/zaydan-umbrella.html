@@ -48,7 +48,11 @@
     return 'light';
   }
 
-  let themeName = resolveTheme();
+  // The banner intentionally renders the INVERSE of the host color mode:
+  // site dark  → white canvas + black umbrella + black rain,
+  // site light → black canvas + white umbrella + white rain.
+  const flip = (t) => (t === 'dark' ? 'light' : 'dark');
+  let themeName = flip(resolveTheme());
   let theme = THEMES[themeName];
 
   // A single ?bg=RRGGBB override still wins for the background (used by any
@@ -67,6 +71,11 @@
     document.body.style.background = bgColor();
   }
 
+  // Adopt the host's color mode as our INVERSE (see flip() above).
+  function adoptSiteTheme(name) {
+    if (name === 'light' || name === 'dark') applyTheme(flip(name));
+  }
+
   // Live updates. Primary path when embedded: this frame is same-origin with
   // the host page, so we can watch the parent <html data-theme> attribute
   // directly and invert the instant the site's toggle flips it — no reliance on
@@ -79,7 +88,7 @@
     try { root = window.parent.document.documentElement; } catch (e) { return; } // cross-origin
     const readParent = () => {
       const t = root.getAttribute('data-theme');
-      if (t === 'light' || t === 'dark') applyTheme(t);
+      if (t === 'light' || t === 'dark') adoptSiteTheme(t);
     };
     readParent(); // adopt the host's current theme immediately
     try {
@@ -87,14 +96,14 @@
     } catch (e) { /* observer unavailable */ }
   })();
   window.addEventListener('storage', (e) => {
-    if (e.key === 'zaydan-theme' && (e.newValue === 'light' || e.newValue === 'dark')) applyTheme(e.newValue);
+    if (e.key === 'zaydan-theme' && (e.newValue === 'light' || e.newValue === 'dark')) adoptSiteTheme(e.newValue);
   });
   window.addEventListener('message', (e) => {
-    if (e.data && (e.data.theme === 'light' || e.data.theme === 'dark')) applyTheme(e.data.theme);
+    if (e.data && (e.data.theme === 'light' || e.data.theme === 'dark')) adoptSiteTheme(e.data.theme);
   });
   if (window.matchMedia) {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      if (!params.get('theme')) applyTheme(resolveTheme());
+      if (!params.get('theme')) adoptSiteTheme(resolveTheme());
     });
   }
   // Click / "i" toggles locally for quick previewing (standalone only — the
