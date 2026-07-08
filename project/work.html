@@ -363,20 +363,11 @@
        strip (edge to edge, no side gutters) closing out the work section.
        Decorative: clicks/scroll pass through the canvas. */
     .work-umbrella {
-      padding: 0; margin: 0;
-    }
-    .work-umbrella-inner {
-      position: relative; display: block; text-decoration: none;
-      overflow: hidden; isolation: isolate;
+      padding: 0; margin: 0; line-height: 0;
     }
     .work-umbrella-frame {
       display: block; width: 100%; height: clamp(190px, 24vw, 340px);
       border: 0; background: var(--bg); pointer-events: none;
-    }
-    .work-umbrella-label {
-      position: absolute; left: clamp(18px, 3vw, 42px); bottom: 14px; z-index: 2;
-      font-size: 12px; letter-spacing: 0.02em; color: var(--gray2);
-      pointer-events: none;
     }
 
     /* Contact / resume footer — pixel buttons anchored to the bottom-right,
@@ -591,19 +582,16 @@
     </a>
 
     <a class="grid-item" href="https://www.knotapi.com" target="_blank" rel="noopener noreferrer" data-project-link="knot" aria-label="Open Knot at knotapi.com">
-      <iframe src="knot-hyperframe/index.html?v=20260702-clean" loading="eager" title="Knot animated preview" aria-hidden="true" style="background:#000"></iframe>
+      <iframe data-src="knot-hyperframe/index.html?v=20260708-fit" title="Knot animated preview" aria-hidden="true" style="background:#000"></iframe>
       <div class="grid-overlay"><span class="item-name">Currently Building @ Knot</span><span class="item-subtitle">Design Engineering, Product Design, API Integration</span></div>
     </a>
 
     <div class="work-footer-strip"><span>more work soon</span></div>
   </main>
 
-  <section class="work-umbrella" aria-label="Umbrella — dithered rain animation">
-    <a class="work-umbrella-inner" href="zaydan-umbrella.html" target="_blank" rel="noopener noreferrer" data-project-link="zaydan-umbrella" aria-label="Open Zaydan Umbrella — dithered rain animation">
-      <iframe class="work-umbrella-frame" data-src="zaydan-umbrella.html" title="Zaydan Umbrella animation" aria-hidden="true" tabindex="-1"></iframe>
-      <span class="work-umbrella-label">Umbrella — Creative Coding, Generative Type, Canvas</span>
-    </a>
-  </section>
+  <div class="work-umbrella" aria-hidden="true">
+    <iframe class="work-umbrella-frame" data-src="zaydan-umbrella.html" title="" aria-hidden="true" tabindex="-1"></iframe>
+  </div>
 
   <!-- ── Info / Contact / Resume ─────────────────────────── -->
   <footer class="work-contact">

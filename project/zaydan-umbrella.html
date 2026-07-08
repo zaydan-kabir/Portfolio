@@ -67,10 +67,25 @@
     document.body.style.background = bgColor();
   }
 
-  // Live updates: the toggle in the parent page writes localStorage, which
-  // fires a `storage` event in this (same-origin) frame. Also accept an explicit
-  // postMessage({ theme }) from an embedder, and react to OS changes when no
-  // explicit preference is set.
+  // Live updates. Primary path when embedded: this frame is same-origin with
+  // the host page, so we can watch the parent <html data-theme> attribute
+  // directly and invert the instant the site's toggle flips it — no reliance on
+  // the (sometimes-flaky) `storage` event. Falls back to storage + postMessage
+  // for cross-document / cross-origin embeds, and to OS changes when no explicit
+  // preference is set.
+  (function watchParentTheme() {
+    if (window.parent === window) return;
+    let root;
+    try { root = window.parent.document.documentElement; } catch (e) { return; } // cross-origin
+    const readParent = () => {
+      const t = root.getAttribute('data-theme');
+      if (t === 'light' || t === 'dark') applyTheme(t);
+    };
+    readParent(); // adopt the host's current theme immediately
+    try {
+      new MutationObserver(readParent).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+    } catch (e) { /* observer unavailable */ }
+  })();
   window.addEventListener('storage', (e) => {
     if (e.key === 'zaydan-theme' && (e.newValue === 'light' || e.newValue === 'dark')) applyTheme(e.newValue);
   });
@@ -82,7 +97,8 @@
       if (!params.get('theme')) applyTheme(resolveTheme());
     });
   }
-  // Click / "i" toggles locally for quick previewing.
+  // Click / "i" toggles locally for quick previewing (standalone only — the
+  // embedded banner is pointer-events:none, so these never fire there).
   window.addEventListener('click', () => applyTheme(themeName === 'dark' ? 'light' : 'dark'));
   window.addEventListener('keydown', (e) => { if (e.key === 'i' || e.key === 'I') applyTheme(themeName === 'dark' ? 'light' : 'dark'); });
 

@@ -30,15 +30,24 @@
     import { LiquidMetal } from '@paper-design/shaders-react';
 
     function App() {
-      const [size, setSize] = useState({
-        w: window.innerWidth || 1280,
-        h: window.innerHeight || 720
-      });
+      // Measure the actual #root box, not window.innerWidth. When this iframe is
+      // embedded in a grid tile it can mount before layout gives it a real size;
+      // a ResizeObserver re-renders the shader the moment the box is sized, so it
+      // no longer intermittently paints blank against a bogus 0/1280 size.
+      const [size, setSize] = useState({ w: 0, h: 0 });
       useEffect(() => {
-        const onResize = () => setSize({ w: window.innerWidth, h: window.innerHeight });
-        window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
+        const el = document.getElementById('root');
+        const measure = () => setSize({
+          w: el.clientWidth || window.innerWidth || 1280,
+          h: el.clientHeight || window.innerHeight || 720
+        });
+        measure();
+        let ro;
+        if (window.ResizeObserver) { ro = new ResizeObserver(measure); ro.observe(el); }
+        window.addEventListener('resize', measure);
+        return () => { if (ro) ro.disconnect(); window.removeEventListener('resize', measure); };
       }, []);
+      if (!size.w || !size.h) return null; // wait for a real box before first paint
       return React.createElement(LiquidMetal, {
         width: size.w,
         height: size.h,
