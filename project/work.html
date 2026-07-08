@@ -293,7 +293,7 @@
 
     .work-grid {
       display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: clamp(76px, 8.4vw, 136px);
-      gap: clamp(22px, 2.8vw, 46px); padding: 0 clamp(18px, 3vw, 42px) clamp(8px, 1.2vw, 14px); align-items: stretch;
+      gap: clamp(22px, 2.8vw, 46px); padding: 0 clamp(18px, 3vw, 42px) clamp(2px, 0.6vw, 8px); align-items: stretch;
     }
     .grid-item {
       position: relative; overflow: hidden; background: var(--tile); text-decoration: none; display: block; border-radius: 6px;
@@ -366,7 +366,7 @@
       padding: 0; margin: 0; line-height: 0;
     }
     .work-umbrella-frame {
-      display: block; width: 100%; height: clamp(190px, 24vw, 340px);
+      display: block; width: 100%; height: clamp(150px, 19vw, 280px);
       border: 0; background: var(--bg); pointer-events: none;
     }
 
@@ -376,7 +376,7 @@
       display: flex; justify-content: flex-end; align-items: flex-end; gap: 18px;
       /* Equal top + bottom padding so the section is framed symmetrically and
          the page ends right there. */
-      padding: clamp(22px, 3vw, 40px) clamp(18px, 3vw, 42px);
+      padding: clamp(16px, 2.2vw, 30px) clamp(18px, 3vw, 42px);
     }
     .pixel-btn {
       font-family: 'VT323', monospace;
@@ -417,7 +417,7 @@
     .p-popup-content a { color: #111; text-decoration: none; border-bottom: 1px solid #ccc; }
     .p-popup-content a:hover { border-bottom-color: #111; }
     @media (max-width: 600px) {
-      .work-contact { gap: 12px; padding-top: 22px; padding-bottom: 22px; }
+      .work-contact { gap: 12px; padding-top: 18px; padding-bottom: 18px; }
       .p-popup-box { padding: 36px 24px 28px; width: 94%; }
     }
 
@@ -632,6 +632,25 @@
       });
       document.getElementById('work-popup-close').addEventListener('click', () => { popup.style.display = 'none'; });
       popup.addEventListener('click', e => { if (e.target === popup) popup.style.display = 'none'; });
+    })();
+
+    // Keep the umbrella banner in sync with the site color mode. Observing our
+    // OWN <html data-theme> (always allowed) and pushing it into the iframe with
+    // postMessage (works cross-origin) is far more reliable than having the
+    // frame read the parent — which browsers block for file:// and cross-origin.
+    (function () {
+      const frame = document.querySelector('.work-umbrella-frame');
+      if (!frame) return;
+      const root = document.documentElement;
+      const send = () => {
+        const t = root.getAttribute('data-theme');
+        if ((t === 'light' || t === 'dark') && frame.contentWindow) {
+          frame.contentWindow.postMessage({ theme: t }, '*');
+        }
+      };
+      new MutationObserver(send).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+      frame.addEventListener('load', send); // push once the animation is live
+      send();
     })();
   </script>
 
