@@ -55,6 +55,13 @@
   let themeName = flip(resolveTheme());
   let theme = THEMES[themeName];
 
+  // Ordered (Bayer 4x4) dithering config — declared up here because applyTheme,
+  // which runs during the theme init below (parent-theme watcher), writes
+  // DITHER.front. Referencing it before this point throws (TDZ) and halts the
+  // whole script, which is what left the embedded tile blank.
+  const BAYER = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]].map((r) => r.map((v) => (v + 0.5) / 16));
+  const DITHER = { size: 1, contrast: 1.15, front: theme.rain.slice() };
+
   // A single ?bg=RRGGBB override still wins for the background (used by any
   // embedding banner that wants a bespoke color); ink/rain stay theme-driven.
   const _bgParam = params.get('bg');
@@ -119,10 +126,6 @@
   document.body.style.background = bgColor();
 
   let W, H, cx, cy, s, oy, dpr;
-
-  // ── Ordered (Bayer 4x4) dithering ──────────────────────────────────
-  const BAYER = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]].map((r) => r.map((v) => (v + 0.5) / 16));
-  const DITHER = { size: 1, contrast: 1.15, front: theme.rain.slice() };
 
   // rainOnly: weight luminance by coverage (alpha) so only the rain glyphs
   // dither into `front` dots; empty pixels stay transparent (bg shows through).
@@ -201,8 +204,11 @@
 
   function resize() {
     dpr = window.devicePixelRatio || 1;
-    W = window.innerWidth;
-    H = window.innerHeight;
+    // Prefer the document box over window.innerWidth: a deferred iframe can
+    // report innerWidth 0 at first run, which would leave the canvas 0-sized.
+    const de = document.documentElement;
+    W = de.clientWidth || window.innerWidth || 300;
+    H = de.clientHeight || window.innerHeight || 200;
     canvas.width = W * dpr;
     canvas.height = H * dpr;
     canvas.style.width = W + 'px';
@@ -226,6 +232,11 @@
   }
   window.addEventListener('resize', resize);
   resize();
+  // When embedded as a deferred iframe, this frame can report a 0×0 viewport at
+  // first run, leaving the canvas 0-sized (so only the body background shows and
+  // the tile looks blank). A ResizeObserver re-runs resize the moment it gets a
+  // real box.
+  if (window.ResizeObserver) { try { new ResizeObserver(resize).observe(document.documentElement); } catch (e) {} }
 
   function drawUmbrella() {
     ctx.textAlign = 'center';
@@ -336,7 +347,7 @@
     let dt = lastT ? (now - lastT) / (1000 / 60) : 1;
     lastT = now;
     if (dt > 3) dt = 3; else if (dt < 0) dt = 0;
-    if (!reduced) step(dt * SPEED);
+    if (!reduced && rainStarted) step(dt * SPEED);
 
     // Plain background...
     ctx.clearRect(0, 0, W, H);
@@ -360,16 +371,19 @@
     requestAnimationFrame(frame);
   }
 
-  // Start only once the page is fully loaded (all resources done), so the rain
-  // doesn't begin mid-load. When embedded, the host also defers this iframe's
-  // src until its own load event, so the rain kicks off after the full page is
-  // ready either way.
-  function start() {
+  // The umbrella + background paint immediately (so the tile is never blank),
+  // but the RAIN only starts once the page is fully loaded, so it doesn't begin
+  // mid-load.
+  let rainStarted = false;
+  function startRain() {
+    if (rainStarted) return;
+    rainStarted = true;
     for (let k = 0; k < 25; k++) { spawn(); drops[drops.length - 1].py = Math.random() * H; }
-    requestAnimationFrame(frame);
   }
-  if (document.readyState === 'complete') start();
-  else window.addEventListener('load', start, { once: true });
+  if (document.readyState === 'complete') startRain();
+  else window.addEventListener('load', startRain, { once: true });
+
+  requestAnimationFrame(frame); // paint the umbrella right away
 </script>
 </body>
 </html>
