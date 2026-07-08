@@ -72,6 +72,10 @@
       position: fixed; top: 0; left: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--ink);
       pointer-events: none; transform: translate(-50%, -50%); z-index: 9999;
     }
+    /* Over the umbrella banner (which renders the inverse of the site theme),
+       the cursor flips to --paper so it stays visible: black on the white
+       canvas in dark mode, white on the black canvas in light mode. */
+    #cursor.cursor-invert { background: var(--paper); }
     #trail-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9997; }
     html[data-theme="light"] body #trail-canvas,
     html[data-theme="dark"] body #trail-canvas {
@@ -355,7 +359,10 @@
       color: var(--label-muted); line-height: 1.25;
     }
     .work-footer-strip {
-      grid-column: 1 / -1; padding: 2px 0 0; font-size: 12px; font-style: italic; color: var(--muted);
+      /* Pulled out of the grid so it takes only its text height (no tall
+         auto-row underneath it), sitting snug above the umbrella banner. */
+      padding: 0 clamp(18px, 3vw, 42px); margin: 2px 0 6px;
+      font-size: 12px; font-style: italic; color: var(--muted);
       display: flex; justify-content: space-between; gap: 18px;
     }
 
@@ -588,8 +595,9 @@
       <div class="grid-overlay"><span class="item-name">Currently Building @ Knot</span><span class="item-subtitle">Design Engineering, Product Design, API Integration</span></div>
     </a>
 
-    <div class="work-footer-strip"><span>more work soon</span></div>
   </main>
+
+  <div class="work-footer-strip"><span>more work soon</span></div>
 
   <div class="work-umbrella" aria-hidden="true">
     <iframe class="work-umbrella-frame" data-src="zaydan-umbrella.html" title="" aria-hidden="true" tabindex="-1"></iframe>
@@ -651,6 +659,15 @@
       new MutationObserver(send).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
       frame.addEventListener('load', send); // push once the animation is live
       send();
+
+      // Flip the custom cursor's color while the pointer is over the banner.
+      // The iframe is pointer-events:none, so hover events land on .work-umbrella.
+      const umbrella = document.querySelector('.work-umbrella');
+      const cursorDot = document.getElementById('cursor');
+      if (umbrella && cursorDot) {
+        umbrella.addEventListener('mouseenter', () => cursorDot.classList.add('cursor-invert'));
+        umbrella.addEventListener('mouseleave', () => cursorDot.classList.remove('cursor-invert'));
+      }
     })();
   </script>
 
