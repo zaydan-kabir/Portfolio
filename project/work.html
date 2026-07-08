@@ -311,6 +311,7 @@
     .grid-item:nth-child(6) { grid-column: 6 / span 4; grid-row: span 2; }            /* [redacted] typeface */
     .grid-item:nth-child(7) { grid-column: 10 / span 3; grid-row: 5 / span 4; }       /* Type Design Poster */
     .grid-item:nth-child(8) { grid-column: 1 / span 9; grid-row: span 2; }            /* Currently Building: Shire */
+    .grid-item:nth-child(9) { grid-column: 10 / span 3; grid-row: span 2; }           /* Umbrella */
 
     .grid-item img, .grid-item iframe {
       width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.08) saturate(.92) contrast(.96);
@@ -359,22 +360,9 @@
       color: var(--label-muted); line-height: 1.25;
     }
     .work-footer-strip {
-      /* Pulled out of the grid so it takes only its text height (no tall
-         auto-row underneath it), sitting snug above the umbrella banner. */
-      padding: 0 clamp(18px, 3vw, 42px); margin: 24px 0;
+      padding: 0 clamp(18px, 3vw, 42px); margin: 18px 0 8px;
       font-size: 12px; font-style: italic; color: var(--muted);
       display: flex; justify-content: space-between; gap: 18px;
-    }
-
-    /* Umbrella footer banner — the dithered-rain animation as a full-bleed
-       strip (edge to edge, no side gutters) closing out the work section.
-       Decorative: clicks/scroll pass through the canvas. */
-    .work-umbrella {
-      padding: 0; margin: 0; line-height: 0;
-    }
-    .work-umbrella-frame {
-      display: block; width: 100%; height: clamp(150px, 19vw, 280px);
-      border: 0; background: var(--bg); pointer-events: none;
     }
 
     /* Contact / resume footer — pixel buttons anchored to the bottom-right,
@@ -593,17 +581,18 @@
     </a>
 
     <a class="grid-item" href="https://www.knotapi.com" target="_blank" rel="noopener noreferrer" data-project-link="knot" aria-label="Open Knot at knotapi.com">
-      <iframe src="knot-hyperframe/index.html?v=20260708-eager" loading="eager" title="Knot animated preview" aria-hidden="true" style="background:#000"></iframe>
+      <iframe src="knot-hyperframe/index.html?v=20260708-inline" loading="eager" title="Knot animated preview" aria-hidden="true" style="background:#000"></iframe>
       <div class="grid-overlay"><span class="item-name">Currently Building @ Knot</span><span class="item-subtitle">Design Engineering, Product Design, API Integration</span></div>
+    </a>
+
+    <a class="grid-item" href="zaydan-umbrella.html" target="_blank" rel="noopener noreferrer" data-project-link="zaydan-umbrella" aria-label="Open Zaydan Umbrella animation">
+      <iframe id="umbrella-frame" data-src="zaydan-umbrella.html?speed=0.7" title="Zaydan Umbrella animated preview" aria-hidden="true"></iframe>
+      <div class="grid-overlay"><span class="item-name">Umbrella</span><span class="item-subtitle">Creative Coding, Generative Type, Canvas</span></div>
     </a>
 
   </main>
 
   <div class="work-footer-strip"><span>more work soon</span></div>
-
-  <div class="work-umbrella" aria-hidden="true">
-    <iframe class="work-umbrella-frame" data-src="zaydan-umbrella.html" title="" aria-hidden="true" tabindex="-1"></iframe>
-  </div>
 
   <!-- ── Info / Contact / Resume ─────────────────────────── -->
   <footer class="work-contact">
@@ -644,12 +633,12 @@
       popup.addEventListener('click', e => { if (e.target === popup) popup.style.display = 'none'; });
     })();
 
-    // Keep the umbrella banner in sync with the site color mode. Observing our
+    // Keep the umbrella tile in sync with the site color mode. Observing our
     // OWN <html data-theme> (always allowed) and pushing it into the iframe with
     // postMessage (works cross-origin) is far more reliable than having the
     // frame read the parent — which browsers block for file:// and cross-origin.
     (function () {
-      const frame = document.querySelector('.work-umbrella-frame');
+      const frame = document.getElementById('umbrella-frame');
       if (!frame) return;
       const root = document.documentElement;
       const send = () => {
@@ -670,10 +659,10 @@
     setTimeout(() => overlay.classList.remove('revealing'), 600);
 
     const cursor = document.getElementById('cursor');
-    const umbrellaSection = document.querySelector('.work-umbrella');
+    const umbrellaSection = document.querySelector('[data-project-link="zaydan-umbrella"]');
     // Recompute the cursor color every move from the pointer position (like the
     // profile page's cursorColorAt) rather than mouseenter/leave, which is
-    // unreliable over a pointer-events:none iframe. Over the umbrella section the
+    // unreliable over a pointer-events:none iframe. Over the umbrella tile the
     // cursor contrasts the inverted canvas: white in light mode, black in dark.
     document.addEventListener('mousemove', e => {
       cursor.style.left = e.clientX + 'px';
@@ -700,7 +689,7 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const now = Date.now();
       const trailRgb = getComputedStyle(document.documentElement).getPropertyValue('--trail-rgb').trim() || '240,240,240';
-      // Over the umbrella banner the canvas is inverted, so the normal ink-colored
+      // Over the umbrella tile the canvas is inverted, so the normal ink-colored
       // trail would vanish into it. Use the contrasting color there (white in
       // light mode, black in dark mode), matching the cursor.
       const light = document.documentElement.dataset.theme === 'light';

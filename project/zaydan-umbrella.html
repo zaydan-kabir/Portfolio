@@ -60,6 +60,11 @@
   const _bgParam = params.get('bg');
   const BG_OVERRIDE = _bgParam && /^[0-9a-fA-F]{3,6}$/.test(_bgParam) ? '#' + _bgParam : null;
 
+  // ?speed= scales the fall speed (1 = default). The embedded banner passes a
+  // value < 1 for a gentler drift than the full-screen standalone version.
+  const _spd = parseFloat(params.get('speed'));
+  const SPEED = isFinite(_spd) && _spd > 0 ? Math.min(3, _spd) : 1;
+
   function bgColor() { return BG_OVERRIDE || theme.bg; }
   function inkColor() { return theme.ink; }
 
@@ -331,7 +336,7 @@
     let dt = lastT ? (now - lastT) / (1000 / 60) : 1;
     lastT = now;
     if (dt > 3) dt = 3; else if (dt < 0) dt = 0;
-    if (!reduced) step(dt);
+    if (!reduced) step(dt * SPEED);
 
     // Plain background...
     ctx.clearRect(0, 0, W, H);
