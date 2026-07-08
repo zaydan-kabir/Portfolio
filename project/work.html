@@ -303,15 +303,18 @@
       position: relative; overflow: hidden; background: var(--tile); text-decoration: none; display: block; border-radius: 6px;
       box-shadow: var(--tile-shadow); isolation: isolate;
     }
-    .grid-item:nth-child(1) { grid-column: 1 / span 5; grid-row: span 3; }            /* Clarity */
-    .grid-item:nth-child(2) { grid-column: 6 / span 4; grid-row: span 4; }            /* Interstellar Automata */
-    .grid-item:nth-child(3) { grid-column: 10 / span 3; grid-row: 1 / span 2; }       /* Design Manifesto */
-    .grid-item:nth-child(4) { grid-column: 10 / span 3; grid-row: 3 / span 2; }       /* Animal Liberation, Indigeneity, and Morality */
-    .grid-item:nth-child(5) { grid-column: 1 / span 5; grid-row: span 3; }            /* Book Cover Re-Design */
-    .grid-item:nth-child(6) { grid-column: 6 / span 4; grid-row: span 2; }            /* [redacted] typeface */
-    .grid-item:nth-child(7) { grid-column: 10 / span 3; grid-row: 5 / span 4; }       /* Type Design Poster */
-    .grid-item:nth-child(8) { grid-column: 1 / span 9; grid-row: span 2; }            /* Currently Building @ Knot */
-    .grid-item:nth-child(9) { grid-column: 1 / -1; grid-row: span 3; }                /* Umbrella — full-width anchor */
+    /* Re-flowed after the Arcane tile was removed — explicit rows so the three
+       upper columns each fill exactly 6 rows (no holes), then two full-width
+       anchors. Order: Clarity, Interstellar, Design Manifesto, Animal Liberation,
+       Book Cover, Type Poster, Knot, Umbrella. */
+    .grid-item:nth-child(1) { grid-column: 1 / span 5; grid-row: 1 / span 3; }        /* Clarity */
+    .grid-item:nth-child(2) { grid-column: 6 / span 4; grid-row: 1 / span 4; }        /* Interstellar Automata */
+    .grid-item:nth-child(3) { grid-column: 6 / span 4; grid-row: 5 / span 2; }        /* Design Manifesto */
+    .grid-item:nth-child(4) { grid-column: 10 / span 3; grid-row: 1 / span 2; }       /* Animal Liberation, Indigeneity, and Morality */
+    .grid-item:nth-child(5) { grid-column: 1 / span 5; grid-row: 4 / span 3; }        /* Book Cover Re-Design */
+    .grid-item:nth-child(6) { grid-column: 10 / span 3; grid-row: 3 / span 4; }       /* Type Design Poster */
+    .grid-item:nth-child(7) { grid-column: 1 / -1; grid-row: 7 / span 2; }            /* Currently Building @ Knot */
+    .grid-item:nth-child(8) { grid-column: 1 / -1; grid-row: 9 / span 3; }            /* Umbrella — full-width anchor */
 
     .grid-item img, .grid-item iframe {
       width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.08) saturate(.92) contrast(.96);
@@ -447,15 +450,13 @@
       .grid-item:nth-child(2) { grid-column: 1; grid-row: span 4; }
       .grid-item:nth-child(3) { grid-column: 2; grid-row: span 2; }
       .grid-item:nth-child(4) { grid-column: 2; grid-row: span 2; }
-      /* Book Cover (col 1) paired with Redacted (col 2, span 3) */
+      /* Book Cover (col 1) paired with Type Poster (col 2, tall portrait) */
       .grid-item:nth-child(5) { grid-column: 1; grid-row: span 3; }
       .grid-item:nth-child(6) { grid-column: 2; grid-row: span 3; }
-      /* Type Poster — full width */
+      /* Knot — full width anchor */
       .grid-item:nth-child(7) { grid-column: 1 / span 2; grid-row: span 2; }
-      /* Shire — full width anchor */
-      .grid-item:nth-child(8) { grid-column: 1 / span 2; grid-row: span 2; }
       /* Umbrella — full width, tall */
-      .grid-item:nth-child(9) { grid-column: 1 / span 2; grid-row: span 3; }
+      .grid-item:nth-child(8) { grid-column: 1 / span 2; grid-row: span 3; }
       .grid-overlay { min-width: 140px; max-width: calc(100% - 20px); padding: 7px 10px 9px; }
       .item-name { font-size: clamp(11px, 3.2vw, 14px); }
       .item-subtitle { font-size: clamp(9px, 2.4vw, 11px); }
@@ -570,11 +571,6 @@
     <a class="grid-item" href="book-cover-redesign.html" target="_blank" rel="noopener noreferrer" data-project-link="book-cover-redesign" aria-label="Open Book Cover Re-Design — My Year of Rest and Relaxation">
       <iframe data-src="book-cover-redesign-hyperframe/index.html?v=20260529-blobs" title="Book Cover Re-Design animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Book Cover Re-Design</span><span class="item-subtitle">Digital Design, Graphic Design, Type Design</span></div>
-    </a>
-
-    <a class="grid-item" href="arcane-typeface.html?v=20260524-glyphs3" target="_blank" rel="noopener noreferrer" data-project-link="redacted-typeface" aria-label="Open Arcane typeface specimen PDF">
-      <iframe data-src="redacted-typeface-hyperframe/index.html?v=20260524-arcane-noghost" title="Arcane typeface animated preview" aria-hidden="true"></iframe>
-      <div class="grid-overlay"><span class="item-name">Typeface — Arcane</span><span class="item-subtitle">Type Design &amp; Web Design</span></div>
     </a>
 
     <a class="grid-item" href="uploads/Type%20Design%20Poster%20copy.pdf" target="_blank" rel="noopener noreferrer" data-project-link="type-poster" aria-label="Open Type Design Poster PDF">
