@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Zaydan Kabir Amanullah — Umbrella</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #0a0a0a; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<script>
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+
+  // Offscreen layer for the dither pass: the falling ZKA rain is drawn here,
+  // run through ordered (Bayer 4x4) dithering, then composited over the plain
+  // scene. The umbrella itself is painted crisp on top — everything is dithered
+  // except the umbrella. (Mechanism adapted from knot-umbrella-rain-dither.html.)
+  const bgCanvas = document.createElement('canvas');
+  const bgCtx = bgCanvas.getContext('2d', { willReadFrequently: true });
+  const ditherCanvas = document.createElement('canvas');
+  const dctx = ditherCanvas.getContext('2d');
+  let dw, dh, DITHER_SCALE;
+
+  // ── Theme ──────────────────────────────────────────────────────────
+  // Follows the site's light/dark toggle. Resolution order: ?theme= param,
+  // then the shared `zaydan-theme` localStorage key (same as theme.js),
+  // then the OS preference. Default light — matching theme.js's default.
+  const THEMES = {
+    // rain = dithered rain-dot color; back = plain background fill.
+    dark:  { bg: '#0a0a0a', ink: '#f0f0f0', rain: [240, 240, 240] },
+    light: { bg: '#f0f0f0', ink: '#0a0a0a', rain: [10, 10, 10] },
+  };
+  const params = new URLSearchParams(location.search);
+
+  function resolveTheme() {
+    const q = params.get('theme');
+    if (q === 'light' || q === 'dark') return q;
+    try {
+      const stored = localStorage.getItem('zaydan-theme');
+      if (stored === 'light' || stored === 'dark') return stored;
+    } catch (e) { /* localStorage blocked (e.g. sandboxed iframe) */ }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+    return 'light';
+  }
+
+  let themeName = resolveTheme();
+  let theme = THEMES[themeName];
+
+  // A single ?bg=RRGGBB override still wins for the background (used by any
+  // embedding banner that wants a bespoke color); ink/rain stay theme-driven.
+  const _bgParam = params.get('bg');
+  const BG_OVERRIDE = _bgParam && /^[0-9a-fA-F]{3,6}$/.test(_bgParam) ? '#' + _bgParam : null;
+
+  function bgColor() { return BG_OVERRIDE || theme.bg; }
+  function inkColor() { return theme.ink; }
+
+  function applyTheme(name) {
+    if (name !== 'light' && name !== 'dark') return;
+    themeName = name;
+    theme = THEMES[name];
+    DITHER.front = theme.rain.slice();
+    document.body.style.background = bgColor();
+  }
+
+  // Live updates: the toggle in the parent page writes localStorage, which
+  // fires a `storage` event in this (same-origin) frame. Also accept an explicit
+  // postMessage({ theme }) from an embedder, and react to OS changes when no
+  // explicit preference is set.
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'zaydan-theme' && (e.newValue === 'light' || e.newValue === 'dark')) applyTheme(e.newValue);
+  });
+  window.addEventListener('message', (e) => {
+    if (e.data && (e.data.theme === 'light' || e.data.theme === 'dark')) applyTheme(e.data.theme);
+  });
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (!params.get('theme')) applyTheme(resolveTheme());
+    });
+  }
+  // Click / "i" toggles locally for quick previewing.
+  window.addEventListener('click', () => applyTheme(themeName === 'dark' ? 'light' : 'dark'));
+  window.addEventListener('keydown', (e) => { if (e.key === 'i' || e.key === 'I') applyTheme(themeName === 'dark' ? 'light' : 'dark'); });
+
+  document.body.style.background = bgColor();
+
+  let W, H, cx, cy, s, oy, dpr;
+
+  // ── Ordered (Bayer 4x4) dithering ──────────────────────────────────
+  const BAYER = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]].map((r) => r.map((v) => (v + 0.5) / 16));
+  const DITHER = { size: 1, contrast: 1.15, front: theme.rain.slice() };
+
+  // rainOnly: weight luminance by coverage (alpha) so only the rain glyphs
+  // dither into `front` dots; empty pixels stay transparent (bg shows through).
+  // The rain is always drawn light in the offscreen buffer to build coverage;
+  // `front` carries the theme's actual rain color out.
+  function ditherRain(src) {
+    const w = src.width, h = src.height, d = src.data;
+    const out = new ImageData(w, h), px = out.data;
+    const md = 4, size = DITHER.size, c = DITHER.contrast, f = DITHER.front;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const o = (y * w + x) * 4;
+        let l = (0.299 * d[o] + 0.587 * d[o + 1] + 0.114 * d[o + 2]) / 255;
+        l *= d[o + 3] / 255;
+        l = (l - 0.5) * c + 0.5;
+        const gx = Math.floor(x / size), gy = Math.floor(y / size);
+        const t = BAYER[((gy % md) + md) % md][((gx % md) + md) % md];
+        if (l > t) { px[o] = f[0]; px[o + 1] = f[1]; px[o + 2] = f[2]; px[o + 3] = 255; }
+      }
+    }
+    return out;
+  }
+
+  // ── Umbrella layout ────────────────────────────────────────────────
+  // Offsets (in reference px) from the umbrella origin: dome of identity lines,
+  // two ZK/A canopy tips, ZKA rib-ends, the vertical ZAYDAN handle, and the
+  // curved tassel/hook at the bottom. Matches "Zaydan Umbrella Animation.png".
+  const UMBRELLA = [
+    { t: 'I',                     dx: 0,   dy: 20  },
+    { t: 'II',                    dx: 0,   dy: 58  },
+    { t: 'ZAYDANKA.COM',          dx: 0,   dy: 100 },
+    { t: 'ZAYDA KABIR AMANULLAH', dx: 0,   dy: 135 },
+    { t: 'C A - USA',             dx: 0,   dy: 178 },
+    { t: 'ZK',                    dx: -167, dy: 176 },
+    { t: 'A',                     dx: -167, dy: 204 },
+    { t: 'ZK',                    dx: 168,  dy: 176 },
+    { t: 'A',                     dx: 168,  dy: 204 },
+    { t: 'ZAYDANKA.COM',          dx: 0,    dy: 233 },
+    { t: 'ZKA',                   dx: -200, dy: 247 },
+    { t: 'ZKA',                   dx: 196,  dy: 243 },
+    { t: 'Z',                     dx: 0,    dy: 283 },
+    { t: 'A',                     dx: 0,    dy: 320 },
+    { t: 'Y',                     dx: 0,    dy: 355 },
+    { t: 'D',                     dx: 0,    dy: 390 },
+    { t: 'A',                     dx: 0,    dy: 427 },
+    { t: 'N',                     dx: 0,    dy: 465 },
+    { t: 'I',                     dx: -67,  dy: 433 },
+    { t: 'II',                    dx: -67,  dy: 468 },
+    { t: 'IIII',                  dx: -25,  dy: 498 },
+  ];
+
+  // Collision canopy: downward-opening parabola (dome).
+  // surface offset-dy = TOP + A * X^2, valid for |X| <= HALF_W
+  const DOME_TOP = 24;      // reference-px dy of the dome's highest point (tip)
+  const DOME_A   = 0.00526; // curvature (edges land ~dy 245 at X=±205)
+  const HALF_W   = 210;     // reference-px half width of the canopy
+
+  // Solid canopy rib-ends (the two "ZKA" glyphs) stick out past the dome curve,
+  // so rain needs to bounce off their flat tops explicitly. Ref-space centers.
+  const CANOPY_BLOCKS = [
+    { dx: -200, dy: 247 },
+    { dx: 196,  dy: 243 },
+  ];
+  const BLOCK_HW = 26, BLOCK_HH = 13; // ref-space half extents of a "ZKA" glyph
+
+  function surfaceY(px) {
+    const X = (px - cx) / s;
+    return oy + (DOME_TOP + DOME_A * X * X) * s;
+  }
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    cx = W / 2;
+    cy = H / 2;
+    // Umbrella scale: driven by width, only mildly by height (smaller
+    // denominator) so it stays large even in a thin banner.
+    s = Math.min(1, W / 1050, H / 560);
+    oy = cy - 259 * s; // center the umbrella vertically around cy
+
+    // Downscaled buffer for the dither pass (chunky + fast, scaled back up with
+    // pixelated rendering).
+    DITHER_SCALE = Math.min(0.5, 700 / Math.max(W, H));
+    dw = Math.max(1, Math.round(W * DITHER_SCALE));
+    dh = Math.max(1, Math.round(H * DITHER_SCALE));
+    bgCanvas.width = dw; bgCanvas.height = dh;
+    ditherCanvas.width = dw; ditherCanvas.height = dh;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function drawUmbrella() {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = (22 * s) + 'px "Courier New", Courier, monospace';
+    ctx.fillStyle = inkColor();
+    for (const e of UMBRELLA) {
+      ctx.fillText(e.t, cx + e.dx * s, oy + e.dy * s);
+    }
+  }
+
+  // ── Rain of ZKA tiles ──────────────────────────────────────────────
+  const G = 0.16;        // gravity
+  const REST = 0.5;      // bounce restitution
+  const MAX_DROPS = 55;
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const drops = [];
+
+  function spawn() {
+    const scale = 0.85 + Math.random() * 0.4;
+    drops.push({
+      px: Math.random() * W,
+      py: -30 - Math.random() * 200,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: 1.4 + Math.random() * 1.8,
+      r: 15 * s * scale,
+      size: 22 * s * scale,
+      alpha: 0.75 + Math.random() * 0.25,
+      age: 0,
+    });
+  }
+
+  function step() {
+    for (let i = drops.length - 1; i >= 0; i--) {
+      const d = drops[i];
+      d.age++;
+      d.vy += G;
+      d.px += d.vx;
+      d.py += d.vy;
+
+      // bounce off the parabolic dome
+      const X = (d.px - cx) / s;
+      if (Math.abs(X) <= HALF_W && d.vy > 0) {
+        const sy = surfaceY(d.px);
+        const bottom = d.py + d.r;
+        const prevBottom = bottom - d.vy;
+        if (prevBottom <= sy && bottom >= sy) {
+          const slope = 2 * DOME_A * X;
+          let nx = slope, ny = -1;
+          const len = Math.hypot(nx, ny);
+          nx /= len; ny /= len;
+          const dot = d.vx * nx + d.vy * ny;
+          d.vx = (d.vx - 2 * dot * nx) * REST;
+          d.vy = (d.vy - 2 * dot * ny) * REST;
+          d.vx += (X > 0 ? 1 : -1) * 0.7; // slide outward off the canopy
+          d.py = sy - d.r;
+        }
+      }
+
+      // bounce off the ZKA rib-ends (flat-top blocks the dome curve misses)
+      if (d.vy > 0) {
+        for (const blk of CANOPY_BLOCKS) {
+          const bx = cx + blk.dx * s, by = oy + blk.dy * s;
+          const top = by - BLOCK_HH * s;
+          const left = bx - BLOCK_HW * s, right = bx + BLOCK_HW * s;
+          const bottom = d.py + d.r;
+          const prevBottom = bottom - d.vy;
+          if (d.px >= left && d.px <= right && prevBottom <= top && bottom >= top) {
+            d.vy = -d.vy * REST;
+            d.vx += (d.px < bx ? -1 : 1) * 0.6; // spray outward off the rib-end
+            d.py = top - d.r;
+          }
+        }
+      }
+
+      // recycle when it leaves the screen (or lingers too long)
+      if (d.py - d.r > H + 40 || d.age > 900) {
+        drops.splice(i, 1);
+      }
+    }
+
+    if (drops.length < MAX_DROPS && Math.random() < 0.28) spawn();
+  }
+
+  // Rain is always painted light into the offscreen buffer to build luminance
+  // coverage; the dither pass re-colors it to the theme's rain color.
+  function drawDrops(g) {
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillStyle = '#ececec';
+    for (const d of drops) {
+      g.globalAlpha = d.alpha;
+      g.font = d.size + 'px "Courier New", Courier, monospace';
+      g.fillText('ZK', d.px, d.py - d.size * 0.55);
+      g.fillText('A', d.px, d.py + d.size * 0.55);
+    }
+    g.globalAlpha = 1;
+  }
+
+  function frame() {
+    if (!reduced) step();
+
+    // Plain background...
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = bgColor();
+    ctx.fillRect(0, 0, W, H);
+
+    // ...ONLY the rain drawn to a transparent buffer, dithered, and composited
+    // over the plain scene (bg shows through the halftone gaps).
+    bgCtx.setTransform(1, 0, 0, 1, 0, 0);
+    bgCtx.clearRect(0, 0, dw, dh);
+    bgCtx.setTransform(DITHER_SCALE, 0, 0, DITHER_SCALE, 0, 0);
+    drawDrops(bgCtx);
+    dctx.putImageData(ditherRain(bgCtx.getImageData(0, 0, dw, dh)), 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(ditherCanvas, 0, 0, dw, dh, 0, 0, W, H);
+    ctx.imageSmoothingEnabled = true;
+
+    // Umbrella crisp on top — always undithered.
+    drawUmbrella();
+
+    requestAnimationFrame(frame);
+  }
+
+  // pre-seed some drops so it isn't empty at start
+  for (let k = 0; k < 25; k++) { spawn(); drops[drops.length - 1].py = Math.random() * H; }
+  requestAnimationFrame(frame);
+</script>
+</body>
+</html>
