@@ -233,7 +233,7 @@
   }
 
   // ── Rain of ZKA tiles ──────────────────────────────────────────────
-  const G = 0.16;        // gravity
+  const G = 0.12;        // gravity
   const REST = 0.5;      // bounce restitution
   const MAX_DROPS = 55;
   const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -245,7 +245,7 @@
       px: Math.random() * W,
       py: -30 - Math.random() * 200,
       vx: (Math.random() - 0.5) * 0.6,
-      vy: 1.4 + Math.random() * 1.8,
+      vy: 1.1 + Math.random() * 1.4,
       r: 15 * s * scale,
       size: 22 * s * scale,
       alpha: 0.75 + Math.random() * 0.25,
