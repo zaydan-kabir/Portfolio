@@ -366,7 +366,7 @@
     .work-footer-strip {
       /* Pulled out of the grid so it takes only its text height (no tall
          auto-row underneath it), sitting snug above the umbrella banner. */
-      padding: 0 clamp(18px, 3vw, 42px); margin: 6px 0;
+      padding: 0 clamp(18px, 3vw, 42px); margin: 8px 0 26px;
       font-size: 12px; font-style: italic; color: var(--muted);
       display: flex; justify-content: space-between; gap: 18px;
     }
@@ -391,9 +391,11 @@
       padding: clamp(9px, 1.2vw, 16px) clamp(18px, 3vw, 42px);
     }
     .pixel-btn {
-      font-family: 'VT323', monospace;
-      font-size: clamp(16px, 1.4vw, 22px);
-      letter-spacing: .06em;
+      /* Match the page font (Lora), like the nav links — not the VT323 pixel
+         face, which wasn't even loaded here and fell back to monospace. */
+      font-family: 'Lora', Georgia, serif;
+      font-size: 14px;
+      letter-spacing: 0;
       color: var(--gray2);
       background: none; border: none; padding: 0;
       text-transform: lowercase;
