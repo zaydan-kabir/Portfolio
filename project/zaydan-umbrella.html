@@ -360,9 +360,16 @@
     requestAnimationFrame(frame);
   }
 
-  // pre-seed some drops so it isn't empty at start
-  for (let k = 0; k < 25; k++) { spawn(); drops[drops.length - 1].py = Math.random() * H; }
-  requestAnimationFrame(frame);
+  // Start only once the page is fully loaded (all resources done), so the rain
+  // doesn't begin mid-load. When embedded, the host also defers this iframe's
+  // src until its own load event, so the rain kicks off after the full page is
+  // ready either way.
+  function start() {
+    for (let k = 0; k < 25; k++) { spawn(); drops[drops.length - 1].py = Math.random() * H; }
+    requestAnimationFrame(frame);
+  }
+  if (document.readyState === 'complete') start();
+  else window.addEventListener('load', start, { once: true });
 </script>
 </body>
 </html>

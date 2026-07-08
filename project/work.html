@@ -310,8 +310,8 @@
     .grid-item:nth-child(5) { grid-column: 1 / span 5; grid-row: span 3; }            /* Book Cover Re-Design */
     .grid-item:nth-child(6) { grid-column: 6 / span 4; grid-row: span 2; }            /* [redacted] typeface */
     .grid-item:nth-child(7) { grid-column: 10 / span 3; grid-row: 5 / span 4; }       /* Type Design Poster */
-    .grid-item:nth-child(8) { grid-column: 1 / span 9; grid-row: span 2; }            /* Currently Building: Shire */
-    .grid-item:nth-child(9) { grid-column: 10 / span 3; grid-row: span 2; }           /* Umbrella */
+    .grid-item:nth-child(8) { grid-column: 1 / span 9; grid-row: span 2; }            /* Currently Building @ Knot */
+    .grid-item:nth-child(9) { grid-column: 1 / -1; grid-row: span 3; }                /* Umbrella — full-width anchor */
 
     .grid-item img, .grid-item iframe {
       width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.08) saturate(.92) contrast(.96);
@@ -454,6 +454,8 @@
       .grid-item:nth-child(7) { grid-column: 1 / span 2; grid-row: span 2; }
       /* Shire — full width anchor */
       .grid-item:nth-child(8) { grid-column: 1 / span 2; grid-row: span 2; }
+      /* Umbrella — full width, tall */
+      .grid-item:nth-child(9) { grid-column: 1 / span 2; grid-row: span 3; }
       .grid-overlay { min-width: 140px; max-width: calc(100% - 20px); padding: 7px 10px 9px; }
       .item-name { font-size: clamp(11px, 3.2vw, 14px); }
       .item-subtitle { font-size: clamp(9px, 2.4vw, 11px); }
