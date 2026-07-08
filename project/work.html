@@ -72,11 +72,6 @@
       position: fixed; top: 0; left: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--ink);
       pointer-events: none; transform: translate(-50%, -50%); z-index: 9999;
     }
-    /* Over the umbrella banner (which renders the inverse of the site theme),
-       the cursor flips to --paper so it stays visible: black on the white
-       canvas in dark mode, white on the black canvas in light mode. */
-    #cursor.cursor-invert { background: var(--paper); }
-
     /* Narrower light/dark toggle on this page (scoped override of theme.css;
        higher specificity wins regardless of stylesheet order). */
     body #theme-toggle { padding: 2px; }
@@ -302,7 +297,7 @@
 
     .work-grid {
       display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: clamp(76px, 8.4vw, 136px);
-      gap: clamp(22px, 2.8vw, 46px); padding: 0 clamp(18px, 3vw, 42px) clamp(2px, 0.6vw, 8px); align-items: stretch;
+      gap: clamp(22px, 2.8vw, 46px); padding: 0 clamp(18px, 3vw, 42px) 0; align-items: stretch;
     }
     .grid-item {
       position: relative; overflow: hidden; background: var(--tile); text-decoration: none; display: block; border-radius: 6px;
@@ -366,7 +361,7 @@
     .work-footer-strip {
       /* Pulled out of the grid so it takes only its text height (no tall
          auto-row underneath it), sitting snug above the umbrella banner. */
-      padding: 0 clamp(18px, 3vw, 42px); margin: 8px 0 26px;
+      padding: 0 clamp(18px, 3vw, 42px); margin: 24px 0;
       font-size: 12px; font-style: italic; color: var(--muted);
       display: flex; justify-content: space-between; gap: 18px;
     }
@@ -666,15 +661,6 @@
       new MutationObserver(send).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
       frame.addEventListener('load', send); // push once the animation is live
       send();
-
-      // Flip the custom cursor's color while the pointer is over the banner.
-      // The iframe is pointer-events:none, so hover events land on .work-umbrella.
-      const umbrella = document.querySelector('.work-umbrella');
-      const cursorDot = document.getElementById('cursor');
-      if (umbrella && cursorDot) {
-        umbrella.addEventListener('mouseenter', () => cursorDot.classList.add('cursor-invert'));
-        umbrella.addEventListener('mouseleave', () => cursorDot.classList.remove('cursor-invert'));
-      }
     })();
   </script>
 
@@ -684,9 +670,24 @@
     setTimeout(() => overlay.classList.remove('revealing'), 600);
 
     const cursor = document.getElementById('cursor');
+    const umbrellaSection = document.querySelector('.work-umbrella');
+    // Recompute the cursor color every move from the pointer position (like the
+    // profile page's cursorColorAt) rather than mouseenter/leave, which is
+    // unreliable over a pointer-events:none iframe. Over the umbrella section the
+    // cursor contrasts the inverted canvas: white in light mode, black in dark.
     document.addEventListener('mousemove', e => {
       cursor.style.left = e.clientX + 'px';
       cursor.style.top  = e.clientY + 'px';
+      let overUmbrella = false;
+      if (umbrellaSection) {
+        const r = umbrellaSection.getBoundingClientRect();
+        overUmbrella = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      }
+      if (overUmbrella) {
+        cursor.style.background = document.documentElement.dataset.theme === 'light' ? '#fff' : '#000';
+      } else {
+        cursor.style.background = ''; // revert to the themed --ink from CSS
+      }
     });
 
     const canvas = document.getElementById('trail-canvas');
