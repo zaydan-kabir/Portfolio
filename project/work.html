@@ -584,7 +584,7 @@
     </a>
 
     <a class="grid-item" href="zaydan-umbrella.html" target="_blank" rel="noopener noreferrer" data-project-link="zaydan-umbrella" aria-label="Open Zaydan Umbrella animation">
-      <iframe id="umbrella-frame" data-src="zaydan-umbrella.html?v=20260708-white&speed=0.7" title="Zaydan Umbrella animated preview" aria-hidden="true"></iframe>
+      <iframe id="umbrella-frame" data-src="zaydan-umbrella.html?v=20260708-perf&speed=0.7" title="Zaydan Umbrella animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Umbrella</span><span class="item-subtitle">Creative Coding, Type Design</span></div>
     </a>
 
@@ -814,6 +814,22 @@
         activateHyperframes();
       } else {
         window.addEventListener('load', activateHyperframes, { once: true });
+      }
+
+      // Pause off-screen preview iframes. Many tiles animate at once (canvas,
+      // WebGL, dither) and only a couple are visible in the tall grid at any
+      // time; letting them all run continuously is what makes the page lag.
+      // display:none suspends an iframe's requestAnimationFrame; a generous
+      // rootMargin resumes each tile just before it scrolls into view. The
+      // grid tracks keep the tile sized, so hiding the inner iframe doesn't
+      // shift layout.
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            en.target.style.display = en.isIntersecting ? '' : 'none';
+          });
+        }, { rootMargin: '400px 0px' });
+        document.querySelectorAll('.grid-item iframe').forEach(function (f) { io.observe(f); });
       }
     })();
   </script>

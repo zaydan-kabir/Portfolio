@@ -337,13 +337,20 @@
     g.globalAlpha = 1;
   }
 
-  // Delta-time loop: motion is scaled to elapsed time (baseline 60fps) so the
-  // rain falls at a consistent speed and stays smooth even when the frame rate
-  // dips — e.g. while the other work-grid iframes are busy. dt is clamped so a
-  // background-tab stall doesn't teleport every drop on return.
-  let lastT = 0;
+  // Delta-time loop, throttled to ~30fps and pausable. The per-frame dither is
+  // a synchronous getImageData readback that stalls the pipeline (expensive
+  // alongside the other work-grid iframes), so we cap the render rate and stop
+  // the loop entirely when the tile is scrolled off-screen (the host page sends
+  // postMessage({playing}) via an IntersectionObserver) or the tab is hidden.
+  const MIN_MS = 1000 / 30;
+  let lastT = 0, rafId = null, playing = true;
+
   function frame(now) {
     now = now || 0;
+    if (!playing || document.hidden) { rafId = null; return; }
+    rafId = requestAnimationFrame(frame);
+    if (lastT && now - lastT < MIN_MS) return; // throttle to ~30fps
+
     let dt = lastT ? (now - lastT) / (1000 / 60) : 1;
     lastT = now;
     if (dt > 3) dt = 3; else if (dt < 0) dt = 0;
@@ -367,9 +374,17 @@
 
     // Umbrella crisp on top — always undithered.
     drawUmbrella();
-
-    requestAnimationFrame(frame);
   }
+
+  // Resume/suspend the loop without piling up rAF callbacks.
+  function setPlaying(p) {
+    p = !!p;
+    if (p === playing) return;
+    playing = p;
+    if (playing && rafId == null) { lastT = 0; rafId = requestAnimationFrame(frame); }
+  }
+  window.addEventListener('message', (e) => { if (e.data && typeof e.data.playing === 'boolean') setPlaying(e.data.playing); });
+  document.addEventListener('visibilitychange', () => setPlaying(!document.hidden));
 
   // The umbrella + background paint immediately (so the tile is never blank),
   // but the RAIN only starts once the page is fully loaded, so it doesn't begin
@@ -383,7 +398,7 @@
   if (document.readyState === 'complete') startRain();
   else window.addEventListener('load', startRain, { once: true });
 
-  requestAnimationFrame(frame); // paint the umbrella right away
+  rafId = requestAnimationFrame(frame); // paint the umbrella right away
 </script>
 </body>
 </html>
