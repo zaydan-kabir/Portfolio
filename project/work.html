@@ -700,12 +700,20 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const now = Date.now();
       const trailRgb = getComputedStyle(document.documentElement).getPropertyValue('--trail-rgb').trim() || '240,240,240';
+      // Over the umbrella banner the canvas is inverted, so the normal ink-colored
+      // trail would vanish into it. Use the contrasting color there (white in
+      // light mode, black in dark mode), matching the cursor.
+      const light = document.documentElement.dataset.theme === 'light';
+      const invRgb = light ? '255,255,255' : '0,0,0';
+      const umb = umbrellaSection ? umbrellaSection.getBoundingClientRect() : null;
+      const overUmb = (x, y) => umb && x >= umb.left && x <= umb.right && y >= umb.top && y <= umb.bottom;
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       for (let i = 1; i < pts.length; i++) {
         const age = (now - pts[i].t) / 300;
         const a = Math.max(0, 1 - age);
+        const rgb = overUmb(pts[i].x, pts[i].y) ? invRgb : trailRgb;
         ctx.beginPath(); ctx.moveTo(pts[i-1].x, pts[i-1].y); ctx.lineTo(pts[i].x, pts[i].y);
-        ctx.strokeStyle = `rgba(${trailRgb},${a * 0.34})`; ctx.lineWidth = (i / pts.length) * 2.5; ctx.stroke();
+        ctx.strokeStyle = `rgba(${rgb},${a * 0.34})`; ctx.lineWidth = (i / pts.length) * 2.5; ctx.stroke();
       }
       while (pts.length && now - pts[0].t > 300) pts.shift();
       requestAnimationFrame(drawTrail);
