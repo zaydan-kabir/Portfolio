@@ -123,22 +123,28 @@
   // dither into `front` dots; empty pixels stay transparent (bg shows through).
   // The rain is always drawn light in the offscreen buffer to build coverage;
   // `front` carries the theme's actual rain color out.
+  // Reused across frames (reallocated in resize) so we don't allocate a fresh
+  // ImageData every frame — that churn is a common source of GC stutter.
+  let ditherOut = null;
+
   function ditherRain(src) {
     const w = src.width, h = src.height, d = src.data;
-    const out = new ImageData(w, h), px = out.data;
-    const md = 4, size = DITHER.size, c = DITHER.contrast, f = DITHER.front;
+    if (!ditherOut || ditherOut.width !== w || ditherOut.height !== h) ditherOut = new ImageData(w, h);
+    const px = ditherOut.data;
+    px.fill(0); // clear last frame's dots (only lit pixels are written below)
+    const md = 4, c = DITHER.contrast, f0 = DITHER.front[0], f1 = DITHER.front[1], f2 = DITHER.front[2];
     for (let y = 0; y < h; y++) {
+      const row = BAYER[y % md];
       for (let x = 0; x < w; x++) {
         const o = (y * w + x) * 4;
+        const a = d[o + 3];
+        if (a === 0) continue; // transparent bg pixel — nothing to dither
         let l = (0.299 * d[o] + 0.587 * d[o + 1] + 0.114 * d[o + 2]) / 255;
-        l *= d[o + 3] / 255;
-        l = (l - 0.5) * c + 0.5;
-        const gx = Math.floor(x / size), gy = Math.floor(y / size);
-        const t = BAYER[((gy % md) + md) % md][((gx % md) + md) % md];
-        if (l > t) { px[o] = f[0]; px[o + 1] = f[1]; px[o + 2] = f[2]; px[o + 3] = 255; }
+        l = (l * (a / 255) - 0.5) * c + 0.5;
+        if (l > row[x % md]) { px[o] = f0; px[o + 1] = f1; px[o + 2] = f2; px[o + 3] = 255; }
       }
     }
-    return out;
+    return ditherOut;
   }
 
   // ── Umbrella layout ────────────────────────────────────────────────
@@ -247,20 +253,21 @@
     });
   }
 
-  function step() {
+  function step(dt) {
     for (let i = drops.length - 1; i >= 0; i--) {
       const d = drops[i];
-      d.age++;
-      d.vy += G;
-      d.px += d.vx;
-      d.py += d.vy;
+      d.age += dt;
+      d.vy += G * dt;
+      d.px += d.vx * dt;
+      const dy = d.vy * dt; // actual vertical travel this frame
+      d.py += dy;
 
       // bounce off the parabolic dome
       const X = (d.px - cx) / s;
       if (Math.abs(X) <= HALF_W && d.vy > 0) {
         const sy = surfaceY(d.px);
         const bottom = d.py + d.r;
-        const prevBottom = bottom - d.vy;
+        const prevBottom = bottom - dy;
         if (prevBottom <= sy && bottom >= sy) {
           const slope = 2 * DOME_A * X;
           let nx = slope, ny = -1;
@@ -281,7 +288,7 @@
           const top = by - BLOCK_HH * s;
           const left = bx - BLOCK_HW * s, right = bx + BLOCK_HW * s;
           const bottom = d.py + d.r;
-          const prevBottom = bottom - d.vy;
+          const prevBottom = bottom - dy;
           if (d.px >= left && d.px <= right && prevBottom <= top && bottom >= top) {
             d.vy = -d.vy * REST;
             d.vx += (d.px < bx ? -1 : 1) * 0.6; // spray outward off the rib-end
@@ -296,7 +303,7 @@
       }
     }
 
-    if (drops.length < MAX_DROPS && Math.random() < 0.28) spawn();
+    if (drops.length < MAX_DROPS && Math.random() < 0.28 * dt) spawn();
   }
 
   // Rain is always painted light into the offscreen buffer to build luminance
@@ -314,8 +321,17 @@
     g.globalAlpha = 1;
   }
 
-  function frame() {
-    if (!reduced) step();
+  // Delta-time loop: motion is scaled to elapsed time (baseline 60fps) so the
+  // rain falls at a consistent speed and stays smooth even when the frame rate
+  // dips — e.g. while the other work-grid iframes are busy. dt is clamped so a
+  // background-tab stall doesn't teleport every drop on return.
+  let lastT = 0;
+  function frame(now) {
+    now = now || 0;
+    let dt = lastT ? (now - lastT) / (1000 / 60) : 1;
+    lastT = now;
+    if (dt > 3) dt = 3; else if (dt < 0) dt = 0;
+    if (!reduced) step(dt);
 
     // Plain background...
     ctx.clearRect(0, 0, W, H);
