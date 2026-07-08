@@ -27,12 +27,12 @@
   let dw, dh, DITHER_SCALE;
 
   // ── Theme ──────────────────────────────────────────────────────────
-  // Follows the site's light/dark toggle. Resolution order: ?theme= param,
-  // then the shared `zaydan-theme` localStorage key (same as theme.js),
-  // then the OS preference. Default light — matching theme.js's default.
+  // Fixed look: always a white canvas with a black umbrella and black rain,
+  // regardless of the site's light/dark mode. Both palettes are identical, so
+  // none of the theme-following / inversion machinery below can change it.
   const THEMES = {
-    // rain = dithered rain-dot color; back = plain background fill.
-    dark:  { bg: '#0a0a0a', ink: '#f0f0f0', rain: [240, 240, 240] },
+    // rain = dithered rain-dot color; bg = plain background fill.
+    dark:  { bg: '#f0f0f0', ink: '#0a0a0a', rain: [10, 10, 10] },
     light: { bg: '#f0f0f0', ink: '#0a0a0a', rain: [10, 10, 10] },
   };
   const params = new URLSearchParams(location.search);
