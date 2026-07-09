@@ -293,12 +293,13 @@
 
     /* ── Info / Contact buttons (Zaydan view) ─────────────── */
     #z-info-contact {
-      position:fixed; bottom:28px; right:32px;
+      position:fixed; bottom:32px; right:32px;
       z-index:80; display:flex;
-      flex-direction:row; gap:16px;
+      flex-direction:row; align-items:center; gap:16px;
+      padding:6px 0;
     }
     @media (max-width: 600px) {
-      #z-info-contact { bottom:20px; right:16px; gap:10px; }
+      #z-info-contact { bottom:20px; right:16px; gap:10px; padding:4px 0; }
     }
     .pixel-btn {
       font-family:'VT323', monospace;
@@ -306,10 +307,10 @@
       letter-spacing:.06em;
       color:rgba(255,255,255,.55);
       background:none; border:none;
-      cursor:none !important; padding:0;
+      cursor:none !important; padding:6px 0;
       text-transform:lowercase;
       transition:color .15s, text-shadow .15s;
-      display:block; text-align:right;
+      display:block; text-align:right; line-height:1;
     }
     .pixel-btn:hover {
       color:#fff;
@@ -337,7 +338,17 @@
     .z-popup-content {
       font-family:'Lora', Georgia, serif;
       font-size:15px; line-height:1.75; color:#333;
+      text-align:center;
     }
+    .z-popup-content .contact-label {
+      font-size:11px; letter-spacing:0.12em; text-transform:uppercase;
+      color:#999; margin-top:20px; margin-bottom:2px;
+    }
+    .z-popup-content .contact-label:first-child { margin-top:0; }
+    .z-popup-content a {
+      color:#111; text-decoration:none; border-bottom:1px solid #ccc;
+    }
+    .z-popup-content a:hover { border-bottom-color:#111; }
 
     /* ════════════════════════════════════════════════════════
        RESPONSIVE
@@ -839,15 +850,26 @@
   const zPopupEl  = document.getElementById('z-popup');
   const zPopupTxt = document.getElementById('z-popup-content');
   document.getElementById('z-btn-info').addEventListener('click', () => {
-    zPopupTxt.innerHTML = '<p>Info coming soon.</p>';
+    zPopupTxt.innerHTML = `
+      <p>Zaydan is an AI-native design engineer based in Stanford, California, whose work sits at the intersection of human-centered design, systems thinking, and social impact.</p>
+    `;
     zPopupEl.style.display = 'flex';
   });
   document.getElementById('z-btn-contact').addEventListener('click', () => {
-    zPopupTxt.innerHTML = '<p>Contact coming soon.</p>';
+    zPopupTxt.innerHTML = `
+      <p class="contact-label">General Inquiries</p>
+      <p><a href="mailto:zaydan1234@gmail.com">zaydan1234@gmail.com</a></p>
+      <p class="contact-label">LinkedIn</p>
+      <p><a href="https://www.linkedin.com/in/zaydanka" target="_blank">Zaydan Kabir Amanullah</a></p>
+      <p class="contact-label">Instagram</p>
+      <p><a href="https://instagram.com/zaydanka.design" target="_blank">@zaydanka.design</a></p>
+      <p class="contact-label">Substack</p>
+      <p><a href="https://zaydanamanullah.substack.com" target="_blank">zaydanamanullah</a></p>
+    `;
     zPopupEl.style.display = 'flex';
   });
   document.getElementById('z-btn-resume').addEventListener('click', () => {
-    window.open('uploads/CV-4.pdf', '_blank');
+    window.open('uploads/Design%20Resume.docx-3.pdf', '_blank');
   });
   document.getElementById('z-popup-close').addEventListener('click', () => { zPopupEl.style.display = 'none'; });
   zPopupEl.addEventListener('click', e => { if (e.target === zPopupEl) zPopupEl.style.display = 'none'; });
