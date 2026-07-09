@@ -168,7 +168,7 @@
       grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(0, 1fr);
       grid-template-rows: auto 1fr;
       height: 100vh; height: 100dvh;
-      padding: clamp(16px, 3vw, 48px) clamp(16px, 3vw, 48px) clamp(72px, 8vh, 108px);
+      padding: clamp(16px, 3vw, 48px);
       gap: 0 clamp(16px, 3vw, 36px);
       overflow: hidden;
       position:relative; z-index:2;
@@ -293,24 +293,21 @@
 
     /* ── Info / Contact buttons (Zaydan view) ─────────────── */
     #z-info-contact {
-      position:fixed; bottom:32px; right:32px;
-      z-index:80; display:flex;
-      flex-direction:row; align-items:center; gap:16px;
-      padding:6px 0;
+      position:fixed; bottom:28px; right:32px;
+      z-index:80; display:none;
+      flex-direction:row; gap:16px;
     }
-    @media (max-width: 600px) {
-      #z-info-contact { bottom:20px; right:16px; gap:10px; padding:4px 0; }
-    }
+    body.zaydan-active #z-info-contact { display:flex; }
     .pixel-btn {
       font-family:'VT323', monospace;
       font-size:clamp(16px,1.4vw,22px);
       letter-spacing:.06em;
       color:rgba(255,255,255,.55);
       background:none; border:none;
-      cursor:none !important; padding:6px 0;
+      cursor:none !important; padding:0;
       text-transform:lowercase;
       transition:color .15s, text-shadow .15s;
-      display:block; text-align:right; line-height:1;
+      display:block; text-align:right;
     }
     .pixel-btn:hover {
       color:#fff;
@@ -338,17 +335,7 @@
     .z-popup-content {
       font-family:'Lora', Georgia, serif;
       font-size:15px; line-height:1.75; color:#333;
-      text-align:center;
     }
-    .z-popup-content .contact-label {
-      font-size:11px; letter-spacing:0.12em; text-transform:uppercase;
-      color:#999; margin-top:20px; margin-bottom:2px;
-    }
-    .z-popup-content .contact-label:first-child { margin-top:0; }
-    .z-popup-content a {
-      color:#111; text-decoration:none; border-bottom:1px solid #ccc;
-    }
-    .z-popup-content a:hover { border-bottom-color:#111; }
 
     /* ════════════════════════════════════════════════════════
        RESPONSIVE
@@ -359,7 +346,7 @@
       #header { padding:18px 28px 10px; }
       .page {
         grid-template-columns: minmax(180px, 220px) minmax(0,1fr) minmax(0,1fr);
-        padding:clamp(12px,2vw,28px) clamp(12px,2vw,28px) clamp(64px,8vh,96px);
+        padding:clamp(12px,2vw,28px);
         gap:0 clamp(10px,2vw,20px);
       }
       .name { font-size:22px; }
@@ -393,7 +380,7 @@
         flex-direction:column;
         height:auto;
         min-height:100vh; min-height:100dvh;
-        padding:16px 16px 72px;
+        padding:16px;
         gap:0;
         overflow:visible;
       }
@@ -850,26 +837,15 @@
   const zPopupEl  = document.getElementById('z-popup');
   const zPopupTxt = document.getElementById('z-popup-content');
   document.getElementById('z-btn-info').addEventListener('click', () => {
-    zPopupTxt.innerHTML = `
-      <p>Zaydan is an AI-native design engineer based in Stanford, California, whose work sits at the intersection of human-centered design, systems thinking, and social impact.</p>
-    `;
+    zPopupTxt.innerHTML = '<p>Info coming soon.</p>';
     zPopupEl.style.display = 'flex';
   });
   document.getElementById('z-btn-contact').addEventListener('click', () => {
-    zPopupTxt.innerHTML = `
-      <p class="contact-label">General Inquiries</p>
-      <p><a href="mailto:zaydan1234@gmail.com">zaydan1234@gmail.com</a></p>
-      <p class="contact-label">LinkedIn</p>
-      <p><a href="https://www.linkedin.com/in/zaydanka" target="_blank">Zaydan Kabir Amanullah</a></p>
-      <p class="contact-label">Instagram</p>
-      <p><a href="https://instagram.com/zaydanka.design" target="_blank">@zaydanka.design</a></p>
-      <p class="contact-label">Substack</p>
-      <p><a href="https://zaydanamanullah.substack.com" target="_blank">zaydanamanullah</a></p>
-    `;
+    zPopupTxt.innerHTML = '<p>Contact coming soon.</p>';
     zPopupEl.style.display = 'flex';
   });
   document.getElementById('z-btn-resume').addEventListener('click', () => {
-    window.open('uploads/Design%20Resume.docx-3.pdf', '_blank');
+    window.open('uploads/CV-4.pdf', '_blank');
   });
   document.getElementById('z-popup-close').addEventListener('click', () => { zPopupEl.style.display = 'none'; });
   zPopupEl.addEventListener('click', e => { if (e.target === zPopupEl) zPopupEl.style.display = 'none'; });
