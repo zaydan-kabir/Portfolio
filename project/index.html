@@ -168,7 +168,7 @@
       grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(0, 1fr);
       grid-template-rows: auto 1fr;
       height: 100vh; height: 100dvh;
-      padding: clamp(16px, 3vw, 48px);
+      padding: clamp(16px, 3vw, 48px) clamp(16px, 3vw, 48px) clamp(72px, 8vh, 108px);
       gap: 0 clamp(16px, 3vw, 36px);
       overflow: hidden;
       position:relative; z-index:2;
@@ -359,7 +359,7 @@
       #header { padding:18px 28px 10px; }
       .page {
         grid-template-columns: minmax(180px, 220px) minmax(0,1fr) minmax(0,1fr);
-        padding:clamp(12px,2vw,28px);
+        padding:clamp(12px,2vw,28px) clamp(12px,2vw,28px) clamp(64px,8vh,96px);
         gap:0 clamp(10px,2vw,20px);
       }
       .name { font-size:22px; }
@@ -393,7 +393,7 @@
         flex-direction:column;
         height:auto;
         min-height:100vh; min-height:100dvh;
-        padding:16px;
+        padding:16px 16px 72px;
         gap:0;
         overflow:visible;
       }
