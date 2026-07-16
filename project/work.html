@@ -165,7 +165,9 @@
       animation: stackMarquee 34s linear infinite;
       will-change: transform;
     }
-    .stack-marquee:hover .stack-track { animation-play-state: paused; }
+    /* Hover pause/resume is driven by JS via the Web Animations API so the
+       current playback position is preserved (a CSS-only :hover rule can
+       jump when the compositor rebuilds the layer). */
     .stack-list {
       list-style: none;
       margin: 0;
@@ -677,6 +679,28 @@
     }
 
     const stackMarquee = document.querySelector('.stack-marquee');
+    const stackTrack = stackMarquee ? stackMarquee.querySelector('.stack-track') : null;
+    if (stackMarquee && stackTrack) {
+      // Pause the marquee where it is on mouse hover and resume from the same
+      // position on leave. Uses the Web Animations API so playback time is
+      // preserved (no jump-to-start on either transition).
+      let stackHoverPointer = false;
+      const getStackAnim = () => (stackTrack.getAnimations ? stackTrack.getAnimations()[0] : null);
+      stackMarquee.addEventListener('pointerenter', event => {
+        if (event.pointerType && event.pointerType !== 'mouse') return;
+        stackHoverPointer = true;
+        const anim = getStackAnim();
+        if (anim && anim.playState === 'running') anim.pause();
+      });
+      stackMarquee.addEventListener('pointerleave', event => {
+        if (event.pointerType && event.pointerType !== 'mouse') return;
+        stackHoverPointer = false;
+        // Only resume if we aren't mid-drag on touch.
+        if (stackMarquee.classList.contains('is-dragging')) return;
+        const anim = getStackAnim();
+        if (anim && anim.playState === 'paused') anim.play();
+      });
+    }
     if (stackMarquee && window.matchMedia('(pointer: coarse)').matches) {
       let stackPointerId = null;
       let stackStartX = 0;
