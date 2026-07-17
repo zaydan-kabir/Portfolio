@@ -676,7 +676,7 @@
   })();
 
   // ── Img-box cursor labels ─────────────────────────────────────────
-  const imgLabels = { 'box-0': 'Magdalen College, Oxford', 'box-2': 'Looking for inspiration' };
+  const imgLabels = { 'box-0': 'Magdalen College, Oxford' };
   document.querySelectorAll('.img-box').forEach(el => {
     if (!imgLabels[el.id]) return;
     el.addEventListener('mouseenter', () => { cursorLabel.textContent = imgLabels[el.id]||''; document.body.classList.add('img-hover'); });
