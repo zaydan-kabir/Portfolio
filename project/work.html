@@ -456,16 +456,34 @@
       }
       .grid-item:last-child { margin-bottom: 0; }
 
-      /* The preview keeps the rounded, shadowed card look; caption sits below. */
+      /* A spacer reserves the preview's height so the tile keeps its size even
+         when the IntersectionObserver hides an off-screen iframe with
+         display:none — otherwise the tile collapses and the page jumps as you
+         scroll. The iframe/img is overlaid on top of this spacer. */
+      .grid-item::before {
+        content: "";
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        border-radius: 6px;
+        background: var(--tile);
+        box-shadow: var(--tile-shadow);
+      }
       .grid-item img, .grid-item iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
         height: auto;
         aspect-ratio: 16 / 10;
         border-radius: 6px;
-        box-shadow: var(--tile-shadow);
+        box-shadow: none;
       }
+      .grid-item:nth-child(2)::before, .grid-item:nth-child(5)::before, .grid-item:nth-child(6)::before,
       .grid-item:nth-child(2) img, .grid-item:nth-child(2) iframe,
       .grid-item:nth-child(5) img, .grid-item:nth-child(5) iframe,
       .grid-item:nth-child(6) img, .grid-item:nth-child(6) iframe { aspect-ratio: 3 / 4; }  /* portrait pieces */
+      .grid-item:nth-child(7)::before,
       .grid-item:nth-child(7) img, .grid-item:nth-child(7) iframe { aspect-ratio: 16 / 9; } /* Knot banner */
 
       /* Caption below the tile — plain text on the page, no scrim, theme-aware. */
