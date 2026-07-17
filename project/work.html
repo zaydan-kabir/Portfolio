@@ -142,32 +142,31 @@
       white-space: nowrap;
     }
     .stack-marquee {
-      --stack-drag-offset: 0px;
       flex: 1 1 auto;
       min-width: 0;
-      overflow: hidden;
+      overflow-x: auto;
+      overflow-y: hidden;
       position: relative;
-      touch-action: pan-y;
+      /* Let horizontal swipes scroll the stack while vertical swipes still
+         scroll the page. */
+      touch-action: pan-x;
       user-select: none;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: auto;
       -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
       mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
     }
-    .stack-marquee.is-dragging .stack-track {
-      animation-play-state: paused;
-    }
-    .stack-marquee.is-settling .stack-track {
-      transition: transform .38s cubic-bezier(.22,1,.36,1);
-    }
+    .stack-marquee::-webkit-scrollbar { display: none; }
     .stack-track {
       display: flex;
       align-items: center;
       width: max-content;
-      animation: stackMarquee 34s linear infinite;
-      will-change: transform;
     }
-    /* Hover pause/resume is driven by JS via the Web Animations API so the
-       current playback position is preserved (a CSS-only :hover rule can
-       jump when the compositor rebuilds the layer). */
+    /* The stack auto-scrolls via JS on top of native horizontal scroll, so it
+       can also be dragged / swiped by hand; auto-advance pauses while the user
+       is interacting and on mouse hover. */
     .stack-list {
       list-style: none;
       margin: 0;
@@ -283,18 +282,13 @@
       background: #fff;
       border: 1px solid rgba(10,10,10,.16);
     }
-    @keyframes stackMarquee {
-      from { transform: translate3d(var(--stack-drag-offset), 0, 0); }
-      to { transform: translate3d(calc(-50% + var(--stack-drag-offset)), 0, 0); }
-    }
     @media (prefers-reduced-motion: reduce) {
-      .stack-track { animation: none; }
       .stack-marquee {
-        overflow-x: auto;
         -webkit-mask-image: none;
         mask-image: none;
         scrollbar-width: thin;
       }
+      .stack-marquee::-webkit-scrollbar { display: block; }
     }
 
     .work-grid {
@@ -717,97 +711,83 @@
       });
     }
 
+    // Design stack: a native horizontal scroller that also auto-advances.
+    // The auto-scroll runs on rAF (adjusting scrollLeft); users can freely
+    // drag/swipe (touch) or wheel/trackpad (desktop) to scroll it themselves.
+    // Auto-advance pauses on mouse hover and briefly while the user interacts,
+    // then resumes from wherever they left it. The tool list is duplicated in
+    // the markup, so wrapping at the halfway point loops seamlessly.
     const stackMarquee = document.querySelector('.stack-marquee');
     const stackTrack = stackMarquee ? stackMarquee.querySelector('.stack-track') : null;
     if (stackMarquee && stackTrack) {
-      // Pause the marquee where it is on mouse hover and resume from the same
-      // position on leave. Uses the Web Animations API so playback time is
-      // preserved (no jump-to-start on either transition).
-      let stackHoverPointer = false;
-      const getStackAnim = () => (stackTrack.getAnimations ? stackTrack.getAnimations()[0] : null);
-      stackMarquee.addEventListener('pointerenter', event => {
-        if (event.pointerType && event.pointerType !== 'mouse') return;
-        stackHoverPointer = true;
-        const anim = getStackAnim();
-        if (anim && anim.playState === 'running') anim.pause();
-      });
-      stackMarquee.addEventListener('pointerleave', event => {
-        if (event.pointerType && event.pointerType !== 'mouse') return;
-        stackHoverPointer = false;
-        // Only resume if we aren't mid-drag on touch.
-        if (stackMarquee.classList.contains('is-dragging')) return;
-        const anim = getStackAnim();
-        if (anim && anim.playState === 'paused') anim.play();
-      });
-    }
-    if (stackMarquee && window.matchMedia('(pointer: coarse)').matches) {
-      let stackPointerId = null;
-      let stackStartX = 0;
-      let stackStartY = 0;
-      let stackDragX = 0;
-      let stackSettlingFrame = 0;
-      let stackIsHorizontal = false;
+      const stackReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const STACK_CYCLE_MS = 34000; // time to travel one full list (matches the old marquee)
 
-      function setStackOffset(value) {
-        stackDragX = Math.max(-140, Math.min(140, value));
-        stackMarquee.style.setProperty('--stack-drag-offset', `${stackDragX}px`);
-      }
+      let stackHalf = 0;      // width of one (duplicated) list
+      let stackPos = 0;       // our float scroll position
+      let stackExpected = 0;  // last scrollLeft we set — used to tell our scrolls from the user's
+      let stackHoverPaused = false;
+      let stackUserActive = false;
+      let stackUserTimer = 0;
+      let stackLastTs = null;
 
-      function settleStackOffset() {
-        cancelAnimationFrame(stackSettlingFrame);
-        const start = stackDragX;
-        const startedAt = performance.now();
-        const duration = 520;
-        stackMarquee.classList.add('is-settling');
+      const measureStack = () => { stackHalf = stackMarquee.scrollWidth / 2; };
+      measureStack();
+      window.addEventListener('load', measureStack);
+      window.addEventListener('resize', measureStack);
+      if (window.ResizeObserver) new ResizeObserver(measureStack).observe(stackTrack);
 
-        function tick(now) {
-          const progress = Math.min(1, (now - startedAt) / duration);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          setStackOffset(start * (1 - eased));
-          if (progress < 1) {
-            stackSettlingFrame = requestAnimationFrame(tick);
-          } else {
-            stackMarquee.classList.remove('is-settling');
-            stackSettlingFrame = 0;
-          }
-        }
+      const applyStackScroll = value => {
+        stackMarquee.scrollLeft = value;
+        stackExpected = stackMarquee.scrollLeft; // read back (browser rounds/clamps)
+      };
+      const wrapStackPos = () => {
+        if (stackHalf <= 0) return;
+        if (stackPos >= stackHalf) stackPos -= stackHalf;
+        else if (stackPos < 0) stackPos += stackHalf;
+      };
+      const markStackUser = () => {
+        stackUserActive = true;
+        clearTimeout(stackUserTimer);
+        stackUserTimer = setTimeout(() => { stackUserActive = false; }, 900);
+      };
 
-        stackSettlingFrame = requestAnimationFrame(tick);
-      }
+      // Desktop: pause auto-advance while hovering with a mouse.
+      stackMarquee.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') stackHoverPaused = true; });
+      stackMarquee.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') stackHoverPaused = false; });
 
-      stackMarquee.addEventListener('pointerdown', event => {
-        if (event.pointerType === 'mouse') return;
-        cancelAnimationFrame(stackSettlingFrame);
-        stackPointerId = event.pointerId;
-        stackStartX = event.clientX;
-        stackStartY = event.clientY;
-        stackIsHorizontal = false;
-        stackMarquee.classList.add('is-dragging');
-        stackMarquee.classList.remove('is-settling');
-        stackMarquee.setPointerCapture(event.pointerId);
+      // Direct manipulation (drag / swipe / horizontal wheel) pauses auto-advance.
+      stackMarquee.addEventListener('pointerdown', markStackUser);
+      stackMarquee.addEventListener('touchstart', markStackUser, { passive: true });
+      stackMarquee.addEventListener('wheel', e => {
+        if (Math.abs(e.deltaX) >= Math.abs(e.deltaY)) markStackUser();
       }, { passive: true });
 
-      stackMarquee.addEventListener('pointermove', event => {
-        if (event.pointerId !== stackPointerId) return;
-        const dx = event.clientX - stackStartX;
-        const dy = event.clientY - stackStartY;
-        if (!stackIsHorizontal && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.15) {
-          stackIsHorizontal = true;
+      // Distinguish user-driven scrolls (drag momentum, wheel) from our own.
+      stackMarquee.addEventListener('scroll', () => {
+        const cur = stackMarquee.scrollLeft;
+        if (Math.abs(cur - stackExpected) > 2) {
+          markStackUser();
+          stackPos = cur;
+          if (stackHalf > 0 && (stackPos >= stackHalf || stackPos < 0)) {
+            wrapStackPos();
+            applyStackScroll(stackPos);
+          }
         }
-        if (!stackIsHorizontal) return;
-        event.preventDefault();
-        setStackOffset(dx * 0.72);
-      }, { passive: false });
+      }, { passive: true });
 
-      function endStackDrag(event) {
-        if (event.pointerId !== stackPointerId) return;
-        stackPointerId = null;
-        stackMarquee.classList.remove('is-dragging');
-        settleStackOffset();
-      }
-
-      stackMarquee.addEventListener('pointerup', endStackDrag);
-      stackMarquee.addEventListener('pointercancel', endStackDrag);
+      const stepStack = ts => {
+        if (stackLastTs == null) stackLastTs = ts;
+        const dt = ts - stackLastTs;
+        stackLastTs = ts;
+        if (!stackReduceMotion && !stackHoverPaused && !stackUserActive && stackHalf > 0) {
+          stackPos += (stackHalf / STACK_CYCLE_MS) * dt;
+          wrapStackPos();
+          applyStackScroll(stackPos);
+        }
+        requestAnimationFrame(stepStack);
+      };
+      requestAnimationFrame(stepStack);
     }
   </script>
 
