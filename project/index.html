@@ -175,8 +175,8 @@
     }
     .header-spacer {
       grid-column:1/-1;
-      height:58px; /* match header height */
-      margin-bottom:8px;
+      height:24px; /* clear the fixed header (page padding adds the rest) */
+      margin-bottom:6px;
       border-bottom:1px solid transparent;
     }
     .left { display:flex; flex-direction:column; gap:6px; position:relative; overflow:hidden; min-height:0; }
@@ -352,6 +352,7 @@
       .name { font-size:22px; }
       .section-label { font-size:12px; }
       .bio, .hobby { font-size:11px; }
+      .header-spacer { height:34px; margin-bottom:6px; }
     }
 
     /* ── Mobile: ≤767px — single column, scrollable ── */
@@ -385,7 +386,7 @@
         overflow:visible;
       }
 
-      .header-spacer { height:56px; margin-bottom:12px; }
+      .header-spacer { height:calc(env(safe-area-inset-top, 0px) + 32px); margin-bottom:4px; }
       .left { overflow-y:visible; min-height:0; gap:10px; }
 
       .name { font-size:24px; }
