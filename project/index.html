@@ -415,21 +415,8 @@
         object-position:center center;
       }
 
-      /* Right images: stacked full-width landscape panels */
-      .img-col-right {
-        flex-direction:column;
-        height:auto;
-        max-height:none;
-        min-height:0;
-        margin-top:14px;
-        margin-bottom:28px;
-        gap:12px;
-      }
-      .img-col-right .img-box {
-        flex:none;
-        width:100%;
-        height:58vw;
-      }
+      /* Mobile: only show the suit portrait (center); hide the other photos */
+      .img-col-right { display:none !important; }
 
       #arrow-svg { display:none !important; }
 
