@@ -463,7 +463,23 @@
       body { cursor: auto; }
       a, button, a:hover, button:hover { cursor: auto !important; }
       #cursor, #trail-canvas { display: none; }
-      .grid-overlay { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      /* Touch: no hover, so pin the label as a small chip in the bottom-left
+         corner instead of a centered box — keeps the hyperframe preview visible. */
+      .grid-overlay,
+      .grid-item:hover .grid-overlay {
+        opacity: 1;
+        left: 8px;
+        top: auto;
+        bottom: 8px;
+        transform: none;
+        min-width: 0;
+        max-width: calc(100% - 16px);
+        align-items: flex-start;
+        text-align: left;
+        gap: 1px;
+        padding: 6px 10px 7px;
+        border-radius: 10px;
+      }
     }
   </style>
   <script src="theme.js?v=20260506-restored-manifesto-panel"></script>
