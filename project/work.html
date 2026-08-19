@@ -299,16 +299,13 @@
       position: relative; overflow: hidden; background: var(--tile); text-decoration: none; display: block; border-radius: 6px;
       box-shadow: var(--tile-shadow); isolation: isolate;
     }
-    /* Explicit rows so the three upper columns each fill exactly 6 rows (no
-       holes), then Knot as the full-width anchor. Order: Clarity, Interstellar,
-       Design Manifesto, Animal Liberation, Book Cover, Type Poster, Knot. */
-    .grid-item:nth-child(1) { grid-column: 1 / span 5; grid-row: 1 / span 3; }        /* Clarity */
-    .grid-item:nth-child(2) { grid-column: 6 / span 4; grid-row: 1 / span 4; }        /* Interstellar Automata */
-    .grid-item:nth-child(3) { grid-column: 6 / span 4; grid-row: 5 / span 2; }        /* Design Manifesto */
-    .grid-item:nth-child(4) { grid-column: 10 / span 3; grid-row: 1 / span 2; }       /* Animal Liberation, Indigeneity, and Morality */
-    .grid-item:nth-child(5) { grid-column: 1 / span 5; grid-row: 4 / span 3; }        /* Book Cover Re-Design */
-    .grid-item:nth-child(6) { grid-column: 10 / span 3; grid-row: 3 / span 4; }       /* Type Design Poster */
-    .grid-item:nth-child(7) { grid-column: 1 / -1; grid-row: 7 / span 2; }            /* Currently Building @ Knot — full-width anchor */
+    /* Two-column split of even 3-row tiles, then Knot as the full-width
+       anchor. Order: Clarity, Design Manifesto, Book Cover, Type Poster, Knot. */
+    .grid-item:nth-child(1) { grid-column: 1 / span 6; grid-row: 1 / span 3; }        /* Clarity */
+    .grid-item:nth-child(2) { grid-column: 7 / span 6; grid-row: 1 / span 3; }        /* Design Manifesto */
+    .grid-item:nth-child(3) { grid-column: 1 / span 6; grid-row: 4 / span 3; }        /* Book Cover Re-Design */
+    .grid-item:nth-child(4) { grid-column: 7 / span 6; grid-row: 4 / span 3; }        /* Type Design Poster */
+    .grid-item:nth-child(5) { grid-column: 1 / -1; grid-row: 7 / span 2; }            /* Currently Building @ Knot — full-width anchor */
 
     .grid-item img, .grid-item iframe {
       width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.08) saturate(.92) contrast(.96);
@@ -420,13 +417,11 @@
       .work-bio p { max-width: 100%; }
       .tool-stack { --stack-gap: 8px; }
       .work-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: clamp(68px, 15vw, 116px); }
-      .grid-item:nth-child(1) { grid-column: 1 / span 6; grid-row: span 3; }   /* Clarity */
-      .grid-item:nth-child(2) { grid-column: 1 / span 3; grid-row: span 4; }   /* Interstellar */
-      .grid-item:nth-child(3) { grid-column: 4 / span 3; grid-row: span 2; }   /* Design Manifesto */
-      .grid-item:nth-child(4) { grid-column: 4 / span 3; grid-row: span 2; }   /* Animal Liberation */
-      .grid-item:nth-child(5) { grid-column: 1 / span 3; grid-row: span 4; }   /* Book Cover */
-      .grid-item:nth-child(6) { grid-column: 4 / span 3; grid-row: span 4; }   /* Type Design Poster */
-      .grid-item:nth-child(7) { grid-column: 1 / span 6; grid-row: span 2; }   /* Knot — full-width anchor */
+      .grid-item:nth-child(1) { grid-column: 1 / span 3; grid-row: span 4; }   /* Clarity */
+      .grid-item:nth-child(2) { grid-column: 4 / span 3; grid-row: span 4; }   /* Design Manifesto */
+      .grid-item:nth-child(3) { grid-column: 1 / span 3; grid-row: span 4; }   /* Book Cover */
+      .grid-item:nth-child(4) { grid-column: 4 / span 3; grid-row: span 4; }   /* Type Design Poster */
+      .grid-item:nth-child(5) { grid-column: 1 / span 6; grid-row: span 2; }   /* Knot — full-width anchor */
     }
     @media (max-width: 560px) {
       #header { padding-left: 18px; padding-right: 18px; }
@@ -479,12 +474,11 @@
         border-radius: 6px;
         box-shadow: none;
       }
-      .grid-item:nth-child(2)::before, .grid-item:nth-child(5)::before, .grid-item:nth-child(6)::before,
-      .grid-item:nth-child(2) img, .grid-item:nth-child(2) iframe,
-      .grid-item:nth-child(5) img, .grid-item:nth-child(5) iframe,
-      .grid-item:nth-child(6) img, .grid-item:nth-child(6) iframe { aspect-ratio: 3 / 4; }  /* portrait pieces */
-      .grid-item:nth-child(7)::before,
-      .grid-item:nth-child(7) img, .grid-item:nth-child(7) iframe { aspect-ratio: 16 / 9; } /* Knot banner */
+      .grid-item:nth-child(3)::before, .grid-item:nth-child(4)::before,
+      .grid-item:nth-child(3) img, .grid-item:nth-child(3) iframe,
+      .grid-item:nth-child(4) img, .grid-item:nth-child(4) iframe { aspect-ratio: 3 / 4; }  /* portrait pieces */
+      .grid-item:nth-child(5)::before,
+      .grid-item:nth-child(5) img, .grid-item:nth-child(5) iframe { aspect-ratio: 16 / 9; } /* Knot banner */
 
       /* Caption below the tile — plain text on the page, no scrim, theme-aware. */
       .grid-item .grid-overlay,
@@ -544,6 +538,7 @@
     <a class="h-name" href="Zaydan%20Kabir%20Amanullah.html" data-page="Zaydan%20Kabir%20Amanullah.html">Zaydan Kabir Amanullah</a>
     <nav class="h-nav">
       <a class="h-link active" href="work.html">Work</a>
+      <a class="h-link" href="playground.html" data-page="playground.html">Playground</a>
       <a class="h-link" href="index.html" data-page="index.html">About</a>
     </nav>
   </header>
@@ -601,19 +596,9 @@
       </div>
     </a>
 
-    <a class="grid-item" href="https://youtu.be/Q-NRXm59fLE" data-project-link="interstellar-automata" target="_blank" rel="noopener noreferrer" aria-label="Open Interstellar Automata video">
-      <iframe data-src="interstellar-automata-hyperframe/index.html" title="Interstellar Automata animated preview" aria-hidden="true"></iframe>
-      <div class="grid-overlay"><span class="item-name">Interstellar Automata</span><span class="item-subtitle">Product Design</span></div>
-    </a>
-
     <a class="grid-item" href="design-manifesto.html" target="_blank" rel="noopener noreferrer" data-project-link="design-manifesto" aria-label="Open Design Manifesto">
       <iframe data-src="design-manifesto-hyperframe/index.html?v=20260508-bee-fig" title="Design Manifesto animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Design Manifesto</span><span class="item-subtitle">Creative Coding, UI Design</span></div>
-    </a>
-
-    <a class="grid-item" href="https://stanfordpoliticalreview.org/2026/04/22/animal-liberation-indigeneity-and-morality/" target="_blank" rel="noopener noreferrer" data-project-link="animal-liberation" aria-label="Read Animal Liberation, Indigeneity, and Morality at Stanford Political Review">
-      <iframe data-src="animal-liberation-hyperframe/index.html" title="Animal Liberation, Indigeneity, and Morality animated preview" aria-hidden="true"></iframe>
-      <div class="grid-overlay"><span class="item-name">Animal Liberation, Indigeneity, and Morality</span><span class="item-subtitle">Stanford Political Review: Social Justice &amp; Law Paper</span></div>
     </a>
 
     <a class="grid-item" href="book-cover-redesign.html" target="_blank" rel="noopener noreferrer" data-project-link="book-cover-redesign" aria-label="Open Book Cover Re-Design — My Year of Rest and Relaxation">
