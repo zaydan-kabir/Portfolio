@@ -16,10 +16,22 @@ column reads as one set (see "Harmonising" below).
 | `stanford.png`      | Stanford University          | **no**  |
 | `oxford.png`        | University of Oxford         | yes     |
 
-Rows whose file is missing fall back to a small typographic monogram
-chip. That fallback is automatic: each `<img>` already points at the
-filename above and carries an `onerror` hook, so **dropping the file in
-here is the only step needed** — no markup or CSS change.
+Rows whose file is missing show a small dashed empty slot — deliberately
+not a lookalike mark, and not the org name repeated back, since the name
+is already the visible text beside it. It holds the column's rhythm so a
+pending row reads as awaiting art rather than broken.
+
+The swap is automatic: each `<img>` already points at the filename above
+and carries an `onerror` hook, so **dropping the file in here is the only
+step needed** — no markup or CSS change.
+
+### Still needed
+
+`stanford.png` and `stimson.png`. Both were unobtainable from this
+environment — the egress policy blocks stanford.edu, stimson.org,
+Wikimedia and Clearbit, Google Drive holds no logo assets, and the
+`simple-icons` set (3,453 brands) carries neither. They have to be
+supplied by hand from each institution's own brand/identity page.
 
 ## Adding a missing logo
 
@@ -99,4 +111,4 @@ in place. Raw originals live in `../_raw-logos/` and are never served.
 These are third-party trademarks, used here nominatively to indicate
 where the site's author studied and worked. Use the organisation's own
 official asset; do not redraw or approximate a mark. Missing rows
-deliberately show a plain typographic monogram rather than a lookalike.
+deliberately show an empty dashed slot rather than a lookalike.
