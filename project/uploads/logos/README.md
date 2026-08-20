@@ -33,12 +33,19 @@ Wikimedia and Clearbit, Google Drive holds no logo assets, and the
 `simple-icons` set (3,453 brands) carries neither. They have to be
 supplied by hand from each institution's own brand/identity page.
 
+Note that a *genuine* SVG cannot be sent through the chat attachment
+pipeline — it rejects the file because it cannot read image dimensions
+from the header. Either export it to PNG first, or paste the SVG source
+as text and it can be written to `_raw-logos/` and rasterised from
+there; the loader handles `.svg` sources directly.
+
 ## Adding a missing logo
 
-1. Get the official asset from the organisation's own brand/press page
-   (SVG or a large transparent PNG is best — at least ~600px on its
-   long edge, transparent background, no surrounding whitespace baked
-   in; the script trims it anyway).
+1. Get the official asset from the organisation's own brand/press page.
+   A true SVG is ideal — `normalise-logos.py` rasterises vectors at
+   1600px wide before downscaling, which stays crisper than any small
+   exported PNG. Otherwise a large transparent PNG (~600px+ on its long
+   edge). Surrounding whitespace is fine; the script trims to content.
 2. Save the raw file somewhere outside this folder, e.g.
    `project/uploads/_raw-logos/pwc-original.png`.
 3. If the source is a flat JPEG on a white ground, or pairs a black

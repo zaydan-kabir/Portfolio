@@ -53,9 +53,37 @@ SCALE = 3    # render at 3x for retina
 BLEND = 0.6  # 1 = pure ink-area balance, 0 = just fit the box
 
 
+RASTER_W = 1600  # width a vector source is rasterised at before downscaling
+
+
+def open_any(path):
+    """Open a raster file, or rasterise a true SVG at high resolution first.
+
+    Brand pages usually hand out vectors, and a genuine SVG cannot be opened
+    by Pillow. Rasterising wide and letting LANCZOS downscale to the slot
+    keeps the mark crisp — far better than accepting a small exported PNG.
+    """
+    if os.path.splitext(path)[1].lower() != ".svg":
+        return Image.open(path).convert("RGBA")
+
+    import io
+
+    try:
+        import cairosvg
+    except ImportError as exc:  # pragma: no cover - depends on environment
+        raise SystemExit(
+            f"{os.path.basename(path)} is a vector source; install the "
+            "rasteriser with `pip install cairosvg`, or export it to a "
+            "transparent PNG first."
+        ) from exc
+
+    png = cairosvg.svg2png(url=path, output_width=RASTER_W)
+    return Image.open(io.BytesIO(png)).convert("RGBA")
+
+
 def load(path):
     """Trim to content, and report ink area + whether the mark is one colour."""
-    im = Image.open(path).convert("RGBA")
+    im = open_any(path)
     bbox = im.split()[-1].getbbox()
     if bbox is None:
         raise ValueError(f"{path} is fully transparent")
