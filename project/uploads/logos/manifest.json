@@ -1,0 +1,26 @@
+{
+  "replit": {
+    "mono": false,
+    "slot": [
+      44,
+      20
+    ],
+    "drawn_css": [
+      16.7,
+      20.0
+    ],
+    "pct_of_naive_fit": 1.0
+  },
+  "knot": {
+    "mono": true,
+    "slot": [
+      44,
+      20
+    ],
+    "drawn_css": [
+      35.3,
+      13.3
+    ],
+    "pct_of_naive_fit": 0.807
+  }
+}
