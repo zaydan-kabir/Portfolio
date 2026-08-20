@@ -4,185 +4,324 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Animal Liberation, Indigeneity, and Morality — preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #efeae0; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #14110d; }
 
+    /* The expanding moral circle — the paper's own argument as its image.
+       A core radiates outward through widening rings of obligation; a pulse
+       sweeps out and each ring of beings lights as it is drawn inside the
+       circle. Warm and earthen so it reads as a sibling to the Interstellar
+       tile's cold observatory rather than a copy of it. */
     [data-composition-id="animal-liberation-preview"] {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      color: #1a1815;
+      color: #ece3d2;
       font-family: 'Cormorant Garamond', 'Lora', Georgia, serif;
       background:
-        radial-gradient(ellipse at 18% 8%, rgba(120,80,40,.10) 0%, transparent 38%),
-        radial-gradient(ellipse at 88% 92%, rgba(60,40,20,.09) 0%, transparent 42%),
-        linear-gradient(180deg, #f4efe4 0%, #ece5d5 100%);
+        radial-gradient(ellipse at 72% 50%, rgba(196,140,66,.20) 0%, transparent 52%),
+        radial-gradient(ellipse at 8% 92%, rgba(120,74,38,.16) 0%, transparent 46%),
+        linear-gradient(158deg, #1d1712 0%, #14110d 52%, #100d0a 100%);
       isolation: isolate;
     }
 
-    /* Faint paper grain */
-    .grain {
-      position: absolute; inset: 0;
+    /* ── The circle graphic — anchored right, bleeding off the edges ── */
+    .orb {
+      position: absolute;
+      right: -9%;
+      top: 50%;
+      height: 152%;
+      aspect-ratio: 1 / 1;
+      transform: translateY(-50%);
+      z-index: 2;
       pointer-events: none;
-      opacity: .07;
-      mix-blend-mode: multiply;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 180px 180px;
-      z-index: 1;
+    }
+    .orb svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+    .ring {
+      fill: none;
+      stroke: rgba(226,190,136,.20);
+      stroke-width: .9;
+      transform-origin: 200px 200px;
+      animation: breathe 11s ease-in-out infinite;
+    }
+    .ring.r2 { animation-delay: -1.4s; }
+    .ring.r3 { animation-delay: -2.8s; stroke-dasharray: 3 7; stroke: rgba(226,190,136,.26); }
+    .ring.r4 { animation-delay: -4.2s; }
+    .ring.r5 { animation-delay: -5.6s; stroke-dasharray: 2 9; stroke: rgba(226,190,136,.17); }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1);    opacity: 1; }
+      50%      { transform: scale(1.018); opacity: .82; }
     }
 
-    .composition {
+    /* Faint radial spokes — the "architecture" holding the circle together */
+    .spoke {
+      stroke: rgba(226,190,136,.10);
+      stroke-width: .7;
+      transform-origin: 200px 200px;
+      animation: spoke-turn 90s linear infinite;
+    }
+    @keyframes spoke-turn { to { transform: rotate(360deg); } }
+
+    /* Beings on each ring. They sit dim until the pulse reaches them. */
+    .ring-nodes circle {
+      fill: #e8c48c;
+      opacity: .26;
+      animation: admit 6s ease-in-out infinite;
+    }
+    .ring-nodes.r1 circle { animation-delay: 1.25s; }
+    .ring-nodes.r2 circle { animation-delay: 2.25s; }
+    .ring-nodes.r3 circle { animation-delay: 3.25s; }
+    .ring-nodes.r4 circle { animation-delay: 4.25s; }
+    .ring-nodes.r5 circle { animation-delay: 5.20s; }
+
+    @keyframes admit {
+      0%      { opacity: .26; filter: none; }
+      6%      { opacity: 1;   filter: drop-shadow(0 0 5px rgba(240,205,150,.95)); }
+      34%     { opacity: .58; filter: drop-shadow(0 0 2px rgba(240,205,150,.35)); }
+      100%    { opacity: .26; filter: none; }
+    }
+
+    /* The sweep itself */
+    .pulse {
+      fill: none;
+      stroke: rgba(245,214,160,.55);
+      stroke-width: 1.1;
+      transform-origin: 200px 200px;
+      animation: sweep 6s cubic-bezier(.34,.64,.4,1) infinite;
+    }
+    @keyframes sweep {
+      0%   { r: 14;  opacity: 0; }
+      8%   { opacity: .75; }
+      88%  { opacity: 0; }
+      100% { r: 205; opacity: 0; }
+    }
+
+    /* The core — the moral "here" the circle expands from */
+    .core {
+      fill: #f6ddb0;
+      animation: core-beat 6s ease-in-out infinite;
+    }
+    .core-glow {
+      fill: rgba(238,190,116,.20);
+      animation: core-halo 6s ease-in-out infinite;
+    }
+    @keyframes core-beat {
+      0%, 100% { opacity: .88; }
+      4%       { opacity: 1; }
+      52%      { opacity: .76; }
+    }
+    @keyframes core-halo {
+      0%, 100% { transform: scale(1);   opacity: .5; }
+      6%       { transform: scale(1.5); opacity: .9; }
+      60%      { transform: scale(1);   opacity: .4; }
+    }
+    .core, .core-glow { transform-origin: 200px 200px; }
+
+    /* ── Editorial chrome ─────────────────────────────────────── */
+    .frame {
       position: relative;
-      z-index: 3;
+      z-index: 4;
       width: 100%;
       height: 100%;
-      padding: clamp(28px, 5vw, 68px) clamp(32px, 6vw, 80px);
+      padding: clamp(14px, 4.4vh, 40px) clamp(16px, 4vw, 48px);
       display: grid;
       grid-template-rows: auto 1fr auto;
-      gap: clamp(10px, 1.6vw, 22px);
     }
 
-    .masthead {
+    .kicker {
       display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 16px;
+      align-items: center;
+      gap: .62em;
       font-family: 'Lora', Georgia, serif;
-      font-size: clamp(10px, .9vw, 13px);
+      font-size: clamp(7.5px, 1.55vw, 12px);
       letter-spacing: .26em;
       text-transform: uppercase;
-      color: #4a3f2c;
-      border-bottom: 1px solid rgba(40,30,18,.28);
-      padding-bottom: clamp(8px, 1vw, 14px);
+      color: rgba(236,227,210,.72);
+      white-space: nowrap;
+    }
+    .kicker::before {
+      content: "";
+      width: .5em; height: .5em;
+      border-radius: 50%;
+      background: #eec06e;
+      box-shadow: 0 0 8px rgba(238,192,110,.9);
+      flex: none;
+      animation: core-beat 6s ease-in-out infinite;
     }
 
-    .masthead .vol {
-      font-style: italic;
-      letter-spacing: .14em;
-      text-transform: none;
-      color: rgba(40,30,18,.62);
+    .lede {
+      align-self: center;
+      max-width: min(58%, 30em);
+      padding-right: 1em;
     }
-
-    .body {
-      display: grid;
-      grid-template-columns: 1.05fr 1fr;
-      gap: clamp(18px, 3vw, 42px);
-      align-items: start;
-    }
-
     .lede h1 {
-      font-family: 'Cormorant Garamond', 'Lora', Georgia, serif;
-      font-weight: 700;
-      font-size: clamp(22px, 3.4vw, 54px);
-      line-height: 1.05;
-      letter-spacing: -0.005em;
       margin: 0;
-      color: #15120e;
+      font-weight: 600;
+      font-size: clamp(17px, 5vw, 46px);
+      line-height: 1.03;
+      letter-spacing: -0.004em;
+      color: #f4ece0;
+      text-wrap: balance;
     }
     .lede h1 em {
       font-style: italic;
       font-weight: 500;
-      color: #3b2d18;
+      color: #e6b878;
     }
-
     .lede .byline {
-      margin-top: clamp(8px, 1.2vw, 16px);
+      margin-top: clamp(5px, 1.5vh, 14px);
       font-family: 'Lora', Georgia, serif;
       font-style: italic;
-      font-size: clamp(11px, 1vw, 14px);
-      color: rgba(40,30,18,.7);
-    }
-
-    /* Suggested column of text — animated rules */
-    .columns {
-      display: grid;
-      gap: clamp(6px, 1vw, 12px);
-      padding-top: clamp(4px, .6vw, 10px);
-    }
-    .columns .rule {
-      height: 2px;
-      background: linear-gradient(90deg, rgba(40,30,18,.42), rgba(40,30,18,0));
-      border-radius: 1px;
-      transform-origin: left center;
-      animation: scan 5.6s ease-in-out infinite;
-    }
-    .columns .rule:nth-child(2)  { animation-delay: .35s; opacity: .9; }
-    .columns .rule:nth-child(3)  { animation-delay: .70s; opacity: .82; }
-    .columns .rule:nth-child(4)  { animation-delay: 1.05s; opacity: .76; width: 92%; }
-    .columns .rule:nth-child(5)  { animation-delay: 1.40s; opacity: .70; width: 78%; }
-    .columns .rule:nth-child(6)  { animation-delay: 1.75s; opacity: .64; width: 88%; }
-    .columns .rule:nth-child(7)  { animation-delay: 2.10s; opacity: .58; width: 64%; }
-    .columns .rule:nth-child(8)  { animation-delay: 2.45s; opacity: .52; width: 84%; }
-    .columns .rule:nth-child(9)  { animation-delay: 2.80s; opacity: .48; width: 72%; }
-    .columns .rule:nth-child(10) { animation-delay: 3.15s; opacity: .42; width: 56%; }
-
-    @keyframes scan {
-      0%, 100% { transform: scaleX(.94); filter: brightness(1); }
-      50%      { transform: scaleX(1.0); filter: brightness(1.08); }
+      font-size: clamp(7.5px, 1.62vw, 13px);
+      line-height: 1.45;
+      color: rgba(236,227,210,.56);
+      max-width: 26em;
     }
 
     .footer {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
+      gap: 1.4em;
       font-family: 'Lora', Georgia, serif;
-      font-style: italic;
-      font-size: clamp(10px, .85vw, 13px);
-      letter-spacing: .04em;
-      color: rgba(40,30,18,.68);
-      border-top: 1px solid rgba(40,30,18,.18);
-      padding-top: clamp(8px, 1vw, 14px);
+      font-size: clamp(7px, 1.45vw, 11.5px);
+      color: rgba(236,227,210,.5);
+      white-space: nowrap;
     }
-
-    .footer .tag {
-      font-style: normal;
-      letter-spacing: .22em;
+    .footer .cat { font-style: italic; }
+    .footer .meta {
+      letter-spacing: .2em;
       text-transform: uppercase;
-      font-size: clamp(9px, .75vw, 11px);
-      color: rgba(40,30,18,.58);
+      font-size: .92em;
+      color: rgba(236,227,210,.38);
     }
 
-    @media (max-width: 700px) {
-      .body { grid-template-columns: 1fr; }
-      .columns { display: none; }
-      .masthead { font-size: 10px; letter-spacing: .2em; }
+    /* Paper grain, kept faint so it warms the dark without muddying it */
+    .grain {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 170px 170px;
+      z-index: 6;
+    }
+
+    /* Vignette pulls the eye back to the title block */
+    .vignette {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      background: radial-gradient(ellipse at 26% 52%, rgba(16,13,10,.66) 0%, rgba(16,13,10,.28) 34%, transparent 62%);
+    }
+
+    /* Narrow tiles (the playground shrinks this frame on small screens):
+       drop the byline and let the title and circle carry it. */
+    @media (max-width: 380px) {
+      .lede { max-width: 62%; }
+      .lede .byline { display: none; }
+      .orb { right: -16%; height: 132%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ring, .spoke, .pulse, .core, .core-glow,
+      .ring-nodes circle, .kicker::before { animation: none; }
+      .ring-nodes circle { opacity: .7; }
     }
   </style>
 </head>
 <body>
-  <div data-composition-id="animal-liberation-preview" data-width="1280" data-height="982" data-duration="10" data-start="0" data-track-index="0">
-    <div class="grain"></div>
-    <div class="composition">
-      <div class="masthead">
-        <span>Stanford Political Review</span>
-        <span class="vol">Vol. XXVI &middot; Spring 2026</span>
+  <div data-composition-id="animal-liberation-preview" data-width="1280" data-height="836" data-duration="12" data-start="0" data-track-index="0">
+
+    <div class="orb" aria-hidden="true">
+      <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
+        <g class="spoke">
+          <line x1="200" y1="200" x2="200" y2="8"/>
+          <line x1="200" y1="200" x2="366" y2="296"/>
+          <line x1="200" y1="200" x2="34"  y2="296"/>
+        </g>
+
+        <circle class="ring r1" cx="200" cy="200" r="45"/>
+        <circle class="ring r2" cx="200" cy="200" r="80"/>
+        <circle class="ring r3" cx="200" cy="200" r="115"/>
+        <circle class="ring r4" cx="200" cy="200" r="150"/>
+        <circle class="ring r5" cx="200" cy="200" r="185"/>
+
+        <circle class="pulse" cx="200" cy="200" r="14"/>
+
+        <g class="ring-nodes r1">
+          <circle cx="183.6" cy="241.9" r="2.94"/>
+          <circle cx="171.2" cy="165.4" r="2.72"/>
+          <circle cx="244.8" cy="195.7" r="1.81"/>
+        </g>
+        <g class="ring-nodes r2">
+          <circle cx="120.2" cy="205.9" r="2.52"/>
+          <circle cx="170.4" cy="125.7" r="1.87"/>
+          <circle cx="266.0" cy="154.7" r="3.27"/>
+          <circle cx="267.0" cy="243.7" r="2.12"/>
+          <circle cx="169.3" cy="273.9" r="3.50"/>
+        </g>
+        <g class="ring-nodes r3">
+          <circle cx="96.8"  cy="149.2" r="3.55"/>
+          <circle cx="165.3" cy="90.4"  r="3.33"/>
+          <circle cx="270.0" cy="108.7" r="1.97"/>
+          <circle cx="314.8" cy="192.7" r="2.29"/>
+          <circle cx="260.6" cy="297.7" r="2.04"/>
+          <circle cx="168.1" cy="310.5" r="2.91"/>
+          <circle cx="96.3"  cy="249.6" r="2.74"/>
+        </g>
+        <g class="ring-nodes r4">
+          <circle cx="344.2" cy="241.5" r="2.09"/>
+          <circle cx="262.7" cy="336.3" r="2.51"/>
+          <circle cx="174.4" cy="347.8" r="2.81"/>
+          <circle cx="81.9"  cy="292.5" r="2.27"/>
+          <circle cx="51.1"  cy="181.7" r="3.03"/>
+          <circle cx="83.1"  cy="106.0" r="2.79"/>
+          <circle cx="181.7" cy="51.1"  r="3.36"/>
+          <circle cx="288.2" cy="78.7"  r="2.25"/>
+          <circle cx="347.6" cy="173.3" r="1.92"/>
+        </g>
+        <g class="ring-nodes r5">
+          <circle cx="33.2"  cy="280.1" r="1.99"/>
+          <circle cx="15.3"  cy="190.0" r="1.77"/>
+          <circle cx="55.2"  cy="84.9"  r="3.15"/>
+          <circle cx="136.1" cy="26.4"  r="3.36"/>
+          <circle cx="227.9" cy="17.1"  r="3.02"/>
+          <circle cx="332.1" cy="70.5"  r="2.80"/>
+          <circle cx="379.7" cy="156.0" r="3.30"/>
+          <circle cx="365.9" cy="281.8" r="2.60"/>
+          <circle cx="306.7" cy="351.1" r="1.82"/>
+          <circle cx="206.2" cy="384.9" r="2.93"/>
+          <circle cx="93.5"  cy="351.3" r="3.26"/>
+        </g>
+
+        <circle class="core-glow" cx="200" cy="200" r="11"/>
+        <circle class="core"      cx="200" cy="200" r="4.2"/>
+      </svg>
+    </div>
+
+    <div class="vignette"></div>
+
+    <div class="frame">
+      <div class="kicker">Stanford Political Review</div>
+
+      <div class="lede">
+        <h1>Animal&nbsp;Liberation, <em>Indigeneity</em>, and Morality</h1>
+        <div class="byline">On the moral architecture binding species, sovereignty, and stewardship — and who the circle is drawn to include.</div>
       </div>
-      <div class="body">
-        <div class="lede">
-          <h1>Animal&nbsp;Liberation, <em>Indigeneity</em>, and Morality</h1>
-          <div class="byline">A paper on the moral architecture binding species, sovereignty, and stewardship.</div>
-        </div>
-        <div class="columns" aria-hidden="true">
-          <div class="rule"></div>
-          <div class="rule"></div>
-          <div class="rule"></div>
-          <div class="rule"></div>
-          <div class="rule"></div>
-          <div class="rule"></div>
-          <div class="rule"></div>
-          <div class="rule"></div>
-          <div class="rule"></div>
-          <div class="rule"></div>
-        </div>
-      </div>
+
       <div class="footer">
-        <span>Social Justice &amp; Law</span>
-        <span class="tag">Read at SPR</span>
+        <span class="cat">social justice &amp; law</span>
+        <span class="meta">Vol. XXVI &middot; 2026</span>
       </div>
     </div>
+
+    <div class="grain"></div>
   </div>
 </body>
 </html>
