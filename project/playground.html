@@ -112,9 +112,10 @@
     .h-link:hover::after, .h-link.active::after { transform: scaleX(1); }
 
     /* ── Free-flow canvas ─────────────────────────────────────
-       Full-bleed, pointer-drag panning only — no wheel handling, no
-       zoom, no top copy. Tiles sit at fixed positions on a world larger
-       than the viewport and are revealed by dragging around. */
+       Full-bleed infinite canvas — drag or scroll to pan, no zoom, no
+       top copy. The world wraps like a torus: tiles repeat on a fixed
+       period in both axes, so panning in any direction eventually
+       loops back to the content instead of ending in empty space. */
     #pg-viewport {
       position: fixed; inset: 0; overflow: hidden; background: var(--paper);
       touch-action: none;
@@ -262,7 +263,7 @@
     </nav>
   </header>
 
-  <div id="pg-viewport" aria-label="Free-flow playground canvas — drag to explore">
+  <div id="pg-viewport" aria-label="Infinite playground canvas — drag or scroll to explore; the canvas loops">
     <div id="pg-world">
       <a class="pg-tile" id="tile-interstellar" href="https://youtu.be/Q-NRXm59fLE" data-project-link="interstellar-automata" target="_blank" rel="noopener noreferrer" aria-label="Open Interstellar Automata video">
         <iframe data-src="interstellar-automata-hyperframe/index.html" title="Interstellar Automata animated preview" aria-hidden="true"></iframe>
@@ -276,7 +277,7 @@
     </div>
   </div>
 
-  <div id="pg-hint">drag to explore</div>
+  <div id="pg-hint">drag or scroll to explore</div>
 
   <!-- ── Info / Contact / Resume ─────────────────────────── -->
   <footer class="work-contact">
@@ -377,7 +378,10 @@
   </script>
 
   <script>
-    // Free-flow canvas: pointer-drag panning only (no wheel/zoom, no scroll).
+    // Infinite free-flow canvas: drag or scroll to pan, no zoom.
+    // The world is a torus — each tile is re-homed to the repeat of the
+    // pattern nearest the viewport, so panning any direction eventually
+    // loops back to the content instead of running into empty space.
     // Tiles remain clickable — a drag is only treated as a pan once it moves
     // past a small threshold, so a plain click still opens the tile's link.
     (function () {
@@ -385,46 +389,56 @@
       const world = document.getElementById('pg-world');
       const hint = document.getElementById('pg-hint');
       const tiles = Array.from(document.querySelectorAll('.pg-tile'));
-      const MARGIN = 200;
+      const GAP = 420; // breathing room between repeats of the content
 
       let panX = 0, panY = 0;
       let isPanning = false, dragged = false;
       let startX = 0, startY = 0, startPanX = 0, startPanY = 0;
       let activePointerId = null;
+      let geo = null;
 
-      function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
-
-      // Measured from the tiles themselves (not a fixed world size) so
-      // centering/clamping stays correct across the responsive breakpoints
-      // that reposition the tiles.
-      function getContentBounds() {
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-        tiles.forEach(t => {
-          minX = Math.min(minX, t.offsetLeft);
-          minY = Math.min(minY, t.offsetTop);
-          maxX = Math.max(maxX, t.offsetLeft + t.offsetWidth);
-          maxY = Math.max(maxY, t.offsetTop + t.offsetHeight);
+      // Base positions come from the responsive CSS, so inline overrides are
+      // cleared before measuring. Each repeat period must be at least a
+      // viewport plus the widest tile so a single wrapped copy of every tile
+      // is always the one on (or nearest) screen.
+      function measure() {
+        tiles.forEach(t => { t.style.left = ''; t.style.top = ''; });
+        const base = tiles.map(t => ({
+          el: t, x: t.offsetLeft, y: t.offsetTop, w: t.offsetWidth, h: t.offsetHeight
+        }));
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, maxW = 0, maxH = 0;
+        base.forEach(b => {
+          minX = Math.min(minX, b.x); minY = Math.min(minY, b.y);
+          maxX = Math.max(maxX, b.x + b.w); maxY = Math.max(maxY, b.y + b.h);
+          maxW = Math.max(maxW, b.w); maxH = Math.max(maxH, b.h);
         });
-        return { minX, minY, maxX, maxY };
-      }
-
-      function clampPan() {
         const vw = viewport.clientWidth, vh = viewport.clientHeight;
-        const b = getContentBounds();
-        panX = clamp(panX, -MARGIN - b.maxX, vw + MARGIN - b.minX);
-        panY = clamp(panY, -MARGIN - b.maxY, vh + MARGIN - b.minY);
+        geo = {
+          base, minX, minY, maxX, maxY,
+          periodW: Math.max(maxX - minX + GAP, vw + maxW + 80),
+          periodH: Math.max(maxY - minY + GAP, vh + maxH + 80)
+        };
       }
 
       function applyPan() {
+        // Keep pan bounded — the view only depends on pan modulo the period.
+        panX = ((panX % geo.periodW) + geo.periodW) % geo.periodW;
+        panY = ((panY % geo.periodH) + geo.periodH) % geo.periodH;
         world.style.transform = `translate(${panX}px, ${panY}px)`;
+        viewport.style.backgroundPosition = `${panX}px ${panY}px`;
+        geo.base.forEach(b => {
+          const kx = -Math.floor((b.x + panX + b.w) / geo.periodW);
+          const ky = -Math.floor((b.y + panY + b.h) / geo.periodH);
+          b.el.style.left = (b.x + kx * geo.periodW) + 'px';
+          b.el.style.top = (b.y + ky * geo.periodH) + 'px';
+        });
       }
 
       function centerInitial() {
+        measure();
         const vw = viewport.clientWidth, vh = viewport.clientHeight;
-        const b = getContentBounds();
-        panX = vw / 2 - (b.minX + b.maxX) / 2;
-        panY = vh / 2 - (b.minY + b.maxY) / 2;
-        clampPan();
+        panX = vw / 2 - (geo.minX + geo.maxX) / 2;
+        panY = vh / 2 - (geo.minY + geo.maxY) / 2;
         applyPan();
       }
       centerInitial();
@@ -449,10 +463,18 @@
         if (dragged) {
           panX = startPanX + dx;
           panY = startPanY + dy;
-          clampPan();
           applyPan();
         }
       });
+
+      viewport.addEventListener('wheel', e => {
+        e.preventDefault();
+        const s = e.deltaMode === 1 ? 16 : 1;
+        panX -= e.deltaX * s;
+        panY -= e.deltaY * s;
+        hint.classList.add('faded');
+        applyPan();
+      }, { passive: false });
 
       function endPan(e) {
         if (e.pointerId !== activePointerId) return;
