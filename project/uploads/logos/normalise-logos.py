@@ -13,7 +13,7 @@ common ink target (clamped so nothing overflows its slot) and composite onto
 an identical transparent canvas.
 
 Usage:  python3 normalise-logos.py [BOX_W] [BOX_H] [DAMP]
-        defaults: 44 20 0.86
+        defaults: 44 20 0.86  (see BLEND below for the optics/legibility dial)
 
 Add a line to SOURCES for each new logo, then re-run.  Requires Pillow.
 """
@@ -33,14 +33,24 @@ UPLOADS = os.path.dirname(HERE)
 SOURCES = {
     "replit": "New_Replit_Logo.svg.png",
     "knot": "knot-wordmark.png",
-    # "marriage-pact": "_raw-logos/marriage-pact-original.png",
-    # "stimson":       "_raw-logos/stimson-original.png",
-    # "pwc":           "_raw-logos/pwc-original.png",
-    # "stanford":      "_raw-logos/stanford-original.png",
-    # "oxford":        "_raw-logos/oxford-original.png",
+    # Supplied as a flat JPEG on white; prepare-sources.py keys the ground out.
+    "marriage-pact": "_raw-logos/marriage-pact-keyed.png",
+    "oxford": "_raw-logos/oxford-original.png",
+    # PwC pairs a black wordmark with colour blocks, so a plain CSS invert on
+    # the dark theme would wreck the palette. Two baked variants instead.
+    "pwc": "_raw-logos/pwc-original.png",
+    "pwc-dark": "_raw-logos/pwc-dark-original.png",
+    # "stimson":  "_raw-logos/stimson-original.png",
+    # "stanford": "_raw-logos/stanford-original.png",
 }
 
-SCALE = 3  # render at 3x for retina
+# Slots that are a dark-theme twin of another slot: they must be scaled by the
+# SAME factor as their base or the logo would visibly resize when the theme is
+# toggled. Maps variant -> base.
+VARIANT_OF = {"pwc-dark": "pwc"}
+
+SCALE = 3    # render at 3x for retina
+BLEND = 0.6  # 1 = pure ink-area balance, 0 = just fit the box
 
 
 def load(path):
@@ -86,15 +96,33 @@ def main():
 
     # scale at which each mark would just fit the slot
     fits = {k: min(cw / v[0].width, ch / v[0].height) for k, v in loaded.items()}
-    # common optical target: geometric mean of the fitted ink areas, damped so
-    # the airiest mark does not drag the whole set upward
+
+    # Dark-theme twins are excluded from the average: they are the same artwork
+    # as their base and would otherwise double-count it.
+    primary = [k for k in loaded if k not in VARIANT_OF]
     target = math.exp(
-        sum(math.log(v[1] * fits[k] ** 2) for k, v in loaded.items()) / len(loaded)
+        sum(math.log(loaded[k][1] * fits[k] ** 2) for k in primary) / len(primary)
     ) * damp
+
+    # Pure ink-area balancing over-punishes very dense marks: a solid block
+    # logo is genuinely "heavy", but shrunk to match an airy wordmark it stops
+    # being legible. So blend the ink-balanced scale with the plain fit scale
+    # in log space — BLEND=1 is pure optical balance, 0 is just fill the box.
+    scales = {}
+    for key in primary:
+        ink_scale = math.sqrt(target / loaded[key][1])
+        scales[key] = min(
+            fits[key] ** (1 - BLEND) * ink_scale ** BLEND,
+            fits[key],
+        )
+    for key, base in VARIANT_OF.items():
+        if key in loaded:
+            # inherit the base's scale so the mark does not jump on theme toggle
+            scales[key] = scales[base] if base in scales else fits[key]
 
     manifest = {}
     for key, (im, ink, mono) in loaded.items():
-        scale = min(math.sqrt(target / ink), fits[key])
+        scale = min(scales[key], fits[key])
         w = max(1, round(im.width * scale))
         h = max(1, round(im.height * scale))
 

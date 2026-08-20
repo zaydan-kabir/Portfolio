@@ -207,6 +207,12 @@
     .exp-logo img { max-width:100%; max-height:100%; object-fit:contain; display:block; }
     /* Single-colour marks would disappear on the dark theme, so flip those. */
     html[data-theme="dark"] .exp-logo img.mono { filter:invert(1) brightness(1.7); }
+    /* Marks that pair a black wordmark with brand colour can't be inverted —
+       it would wreck the palette — so they ship a baked dark twin instead,
+       scaled by the same factor as the base so it doesn't jump on toggle. */
+    .exp-logo img.on-dark { display:none; }
+    html[data-theme="dark"] .exp-logo img.on-light { display:none; }
+    html[data-theme="dark"] .exp-logo img.on-dark { display:block; }
     /* Typographic stand-in shown only when an official asset isn't present.
        Dropping the file into uploads/logos/ replaces it with no code change. */
     .exp-monogram {
@@ -215,7 +221,7 @@
       font-size:8px; letter-spacing:.09em; font-weight:400; font-style:normal;
       text-transform:uppercase; color:var(--gray2); white-space:nowrap;
     }
-    .exp-logo.missing img { display:none; }
+    .exp-logo.missing img { display:none !important; }
     .exp-logo.missing .exp-monogram { display:inline-flex; }
     .exp-org { font-size:11px; font-weight:400; color:var(--ink); line-height:1.3; }
     .exp-role { font-size:10.5px; font-weight:300; font-style:italic; color:var(--gray2); }
@@ -527,16 +533,16 @@
       <div class="exp-block">
         <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img src="uploads/logos/replit.png" alt="Replit" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram">Replit</span></span><span class="exp-text"><span class="exp-org">Replit</span><span class="exp-role">Campus Ambassador</span></span></div><div class="exp-year">2026</div></div>
         <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img class="mono" src="uploads/logos/knot.png" alt="Knot" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram">Knot</span></span><span class="exp-text"><span class="exp-org">Knot</span><span class="exp-role">Design Engineering Intern</span></span></div><div class="exp-year">2026</div></div>
-        <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img class="mono" src="uploads/logos/marriage-pact.png" alt="Marriage Pact" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram">MP</span></span><span class="exp-text"><span class="exp-org">Marriage Pact</span><span class="exp-role">Growth</span></span></div><div class="exp-year">2026</div></div>
+        <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img class="mono" src="uploads/logos/marriage-pact.png" alt="Marriage Pact" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram">Marriage Pact</span></span><span class="exp-text"><span class="exp-org">Marriage Pact</span><span class="exp-role">Growth</span></span></div><div class="exp-year">2026</div></div>
         <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img src="uploads/logos/stimson.png" alt="The Stimson Center" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram">Stimson</span></span><span class="exp-text"><span class="exp-org">The Stimson Center</span><span class="exp-role">South Asia Intern</span></span></div><div class="exp-year">2026</div></div>
-        <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img src="uploads/logos/pwc.png" alt="PwC" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram">PwC</span></span><span class="exp-text"><span class="exp-org">PricewaterhouseCoopers (PwC)</span><span class="exp-role">Tax Audit Intern</span></span></div><div class="exp-year">2024</div></div>
+        <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img class="on-light" src="uploads/logos/pwc.png" alt="PwC" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><img class="on-dark" src="uploads/logos/pwc-dark.png" alt="" aria-hidden="true" loading="lazy"><span class="exp-monogram">PwC</span></span><span class="exp-text"><span class="exp-org">PricewaterhouseCoopers (PwC)</span><span class="exp-role">Tax Audit Intern</span></span></div><div class="exp-year">2024</div></div>
       </div>
       <div class="divider"></div>
       <div class="section-label">Education</div>
       <div class="divider"></div>
       <div class="edu">
         <div class="edu-item"><span class="exp-logo"><img src="uploads/logos/stanford.png" alt="Stanford University" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram">Stanford</span></span><span class="edu-text"><span class="edu-school">Stanford University</span><span class="edu-degree">Design &amp; Political Science</span></span></div>
-        <div class="edu-item"><span class="exp-logo"><img src="uploads/logos/oxford.png" alt="University of Oxford" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram">Oxford</span></span><span class="edu-text"><span class="edu-school">University of Oxford</span><span class="edu-degree">Visiting Student, Politics, Philosophy &amp; Economics (PPE)</span></span></div>
+        <div class="edu-item"><span class="exp-logo"><img class="mono" src="uploads/logos/oxford.png" alt="University of Oxford" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram">Oxford</span></span><span class="edu-text"><span class="edu-school">University of Oxford</span><span class="edu-degree">Visiting Student, Politics, Philosophy &amp; Economics (PPE)</span></span></div>
       </div>
     </div>
 
