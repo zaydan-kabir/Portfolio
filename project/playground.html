@@ -62,7 +62,7 @@
     html::-webkit-scrollbar { display: none; }
     body {
       width: 100%; height: 100%; background: var(--paper); font-family: 'Lora', Georgia, serif;
-      color: var(--ink); overflow: hidden; cursor: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+      color: var(--ink); overflow-x: hidden; overflow-y: auto; cursor: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     }
     a, a:hover, a:active, button, button:hover { cursor: none !important; }
 
@@ -111,34 +111,32 @@
     .h-link:hover, .h-link.active { color: var(--ink); }
     .h-link:hover::after, .h-link.active::after { transform: scaleX(1); }
 
-    /* ── Free-flow canvas ─────────────────────────────────────
-       Full-bleed infinite canvas — drag or scroll to pan, no zoom, no
-       top copy. The world wraps like a torus: tiles repeat on a fixed
-       period in both axes, so panning in any direction eventually
-       loops back to the content instead of ending in empty space. */
-    #pg-viewport {
-      position: fixed; inset: 0; overflow: hidden; background: var(--paper);
-      touch-action: none;
-      background-image: radial-gradient(var(--dot) 1.5px, transparent 1.5px);
-      background-size: 30px 30px;
-    }
-    #pg-world {
-      position: absolute; left: 0; top: 0; width: 2400px; height: 1500px;
-      will-change: transform;
+    /* ── Playground grid ─────────────────────────────────────
+       A plain two-up grid of the hyperframe previews on a blank
+       ground — no panning, no backdrop pattern. */
+    #pg-grid {
+      max-width: 1160px; margin: 0 auto;
+      padding: calc(env(safe-area-inset-top, 0px) + 98px) clamp(18px, 4vw, 48px) 64px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2.5vw, 28px);
     }
     .pg-tile {
-      position: absolute; overflow: hidden; background: var(--tile); text-decoration: none; display: block;
+      position: relative; overflow: hidden; background: var(--tile); text-decoration: none; display: block;
       border-radius: 6px; box-shadow: var(--tile-shadow); isolation: isolate;
+      aspect-ratio: 1512 / 982;
     }
-    .pg-tile img, .pg-tile iframe {
+    .pg-tile img {
       width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.08) saturate(.92) contrast(.96);
       transition: transform .55s cubic-bezier(.25,.46,.45,.94), filter .4s ease;
     }
-    .pg-tile iframe { border: 0; pointer-events: none; background: transparent; }
-    .pg-tile:hover img, .pg-tile:hover iframe { transform: scale(1.035); filter: grayscale(0) saturate(1.05) contrast(1.02); }
-
-    #tile-interstellar { left: 260px; top: 200px; width: 460px; height: 460px; transform: rotate(-2deg); }
-    #tile-animal-lib   { left: 980px; top: 520px; width: 520px; height: 340px; transform: rotate(1.4deg); }
+    /* Each hyperframe renders at its native composition size and is scaled
+       to cover the tile (see fitHyperframes in the script below). */
+    .pg-tile iframe {
+      position: absolute; left: 0; top: 0; transform-origin: 0 0;
+      border: 0; pointer-events: none; background: transparent; display: block;
+      filter: grayscale(.08) saturate(.92) contrast(.96); transition: filter .4s ease;
+    }
+    .pg-tile:hover img { transform: scale(1.035); }
+    .pg-tile:hover img, .pg-tile:hover iframe { filter: grayscale(0) saturate(1.05) contrast(1.02); }
 
     .grid-overlay {
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.94);
@@ -160,71 +158,24 @@
       color: var(--label-muted); line-height: 1.25;
     }
 
-    #pg-hint {
-      position: fixed; left: clamp(18px, 3vw, 42px); bottom: clamp(18px, 2.4vw, 30px); z-index: 60;
-      font-size: 11px; font-style: italic; color: var(--muted); letter-spacing: .02em;
-      pointer-events: none; user-select: none;
-      opacity: 1; transition: opacity .4s ease;
-    }
-    #pg-hint.faded { opacity: 0; }
 
-    /* Contact / resume footer — same treatment as work.html */
-    .work-contact {
-      position: fixed; right: 0; bottom: 0; z-index: 60;
-      display: flex; justify-content: flex-end; align-items: flex-end; gap: 18px;
-      padding: clamp(9px, 1.2vw, 16px) clamp(18px, 3vw, 42px);
-    }
-    .pixel-btn {
-      font-family: 'Lora', Georgia, serif; font-size: 14px; letter-spacing: 0; color: var(--gray2);
-      background: none; border: none; padding: 0; text-transform: lowercase; transition: color .15s;
-      display: block; text-align: right;
-    }
-    .pixel-btn:hover { color: var(--ink); }
-    .p-popup-overlay {
-      position: fixed; inset: 0; z-index: 350;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,.45);
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    }
-    .p-popup-box {
-      background: #fff; min-width: 280px; max-width: 460px; width: 90%;
-      padding: 48px 40px 40px; position: relative;
-      box-shadow: 0 24px 64px rgba(0,0,0,.4); max-height: 90vh; overflow-y: auto;
-    }
-    .p-popup-close {
-      position: absolute; top: 14px; right: 20px;
-      font-family: 'VT323', monospace; font-size: 30px; line-height: 1;
-      color: #222; background: none; border: none; opacity: .35; transition: opacity .15s;
-    }
-    .p-popup-close:hover { opacity: 1; }
-    .p-popup-content {
-      font-family: 'Lora', Georgia, serif; font-size: 15px; line-height: 1.75; color: #333; text-align: center;
-    }
-    .p-popup-content .contact-label {
-      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-      color: #999; margin-top: 20px; margin-bottom: 2px;
-    }
-    .p-popup-content .contact-label:first-child { margin-top: 0; }
-    .p-popup-content a { color: #111; text-decoration: none; border-bottom: 1px solid #ccc; }
-    .p-popup-content a:hover { border-bottom-color: #111; }
+
+
 
     @media (max-width: 900px) {
       #header { padding-left: 24px; padding-right: 24px; }
-      #tile-interstellar { left: 140px; top: 160px; width: 320px; height: 320px; }
-      #tile-animal-lib   { left: 560px; top: 420px; width: 340px; height: 230px; }
+    }
+    @media (max-width: 700px) {
+      #pg-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
       #header { padding-left: 18px; padding-right: 18px; }
       .h-nav { gap: 16px; }
-      #tile-interstellar { left: 90px; top: 140px; width: 240px; height: 240px; }
-      #tile-animal-lib   { left: 400px; top: 360px; width: 260px; height: 180px; }
       .grid-overlay { min-width: 140px; }
       .item-name { font-size: 13px; }
       .item-subtitle { font-size: 10px; }
     }
-    @media (max-width: 600px) {
-      .p-popup-box { padding: 36px 24px 28px; width: 94%; }
-    }
+
     @media (pointer: coarse) {
       body { cursor: auto; }
       a, button, a:hover, button:hover { cursor: auto !important; }
@@ -263,61 +214,18 @@
     </nav>
   </header>
 
-  <div id="pg-viewport" aria-label="Infinite playground canvas — drag or scroll to explore; the canvas loops">
-    <div id="pg-world">
+  <main id="pg-grid" aria-label="Playground projects">
       <a class="pg-tile" id="tile-interstellar" href="https://youtu.be/Q-NRXm59fLE" data-project-link="interstellar-automata" target="_blank" rel="noopener noreferrer" aria-label="Open Interstellar Automata video">
-        <iframe data-src="interstellar-automata-hyperframe/index.html" title="Interstellar Automata animated preview" aria-hidden="true"></iframe>
+        <iframe data-src="interstellar-automata-hyperframe/index.html" data-w="1512" data-h="982" title="Interstellar Automata animated preview" aria-hidden="true"></iframe>
         <div class="grid-overlay"><span class="item-name">Interstellar Automata</span><span class="item-subtitle">Product Design</span></div>
       </a>
 
       <a class="pg-tile" id="tile-animal-lib" href="https://stanfordpoliticalreview.org/2026/04/22/animal-liberation-indigeneity-and-morality/" target="_blank" rel="noopener noreferrer" data-project-link="animal-liberation" aria-label="Read Animal Liberation, Indigeneity, and Morality at Stanford Political Review">
-        <iframe data-src="animal-liberation-hyperframe/index.html" title="Animal Liberation, Indigeneity, and Morality animated preview" aria-hidden="true"></iframe>
+        <iframe data-src="animal-liberation-hyperframe/index.html" data-w="1280" data-h="836" title="Animal Liberation, Indigeneity, and Morality animated preview" aria-hidden="true"></iframe>
         <div class="grid-overlay"><span class="item-name">Animal Liberation, Indigeneity, and Morality</span><span class="item-subtitle">Stanford Political Review: Social Justice &amp; Law Paper</span></div>
       </a>
-    </div>
-  </div>
+  </main>
 
-  <div id="pg-hint">drag or scroll to explore</div>
-
-  <!-- ── Info / Contact / Resume ─────────────────────────── -->
-  <footer class="work-contact">
-    <button class="pixel-btn" id="work-btn-info">info</button>
-    <button class="pixel-btn" id="work-btn-contact">contact</button>
-    <button class="pixel-btn" id="work-btn-resume">resume</button>
-  </footer>
-  <div id="work-popup" class="p-popup-overlay" style="display:none">
-    <div class="p-popup-box">
-      <button class="p-popup-close" id="work-popup-close">X</button>
-      <div class="p-popup-content" id="work-popup-content"></div>
-    </div>
-  </div>
-
-  <script>
-    // Info / Contact / Resume — mirrors the work page's popup.
-    (function () {
-      const popup = document.getElementById('work-popup');
-      const txt = document.getElementById('work-popup-content');
-      const open = html => { txt.innerHTML = html; popup.style.display = 'flex'; };
-      document.getElementById('work-btn-info').addEventListener('click', () => open(
-        `<p>Zaydan is an AI-native design engineer based in Stanford, California, whose work sits at the intersection of human-centered design, systems thinking, and social impact.</p>`
-      ));
-      document.getElementById('work-btn-contact').addEventListener('click', () => open(
-        `<p class="contact-label">General Inquiries</p>
-         <p><a href="mailto:zaydan1234@gmail.com">zaydan1234@gmail.com</a></p>
-         <p class="contact-label">LinkedIn</p>
-         <p><a href="https://www.linkedin.com/in/zaydanka" target="_blank" rel="noopener">Zaydan Kabir Amanullah</a></p>
-         <p class="contact-label">Instagram</p>
-         <p><a href="https://instagram.com/zaydanka.design" target="_blank" rel="noopener">@zaydanka.design</a></p>
-         <p class="contact-label">Substack</p>
-         <p><a href="https://zaydanamanullah.substack.com" target="_blank" rel="noopener">zaydanamanullah</a></p>`
-      ));
-      document.getElementById('work-btn-resume').addEventListener('click', () => {
-        window.open('uploads/Design%20Resume.docx-3.pdf', '_blank', 'noopener');
-      });
-      document.getElementById('work-popup-close').addEventListener('click', () => { popup.style.display = 'none'; });
-      popup.addEventListener('click', e => { if (e.target === popup) popup.style.display = 'none'; });
-    })();
-  </script>
 
   <script>
     const overlay = document.getElementById('page-out');
@@ -374,126 +282,25 @@
       } else {
         window.addEventListener('load', activateHyperframes, { once: true });
       }
+
+      // Scale each composition from its native size to cover its tile.
+      function fitHyperframes() {
+        document.querySelectorAll('.pg-tile iframe[data-w]').forEach(function (f) {
+          var tile = f.closest('.pg-tile');
+          var w = parseFloat(f.getAttribute('data-w')), h = parseFloat(f.getAttribute('data-h'));
+          if (!tile || !w || !h) return;
+          var s = Math.max(tile.clientWidth / w, tile.clientHeight / h);
+          f.style.width = w + 'px';
+          f.style.height = h + 'px';
+          f.style.transform = 'scale(' + s + ')';
+        });
+      }
+      fitHyperframes();
+      window.addEventListener('load', fitHyperframes, { once: true });
+      window.addEventListener('resize', fitHyperframes);
     })();
   </script>
 
-  <script>
-    // Infinite free-flow canvas: drag or scroll to pan, no zoom.
-    // The world is a torus — each tile is re-homed to the repeat of the
-    // pattern nearest the viewport, so panning any direction eventually
-    // loops back to the content instead of running into empty space.
-    // Tiles remain clickable — a drag is only treated as a pan once it moves
-    // past a small threshold, so a plain click still opens the tile's link.
-    (function () {
-      const viewport = document.getElementById('pg-viewport');
-      const world = document.getElementById('pg-world');
-      const hint = document.getElementById('pg-hint');
-      const tiles = Array.from(document.querySelectorAll('.pg-tile'));
-      const GAP = 420; // breathing room between repeats of the content
 
-      let panX = 0, panY = 0;
-      let isPanning = false, dragged = false;
-      let startX = 0, startY = 0, startPanX = 0, startPanY = 0;
-      let activePointerId = null;
-      let geo = null;
-
-      // Base positions come from the responsive CSS, so inline overrides are
-      // cleared before measuring. Each repeat period must be at least a
-      // viewport plus the widest tile so a single wrapped copy of every tile
-      // is always the one on (or nearest) screen.
-      function measure() {
-        tiles.forEach(t => { t.style.left = ''; t.style.top = ''; });
-        const base = tiles.map(t => ({
-          el: t, x: t.offsetLeft, y: t.offsetTop, w: t.offsetWidth, h: t.offsetHeight
-        }));
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, maxW = 0, maxH = 0;
-        base.forEach(b => {
-          minX = Math.min(minX, b.x); minY = Math.min(minY, b.y);
-          maxX = Math.max(maxX, b.x + b.w); maxY = Math.max(maxY, b.y + b.h);
-          maxW = Math.max(maxW, b.w); maxH = Math.max(maxH, b.h);
-        });
-        const vw = viewport.clientWidth, vh = viewport.clientHeight;
-        geo = {
-          base, minX, minY, maxX, maxY,
-          periodW: Math.max(maxX - minX + GAP, vw + maxW + 80),
-          periodH: Math.max(maxY - minY + GAP, vh + maxH + 80)
-        };
-      }
-
-      function applyPan() {
-        // Keep pan bounded — the view only depends on pan modulo the period.
-        panX = ((panX % geo.periodW) + geo.periodW) % geo.periodW;
-        panY = ((panY % geo.periodH) + geo.periodH) % geo.periodH;
-        world.style.transform = `translate(${panX}px, ${panY}px)`;
-        viewport.style.backgroundPosition = `${panX}px ${panY}px`;
-        geo.base.forEach(b => {
-          const kx = -Math.floor((b.x + panX + b.w) / geo.periodW);
-          const ky = -Math.floor((b.y + panY + b.h) / geo.periodH);
-          b.el.style.left = (b.x + kx * geo.periodW) + 'px';
-          b.el.style.top = (b.y + ky * geo.periodH) + 'px';
-        });
-      }
-
-      function centerInitial() {
-        measure();
-        const vw = viewport.clientWidth, vh = viewport.clientHeight;
-        panX = vw / 2 - (geo.minX + geo.maxX) / 2;
-        panY = vh / 2 - (geo.minY + geo.maxY) / 2;
-        applyPan();
-      }
-      centerInitial();
-      window.addEventListener('resize', centerInitial);
-
-      viewport.addEventListener('pointerdown', e => {
-        isPanning = true;
-        dragged = false;
-        activePointerId = e.pointerId;
-        startX = e.clientX; startY = e.clientY;
-        startPanX = panX; startPanY = panY;
-        viewport.setPointerCapture(e.pointerId);
-      });
-
-      viewport.addEventListener('pointermove', e => {
-        if (!isPanning || e.pointerId !== activePointerId) return;
-        const dx = e.clientX - startX, dy = e.clientY - startY;
-        if (!dragged && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
-          dragged = true;
-          hint.classList.add('faded');
-        }
-        if (dragged) {
-          panX = startPanX + dx;
-          panY = startPanY + dy;
-          applyPan();
-        }
-      });
-
-      viewport.addEventListener('wheel', e => {
-        e.preventDefault();
-        const s = e.deltaMode === 1 ? 16 : 1;
-        panX -= e.deltaX * s;
-        panY -= e.deltaY * s;
-        hint.classList.add('faded');
-        applyPan();
-      }, { passive: false });
-
-      function endPan(e) {
-        if (e.pointerId !== activePointerId) return;
-        isPanning = false;
-        activePointerId = null;
-      }
-      viewport.addEventListener('pointerup', endPan);
-      viewport.addEventListener('pointercancel', endPan);
-
-      // Swallow the click that follows a drag so tiles don't navigate
-      // when the user was just panning the canvas.
-      viewport.addEventListener('click', e => {
-        if (dragged) {
-          e.preventDefault();
-          e.stopPropagation();
-          dragged = false;
-        }
-      }, true);
-    })();
-  </script>
 </body>
 </html>
