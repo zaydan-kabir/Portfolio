@@ -166,7 +166,7 @@
     .page {
       display: grid;
       grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(0, 1fr);
-      grid-template-rows: auto 1fr;
+      grid-template-rows: auto 1fr auto;
       height: 100vh; height: 100dvh;
       padding: clamp(16px, 3vw, 48px);
       gap: 0 clamp(16px, 3vw, 36px);
@@ -200,29 +200,29 @@
     .exp-left { display:flex; align-items:center; gap:9px; min-width:0; }
     .exp-text { display:flex; flex-direction:column; gap:1px; min-width:0; }
     /* Fixed logo gutter. Every mark is pre-normalised to this exact 44x20 box
-       (see uploads/logos/) and balanced by ink area rather than bounding box,
+       (see uploads/logos-md/) and balanced by ink area rather than bounding box,
        so a dense square mark and an airy wordmark carry the same visual
        weight and all of them share one left edge. */
-    .exp-logo { flex:none; width:44px; height:20px; display:flex; align-items:center; justify-content:flex-start; }
+    .exp-logo { flex:none; width:88px; height:40px; display:flex; align-items:center; justify-content:flex-start; }
     .exp-logo img { max-width:100%; max-height:100%; object-fit:contain; display:block; }
     /* Single-colour marks would disappear on the dark theme, so flip those. */
-    html[data-theme="dark"] .exp-logo img.mono { filter:invert(1) brightness(1.7); }
+    html[data-theme="dark"] img.mono { filter:invert(1) brightness(1.7); }
     /* A mark drawn in one *brand* colour can't be inverted — cardinal would
        come back cyan — but it reverses like any single-colour mark: knock the
        hue out first, then flip. Matches the institution's own reversed
        artwork, and keeps a hairline seal as legible as the crest beneath it. */
-    html[data-theme="dark"] .exp-logo img.reverse { filter:brightness(0) invert(1); }
+    html[data-theme="dark"] img.reverse { filter:brightness(0) invert(1); }
     /* Marks that pair a black wordmark with brand colour can't be inverted —
        it would wreck the palette — so they ship a baked dark twin instead,
        scaled by the same factor as the base so it doesn't jump on toggle. */
-    .exp-logo img.on-dark { display:none; }
-    html[data-theme="dark"] .exp-logo img.on-light { display:none; }
-    html[data-theme="dark"] .exp-logo img.on-dark { display:block; }
+    img.on-dark { display:none !important; }
+    html[data-theme="dark"] img.on-light { display:none !important; }
+    html[data-theme="dark"] img.on-dark { display:block !important; }
     /* Shown only when an official asset isn't present yet. A dashed empty
        slot, not a lookalike mark and not the org name repeated back — the
        name is already the visible text beside it. It holds the column's
        rhythm so a pending row reads as awaiting art rather than broken.
-       Dropping the file into uploads/logos/ replaces it, no code change. */
+       Dropping the file into uploads/logos-md/ replaces it, no code change. */
     .exp-monogram {
       display:none; width:19px; height:19px; flex:none;
       border:1px dashed var(--gray3); border-radius:4px;
@@ -236,10 +236,10 @@
     .edu { margin-top:0; flex-shrink:0; display:flex; flex-direction:column; gap:3px; }
     /* Same logo gutter as Experience, so the crest and the org names in both
        blocks hang off one shared left edge. */
-    .edu-item { display:flex; align-items:center; gap:9px; min-width:0; padding:2px 0; }
+    .edu-item { display:flex; align-items:center; gap:14px; min-width:0; padding:6px 0; }
     .edu-text { display:flex; flex-direction:column; gap:1px; min-width:0; }
-    .edu-school { font-size:11.5px; font-weight:400; color:var(--ink); line-height:1.3; }
-    .edu-degree { font-size:10.5px; color:var(--gray2); font-style:italic; font-weight:300; line-height:1.35; margin-top:0; }
+    .edu-school { font-size:13px; font-weight:400; color:var(--ink); line-height:1.3; }
+    .edu-degree { font-size:11.5px; color:var(--gray2); font-style:italic; font-weight:300; line-height:1.35; margin-top:0; }
     .img-col-center { display:flex; flex-direction:column; min-height:0; }
     .img-col-right { display:flex; flex-direction:column; gap:16px; min-height:0; }
     .img-box {
@@ -252,10 +252,20 @@
     .img-box.has-image img { display:block; }
     /* Center image: portrait photo, cover fills the cell */
     #box-0 { background:#0a0a0a; }
-    #box-0 img { object-fit:cover; object-position:center top; }
+    #box-0 img { object-fit:cover; object-position:50% 30%; }
+    /* Photo focus crops — keep Zaydan centered */
+    #box-1 img { object-position:49% 52%; transform:scale(1.35); transform-origin:49% 52%; }
+    #box-2 img { object-position:50% 42%; transform:scale(1.35); transform-origin:100% 42%; }
 
-    /* Arrow */
-    #arrow-svg { position:fixed;width:48px;height:110px;overflow:visible;opacity:0;transition:opacity .2s;pointer-events:none;z-index:10; }
+    /* Experience band */
+    .exp-band { grid-column:1/-1; align-self:end; margin-top:clamp(12px,2vh,22px); padding-top:12px; border-top:1px solid var(--gray3); }
+    .band-row { display:flex; align-items:stretch; justify-content:space-between; gap:clamp(10px,2vw,28px); margin-top:14px; }
+    .band-item { flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; text-align:center; gap:7px; }
+    .band-logo { height:40px; display:flex; align-items:center; justify-content:center; }
+    .band-logo img { height:100%; width:auto; display:block; }
+    .band-org { font-size:12px; color:var(--ink); }
+    .band-role { font-size:10.5px; font-weight:300; font-style:italic; color:var(--gray2); line-height:1.3; }
+    .band-year { font-size:10px; color:var(--gray2); font-style:italic; }
 
     /* ════════════════════════════════════════════════════════
        ZAYDAN VIEW
@@ -455,7 +465,8 @@
       /* Mobile: only show the suit portrait (center); hide the other photos */
       .img-col-right { display:none !important; }
 
-      #arrow-svg { display:none !important; }
+      .exp-band { margin-top:20px; }
+      .band-row { display:grid; grid-template-columns:1fr 1fr; gap:18px 10px; }
 
       /* Zaydan view: disable horizontal scroll on mobile, just show masthead */
       #view-zaydan { min-height:100vh; min-height:100dvh; }
@@ -520,10 +531,6 @@
     <!-- LEFT COLUMN -->
     <div class="left">
       <div class="name" id="hey-name"></div>
-      <svg id="arrow-svg" viewBox="0 0 48 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path id="arrow-path" d="M 22 0 C 2 0, 2 48, 32 48" stroke="#fff" stroke-width="1.8" stroke-linecap="round" fill="none" style="stroke-dasharray:150;stroke-dashoffset:150;"/>
-        <path id="arrow-head" d="M 32 48 L 22 40 M 32 48 L 22 56" transform="rotate(8 32 48)" stroke="#fff" stroke-width="1.8" stroke-linecap="round" fill="none" style="stroke-dasharray:20;stroke-dashoffset:20;"/>
-      </svg>
       <div class="divider"></div>
       <p class="bio">Raised between Bangladesh and Canada and now based in California, I study Design and Political Science at Stanford University, where I build impactful work at the intersection of systems, people, and social change. My work is driven by a commitment to uplift others and to embody the change I want to see in the world.</p>
       <div class="divider"></div>
@@ -535,21 +542,11 @@
         <div class="hobby"><span class="hobby-dash">•</span> Running or going to the gym</div>
       </div>
       <div class="divider"></div>
-      <div class="section-label">Experience</div>
-      <div class="divider"></div>
-      <div class="exp-block">
-        <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img src="uploads/logos/replit.png" alt="Replit" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram" aria-hidden="true"></span></span><span class="exp-text"><span class="exp-org">Replit</span><span class="exp-role">Campus Ambassador</span></span></div><div class="exp-year">2026</div></div>
-        <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img class="mono" src="uploads/logos/knot.png" alt="Knot" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram" aria-hidden="true"></span></span><span class="exp-text"><span class="exp-org">Knot</span><span class="exp-role">Design Engineering Intern</span></span></div><div class="exp-year">2026</div></div>
-        <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img class="mono" src="uploads/logos/marriage-pact.png" alt="Marriage Pact" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram" aria-hidden="true"></span></span><span class="exp-text"><span class="exp-org">Marriage Pact</span><span class="exp-role">Growth</span></span></div><div class="exp-year">2026</div></div>
-        <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img src="uploads/logos/stimson.png" alt="The Stimson Center" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram" aria-hidden="true"></span></span><span class="exp-text"><span class="exp-org">The Stimson Center</span><span class="exp-role">South Asia Intern</span></span></div><div class="exp-year">2026</div></div>
-        <div class="exp-item"><div class="exp-left"><span class="exp-logo"><img class="on-light" src="uploads/logos/pwc.png" alt="PwC" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><img class="on-dark" src="uploads/logos/pwc-dark.png" alt="" aria-hidden="true" loading="lazy"><span class="exp-monogram" aria-hidden="true"></span></span><span class="exp-text"><span class="exp-org">PricewaterhouseCoopers (PwC)</span><span class="exp-role">Tax Audit Intern</span></span></div><div class="exp-year">2024</div></div>
-      </div>
-      <div class="divider"></div>
       <div class="section-label">Education</div>
       <div class="divider"></div>
       <div class="edu">
-        <div class="edu-item"><span class="exp-logo"><img class="reverse" src="uploads/logos/stanford.png" alt="Stanford University" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram" aria-hidden="true"></span></span><span class="edu-text"><span class="edu-school">Stanford University</span><span class="edu-degree">Design &amp; Political Science</span></span></div>
-        <div class="edu-item"><span class="exp-logo"><img class="mono" src="uploads/logos/oxford.png" alt="University of Oxford" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram" aria-hidden="true"></span></span><span class="edu-text"><span class="edu-school">University of Oxford</span><span class="edu-degree">Visiting Student, Politics, Philosophy &amp; Economics (PPE)</span></span></div>
+        <div class="edu-item"><span class="exp-logo"><img class="reverse" src="uploads/logos-md/stanford.png" alt="Stanford University" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram" aria-hidden="true"></span></span><span class="edu-text"><span class="edu-school">Stanford University</span><span class="edu-degree">Design &amp; Political Science</span></span></div>
+        <div class="edu-item"><span class="exp-logo"><img class="mono" src="uploads/logos-md/oxford.png" alt="University of Oxford" loading="lazy" onerror="this.closest('.exp-logo').classList.add('missing')"><span class="exp-monogram" aria-hidden="true"></span></span><span class="edu-text"><span class="edu-school">University of Oxford</span><span class="edu-degree">Visiting Student, Politics, Philosophy &amp; Economics (PPE)</span></span></div>
       </div>
     </div>
 
@@ -567,6 +564,18 @@
       </div>
       <div class="img-box has-image" id="box-2">
         <img id="img-2" alt="Hiking photo" src="uploads/IMG_3073.jpg" style="display:block" />
+      </div>
+    </div>
+
+    <!-- EXPERIENCE BAND -->
+    <div class="exp-band">
+      <div class="section-label">Experience</div>
+      <div class="band-row">
+      <div class="band-item"><span class="band-logo"><img src="uploads/logos-lg/replit.png" alt="Replit" loading="lazy"></span><span class="band-org">Replit</span><span class="band-role">Campus Ambassador</span><span class="band-year">2026</span></div>
+      <div class="band-item"><span class="band-logo"><img class="mono" src="uploads/logos-lg/knot.png" alt="Knot" loading="lazy"></span><span class="band-org">Knot</span><span class="band-role">Design Engineering Intern</span><span class="band-year">2026</span></div>
+      <div class="band-item"><span class="band-logo"><img class="mono" src="uploads/logos-lg/marriage-pact.png" alt="Marriage Pact" loading="lazy"></span><span class="band-org">Marriage Pact</span><span class="band-role">Growth</span><span class="band-year">2026</span></div>
+      <div class="band-item"><span class="band-logo"><img src="uploads/logos-lg/stimson.png" alt="The Stimson Center" loading="lazy"></span><span class="band-org">The Stimson Center</span><span class="band-role">South Asia Intern</span><span class="band-year">2026</span></div>
+      <div class="band-item"><span class="band-logo"><img class="on-light" src="uploads/logos-lg/pwc.png" alt="PwC" loading="lazy"><img class="on-dark" src="uploads/logos-lg/pwc-dark.png" alt="" aria-hidden="true" loading="lazy"></span><span class="band-org">PwC</span><span class="band-role">Tax Audit Intern</span><span class="band-year">2024</span></div>
       </div>
     </div>
   </div>
@@ -739,17 +748,6 @@
       if (i < fullText.length) { textEl.textContent += fullText[i++]; setTimeout(type, 110 + Math.random()*60); }
       else {
         setTimeout(() => { cursorE.style.animation='none'; cursorE.style.opacity='0'; }, 2000);
-        setTimeout(() => {
-          const svg = document.getElementById('arrow-svg');
-          const ap  = document.getElementById('arrow-path');
-          const ah  = document.getElementById('arrow-head');
-          const rect = document.getElementById('hey-name').getBoundingClientRect();
-          svg.style.left = (rect.left - 40) + 'px';
-          svg.style.top  = (rect.top - 9) + 'px';
-          svg.style.opacity='1';
-          ap.style.transition='stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)'; ap.style.strokeDashoffset='0';
-          setTimeout(() => { ah.style.transition='stroke-dashoffset 0.4s cubic-bezier(.4,0,.2,1)'; ah.style.strokeDashoffset='0'; }, 800);
-        }, 2200);
       }
     };
     setTimeout(type, 300);
