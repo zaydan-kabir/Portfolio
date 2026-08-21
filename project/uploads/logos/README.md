@@ -109,8 +109,8 @@ than bounding box:
    block is genuinely "heavy", but shrunk to match an airy wordmark its
    type stopped being readable. `BLEND` is the optics/legibility dial —
    1.0 is pure optical balance, 0 is just fill the box,
-4. composite onto an identical transparent canvas, left-aligned and
-   vertically centred, at 3x for retina.
+4. composite onto an identical transparent canvas, centred both ways,
+   at 3x for retina.
 
 One mark needs a step past this. A seal engraved in hairlines — Stanford
 — loses most of its ink to antialiasing at 20px and comes out pink and

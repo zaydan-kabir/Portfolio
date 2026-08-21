@@ -199,11 +199,11 @@
     .exp-item:last-child { border-bottom:none; }
     .exp-left { display:flex; align-items:center; gap:12px; min-width:0; }
     .exp-text { display:flex; flex-direction:column; gap:1px; min-width:0; }
-    /* Fixed logo gutter. Every mark is pre-normalised to this exact 44x20 box
+    /* Fixed logo gutter. Every mark is pre-normalised to this exact 64x28 box
        (see uploads/logos/) and balanced by ink area rather than bounding box,
        so a dense square mark and an airy wordmark carry the same visual
-       weight and all of them share one left edge. */
-    .exp-logo { flex:none; width:64px; height:28px; display:flex; align-items:center; justify-content:flex-start; }
+       weight and all of them share one centre axis. */
+    .exp-logo { flex:none; width:64px; height:28px; display:flex; align-items:center; justify-content:center; }
     .exp-logo img { max-width:100%; max-height:100%; object-fit:contain; display:block; }
     /* Single-colour marks would disappear on the dark theme, so flip those. */
     html[data-theme="dark"] .exp-logo img.mono { filter:invert(1) brightness(1.7); }
@@ -234,8 +234,8 @@
     .exp-role { font-size:11px; font-weight:300; font-style:italic; color:var(--gray2); }
     .exp-year { font-size:10.5px; color:var(--gray2); font-style:italic; white-space:nowrap; flex-shrink:0; }
     .edu { margin-top:0; flex-shrink:0; display:flex; flex-direction:column; gap:3px; }
-    /* Same logo gutter as Experience, so the crest and the org names in both
-       blocks hang off one shared left edge. */
+    /* Same logo gutter as Experience, so the marks in both blocks sit on
+       one shared centre axis and the org names on one shared left edge. */
     .edu-item { display:flex; align-items:center; gap:12px; min-width:0; padding:4px 0; }
     .edu-text { display:flex; flex-direction:column; gap:1px; min-width:0; }
     .edu-school { font-size:12px; font-weight:400; color:var(--ink); line-height:1.3; }

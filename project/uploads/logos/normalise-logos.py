@@ -173,7 +173,7 @@ def main():
             drawn = Image.merge("RGBA", (r, g, b, a))
 
         canvas = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
-        canvas.alpha_composite(drawn, (0, (ch - h) // 2))
+        canvas.alpha_composite(drawn, ((cw - w) // 2, (ch - h) // 2))
 
         out = os.path.join(HERE, f"{key}.png")
         canvas.save(out, optimize=True)
