@@ -195,15 +195,15 @@
     .hobby { display:flex; align-items:flex-start; gap:7px; font-size:11px; color:var(--gray2); font-style:italic; font-weight:300; line-height:1.4; }
     .hobby-dash { color:var(--gray); flex-shrink:0; }
     .exp-block { flex-shrink:0; }
-    .exp-item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:3px 0; border-bottom:1px solid var(--gray3); }
+    .exp-item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--gray3); }
     .exp-item:last-child { border-bottom:none; }
-    .exp-left { display:flex; align-items:center; gap:9px; min-width:0; }
+    .exp-left { display:flex; align-items:center; gap:12px; min-width:0; }
     .exp-text { display:flex; flex-direction:column; gap:1px; min-width:0; }
     /* Fixed logo gutter. Every mark is pre-normalised to this exact 44x20 box
        (see uploads/logos/) and balanced by ink area rather than bounding box,
        so a dense square mark and an airy wordmark carry the same visual
        weight and all of them share one left edge. */
-    .exp-logo { flex:none; width:44px; height:20px; display:flex; align-items:center; justify-content:flex-start; }
+    .exp-logo { flex:none; width:64px; height:28px; display:flex; align-items:center; justify-content:flex-start; }
     .exp-logo img { max-width:100%; max-height:100%; object-fit:contain; display:block; }
     /* Single-colour marks would disappear on the dark theme, so flip those. */
     html[data-theme="dark"] .exp-logo img.mono { filter:invert(1) brightness(1.7); }
@@ -224,22 +224,22 @@
        rhythm so a pending row reads as awaiting art rather than broken.
        Dropping the file into uploads/logos/ replaces it, no code change. */
     .exp-monogram {
-      display:none; width:19px; height:19px; flex:none;
+      display:none; width:26px; height:26px; flex:none;
       border:1px dashed var(--gray3); border-radius:4px;
       font-size:0; opacity:.75;
     }
     .exp-logo.missing img { display:none !important; }
     .exp-logo.missing .exp-monogram { display:block; }
-    .exp-org { font-size:11px; font-weight:400; color:var(--ink); line-height:1.3; }
-    .exp-role { font-size:10.5px; font-weight:300; font-style:italic; color:var(--gray2); }
-    .exp-year { font-size:10px; color:var(--gray2); font-style:italic; white-space:nowrap; flex-shrink:0; }
+    .exp-org { font-size:12px; font-weight:400; color:var(--ink); line-height:1.3; }
+    .exp-role { font-size:11px; font-weight:300; font-style:italic; color:var(--gray2); }
+    .exp-year { font-size:10.5px; color:var(--gray2); font-style:italic; white-space:nowrap; flex-shrink:0; }
     .edu { margin-top:0; flex-shrink:0; display:flex; flex-direction:column; gap:3px; }
     /* Same logo gutter as Experience, so the crest and the org names in both
        blocks hang off one shared left edge. */
-    .edu-item { display:flex; align-items:center; gap:9px; min-width:0; padding:2px 0; }
+    .edu-item { display:flex; align-items:center; gap:12px; min-width:0; padding:4px 0; }
     .edu-text { display:flex; flex-direction:column; gap:1px; min-width:0; }
-    .edu-school { font-size:11.5px; font-weight:400; color:var(--ink); line-height:1.3; }
-    .edu-degree { font-size:10.5px; color:var(--gray2); font-style:italic; font-weight:300; line-height:1.35; margin-top:0; }
+    .edu-school { font-size:12px; font-weight:400; color:var(--ink); line-height:1.3; }
+    .edu-degree { font-size:11px; color:var(--gray2); font-style:italic; font-weight:300; line-height:1.35; margin-top:0; }
     .img-col-center { display:flex; flex-direction:column; min-height:0; }
     .img-col-right { display:flex; flex-direction:column; gap:16px; min-height:0; }
     .img-box {

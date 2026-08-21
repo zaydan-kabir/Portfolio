@@ -120,7 +120,7 @@ back up (0.7 for `stanford`) after the downscale, restoring the drawing's
 weight without thickening the strokes. It is for fine line art only; on a
 solid mark it just fattens the edges.
 
-Slot is **44x20 CSS px** -> canvas **132x60**. At the current settings
+Slot is **64x28 CSS px** -> canvas **192x84**. At the current settings
 PwC, the Oxford crest and the Stanford seal fill the slot, Knot lands at
 81% of its naive fit and Marriage Pact and Stimson at 79%. Adding a logo
 shifts the common ink target, so every other mark is rescaled slightly —
@@ -131,7 +131,7 @@ Regenerate from the repo root:
 
 ```
 python3 project/uploads/logos/prepare-sources.py   # only if sources changed
-python3 project/uploads/logos/normalise-logos.py 44 20 0.86
+python3 project/uploads/logos/normalise-logos.py 64 28 0.86
 ```
 
 `normalise-logos.py` reads the sources listed in `SOURCES` at the top of
