@@ -38,23 +38,6 @@ from the header. Either export it to PNG first, or paste the SVG source
 as text and it can be written to `_raw-logos/` and rasterised from
 there; the loader handles `.svg` sources directly.
 
-## Sibling sets: logos-md/ and logos-lg/
-
-The About page's 2026 redesign promoted the marks, so two additional
-pre-normalised sets sit alongside this one, produced by the same script
-(each folder carries its own copy with the settings baked into the
-invocation below):
-
-* `logos-md/` — slot **64x28**, left-aligned; used by the Education rows.
-  Regenerate: `python3 project/uploads/logos-md/normalise-logos.py 64 28 0.86`
-* `logos-lg/` — slot **120x48**, **centre-aligned** (its copy of the script
-  composites at centre instead of left); used by the Experience band.
-  Regenerate: `python3 project/uploads/logos-lg/normalise-logos.py 120 48 0.86`
-
-This folder remains the canonical 44x20 set and the home of the source
-list and pre-cleaning pipeline. Adding a new organisation means adding it
-to `SOURCES` in all three copies and re-running each.
-
 ## Adding a missing logo
 
 1. Get the official asset from the organisation's own brand/press page.
