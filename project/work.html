@@ -317,9 +317,16 @@
     }
     .grid-item iframe { border: 0; pointer-events: none; background: transparent; }
     /* Compositions that render at a fixed native size (data-w/data-h) are
-       absolutely positioned and scaled to cover their tile by
-       fitHyperframes() below. */
-    .grid-item iframe[data-w] { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+       absolutely positioned and scaled to cover their tile — centred, like
+       object-fit: cover — by fitHyperframes() below. No transform transition:
+       the fit must apply instantly, not animate. */
+    .grid-item iframe[data-w] {
+      position: absolute; left: 0; top: 0; transform-origin: 0 0;
+      transition: opacity .45s ease, filter .4s ease;
+    }
+    /* Every deferred preview stays invisible until its document has actually
+       loaded, so a half-laid-out composition never flashes. */
+    .grid-item iframe.hf-loading { opacity: 0; }
     .grid-item:hover img, .grid-item:hover iframe { transform: scale(1.035); filter: grayscale(0) saturate(1.05) contrast(1.02); }
 
     .grid-overlay {
@@ -824,11 +831,17 @@
     // tile chrome) has fully loaded — only then start their animations.
     (function () {
       function activateHyperframes() {
+        // Size the fixed-size compositions BEFORE giving them a src, so each
+        // boots at its native viewport and lays out correctly the first time.
+        fitHyperframes();
         document.querySelectorAll('iframe[data-src]').forEach(function (f) {
           var s = f.getAttribute('data-src');
-          if (s) { f.setAttribute('src', s); f.removeAttribute('data-src'); }
+          if (!s) return;
+          f.classList.add('hf-loading');
+          f.addEventListener('load', function () { f.classList.remove('hf-loading'); }, { once: true });
+          f.setAttribute('src', s);
+          f.removeAttribute('data-src');
         });
-        fitHyperframes();
       }
 
       // Compositions with data-w/data-h render at a fixed native size, so
@@ -839,9 +852,11 @@
           var w = parseFloat(f.getAttribute('data-w')), h = parseFloat(f.getAttribute('data-h'));
           if (!tile || !w || !h) return;
           var sc = Math.max(tile.clientWidth / w, tile.clientHeight / h);
+          var tx = (tile.clientWidth - w * sc) / 2;
+          var ty = (tile.clientHeight - h * sc) / 2;
           f.style.width = w + 'px';
           f.style.height = h + 'px';
-          f.style.transform = 'scale(' + sc + ')';
+          f.style.transform = 'translate(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px) scale(' + sc + ')';
         });
       }
       window.addEventListener('resize', fitHyperframes);

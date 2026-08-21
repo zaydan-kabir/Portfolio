@@ -291,9 +291,11 @@
           var w = parseFloat(f.getAttribute('data-w')), h = parseFloat(f.getAttribute('data-h'));
           if (!tile || !w || !h) return;
           var s = Math.max(tile.clientWidth / w, tile.clientHeight / h);
+          var tx = (tile.clientWidth - w * s) / 2;
+          var ty = (tile.clientHeight - h * s) / 2;
           f.style.width = w + 'px';
           f.style.height = h + 'px';
-          f.style.transform = 'scale(' + s + ')';
+          f.style.transform = 'translate(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px) scale(' + s + ')';
         });
       }
       fitHyperframes();
