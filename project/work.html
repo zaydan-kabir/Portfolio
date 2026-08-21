@@ -308,12 +308,18 @@
     .grid-item:nth-child(3) { grid-column: 5 / span 2; grid-row: 1 / span 4; }        /* Book Cover Re-Design */
     .grid-item:nth-child(4) { grid-column: 7 / span 2; grid-row: 1 / span 4; }        /* Type Design Poster */
     .grid-item:nth-child(5) { grid-column: 5 / span 4; grid-row: 5 / span 3; }        /* Currently Building @ Knot */
+    .grid-item:nth-child(6) { grid-column: 1 / span 4; grid-row: 8 / span 3; }        /* Interstellar Automata */
+    .grid-item:nth-child(7) { grid-column: 5 / span 4; grid-row: 8 / span 3; }        /* Animal Liberation */
 
     .grid-item img, .grid-item iframe {
       width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.08) saturate(.92) contrast(.96);
       transition: transform .55s cubic-bezier(.25,.46,.45,.94), filter .4s ease;
     }
     .grid-item iframe { border: 0; pointer-events: none; background: transparent; }
+    /* Compositions that render at a fixed native size (data-w/data-h) are
+       absolutely positioned and scaled to cover their tile by
+       fitHyperframes() below. */
+    .grid-item iframe[data-w] { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
     .grid-item:hover img, .grid-item:hover iframe { transform: scale(1.035); filter: grayscale(0) saturate(1.05) contrast(1.02); }
 
     .grid-overlay {
@@ -424,6 +430,8 @@
       .grid-item:nth-child(3) { grid-column: 1 / span 3; grid-row: 5 / span 4; }   /* Book Cover */
       .grid-item:nth-child(4) { grid-column: 4 / span 3; grid-row: 5 / span 4; }   /* Type Design Poster */
       .grid-item:nth-child(5) { grid-column: 4 / span 3; grid-row: 9 / span 3; }   /* Knot */
+      .grid-item:nth-child(6) { grid-column: 1 / span 3; grid-row: 12 / span 3; } /* Interstellar Automata */
+      .grid-item:nth-child(7) { grid-column: 4 / span 3; grid-row: 12 / span 3; } /* Animal Liberation */
     }
     @media (max-width: 560px) {
       #header { padding-left: 18px; padding-right: 18px; }
@@ -481,6 +489,9 @@
       .grid-item:nth-child(4) img, .grid-item:nth-child(4) iframe { aspect-ratio: 3 / 4; }  /* portrait pieces */
       .grid-item:nth-child(5)::before,
       .grid-item:nth-child(5) img, .grid-item:nth-child(5) iframe { aspect-ratio: 16 / 9; } /* Knot banner */
+      .grid-item:nth-child(6)::before, .grid-item:nth-child(7)::before,
+      .grid-item:nth-child(6) img, .grid-item:nth-child(6) iframe,
+      .grid-item:nth-child(7) img, .grid-item:nth-child(7) iframe { aspect-ratio: 1512 / 982; } /* playground pieces */
 
       /* Caption below the tile — plain text on the page, no scrim, theme-aware. */
       .grid-item .grid-overlay,
@@ -618,6 +629,16 @@
     <a class="grid-item" href="https://www.knotapi.com" target="_blank" rel="noopener noreferrer" data-project-link="knot" aria-label="Open Knot at knotapi.com">
       <iframe src="knot-hyperframe/index.html?v=20260708-inline" loading="eager" title="Knot animated preview" aria-hidden="true" style="background:#000"></iframe>
       <div class="grid-overlay"><span class="item-name">Currently Building @ Knot</span><span class="item-subtitle">Design Engineering, Product Design, UI/UX Design</span></div>
+    </a>
+
+    <a class="grid-item" href="https://youtu.be/Q-NRXm59fLE" data-project-link="interstellar-automata" target="_blank" rel="noopener noreferrer" aria-label="Open Interstellar Automata video">
+      <iframe data-src="interstellar-automata-hyperframe/index.html" data-w="1512" data-h="982" title="Interstellar Automata animated preview" aria-hidden="true"></iframe>
+      <div class="grid-overlay"><span class="item-name">Interstellar Automata</span><span class="item-subtitle">Product Design</span></div>
+    </a>
+
+    <a class="grid-item" href="https://stanfordpoliticalreview.org/2026/04/22/animal-liberation-indigeneity-and-morality/" target="_blank" rel="noopener noreferrer" data-project-link="animal-liberation" aria-label="Read Animal Liberation, Indigeneity, and Morality at Stanford Political Review">
+      <iframe data-src="animal-liberation-hyperframe/index.html" data-w="1280" data-h="836" title="Animal Liberation, Indigeneity, and Morality animated preview" aria-hidden="true"></iframe>
+      <div class="grid-overlay"><span class="item-name">Animal Liberation, Indigeneity, and Morality</span><span class="item-subtitle">Stanford Political Review: Social Justice &amp; Law Paper</span></div>
     </a>
 
   </main>
@@ -807,7 +828,23 @@
           var s = f.getAttribute('data-src');
           if (s) { f.setAttribute('src', s); f.removeAttribute('data-src'); }
         });
+        fitHyperframes();
       }
+
+      // Compositions with data-w/data-h render at a fixed native size, so
+      // scale each from that size to cover its tile.
+      function fitHyperframes() {
+        document.querySelectorAll('.grid-item iframe[data-w]').forEach(function (f) {
+          var tile = f.closest('.grid-item');
+          var w = parseFloat(f.getAttribute('data-w')), h = parseFloat(f.getAttribute('data-h'));
+          if (!tile || !w || !h) return;
+          var sc = Math.max(tile.clientWidth / w, tile.clientHeight / h);
+          f.style.width = w + 'px';
+          f.style.height = h + 'px';
+          f.style.transform = 'scale(' + sc + ')';
+        });
+      }
+      window.addEventListener('resize', fitHyperframes);
       if (document.readyState === 'complete') {
         activateHyperframes();
       } else {
