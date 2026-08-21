@@ -40,14 +40,25 @@ SOURCES = {
     # the dark theme would wreck the palette. Two baked variants instead.
     "pwc": "_raw-logos/pwc-original.png",
     "pwc-dark": "_raw-logos/pwc-dark-original.png",
-    # "stimson":  "_raw-logos/stimson-original.png",
-    # "stanford": "_raw-logos/stanford-original.png",
+    # The seal ships as cardinal artwork flattened onto an opaque white disc;
+    # prepare-sources.py un-mattes that ground so only the mark is drawn.
+    "stanford": "_raw-logos/stanford-keyed.png",
+    # Supplied as the roundel avatar on paper; only the paper is keyed out,
+    # since the pale disc behind the glyph is part of the mark.
+    "stimson": "_raw-logos/stimson-keyed.png",
 }
 
 # Slots that are a dark-theme twin of another slot: they must be scaled by the
 # SAME factor as their base or the logo would visibly resize when the theme is
 # toggled. Maps variant -> base.
 VARIANT_OF = {"pwc-dark": "pwc"}
+
+# Per-slot alpha gamma applied after the downscale (<1 firms hairlines up).
+# A seal engraved in hairlines loses most of its ink to antialiasing at slot
+# size and turns pink; pushing the partial coverage back up restores the
+# drawing's weight without thickening the strokes themselves. Only reach for
+# this on very fine line art — on a solid mark it just fattens the edges.
+ALPHA_GAMMA = {"stanford": 0.7}
 
 SCALE = 3    # render at 3x for retina
 BLEND = 0.6  # 1 = pure ink-area balance, 0 = just fit the box
@@ -154,8 +165,15 @@ def main():
         w = max(1, round(im.width * scale))
         h = max(1, round(im.height * scale))
 
+        drawn = im.resize((w, h), Image.LANCZOS)
+        gamma = ALPHA_GAMMA.get(key)
+        if gamma:
+            r, g, b, a = drawn.split()
+            a = a.point(lambda v: min(255, round(255 * (v / 255) ** gamma)))
+            drawn = Image.merge("RGBA", (r, g, b, a))
+
         canvas = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
-        canvas.alpha_composite(im.resize((w, h), Image.LANCZOS), (0, (ch - h) // 2))
+        canvas.alpha_composite(drawn, (0, (ch - h) // 2))
 
         out = os.path.join(HERE, f"{key}.png")
         canvas.save(out, optimize=True)

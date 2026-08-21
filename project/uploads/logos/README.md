@@ -11,9 +11,9 @@ column reads as one set (see "Harmonising" below).
 | `replit.png`        | Replit                       | yes     |
 | `knot.png`          | Knot                         | yes     |
 | `marriage-pact.png` | Marriage Pact                | yes     |
-| `stimson.png`       | The Stimson Center           | **no**  |
+| `stimson.png`       | The Stimson Center           | yes     |
 | `pwc.png` + `pwc-dark.png` | PricewaterhouseCoopers (PwC) | yes |
-| `stanford.png`      | Stanford University          | **no**  |
+| `stanford.png`      | Stanford University          | yes     |
 | `oxford.png`        | University of Oxford         | yes     |
 
 Rows whose file is missing show a small dashed empty slot — deliberately
@@ -25,13 +25,12 @@ The swap is automatic: each `<img>` already points at the filename above
 and carries an `onerror` hook, so **dropping the file in here is the only
 step needed** — no markup or CSS change.
 
-### Still needed
+### All slots filled
 
-`stanford.png` and `stimson.png`. Both were unobtainable from this
-environment — the egress policy blocks stanford.edu, stimson.org,
-Wikimedia and Clearbit, Google Drive holds no logo assets, and the
-`simple-icons` set (3,453 brands) carries neither. They have to be
-supplied by hand from each institution's own brand/identity page.
+Every row now carries its official mark. Stanford and Stimson were the
+last two — both were unobtainable from this environment (the egress
+policy blocks stanford.edu, stimson.org, Wikimedia and Clearbit, and the
+`simple-icons` set carries neither) and were supplied by hand.
 
 Note that a *genuine* SVG cannot be sent through the chat attachment
 pipeline — it rejects the file because it cannot read image dimensions
@@ -48,23 +47,38 @@ there; the loader handles `.svg` sources directly.
    edge). Surrounding whitespace is fine; the script trims to content.
 2. Save the raw file somewhere outside this folder, e.g.
    `project/uploads/_raw-logos/pwc-original.png`.
-3. If the source is a flat JPEG on a white ground, or pairs a black
-   wordmark with brand colour, add it to `prepare-sources.py` and run
-   that first (see "Pre-cleaning" below).
+3. If the source arrives on an opaque ground, or pairs a black wordmark
+   with brand colour, add it to the matching table in
+   `prepare-sources.py` and run that first (see "Pre-cleaning" below).
 4. Add a line to `SOURCES` in `normalise-logos.py`, then run it to
    produce the slot-sized file here.
-5. If the mark is a single flat colour, add `class="mono"` to that row's
-   `<img>` in `index.html` so it inverts on the dark theme. If it is
-   full colour, leave the class off.
+5. Pick the row's dark-theme class in `index.html` from what the mark is:
+   `class="mono"` for a black/grey mark, which inverts to white;
+   `class="reverse"` for a mark drawn in one *brand* colour, which knocks
+   the hue out before flipping (a plain invert would turn Stanford's
+   cardinal cyan); no class at all for full-colour artwork, which is left
+   as drawn. `normalise-logos.py` prints `mono=` per slot to help — it
+   only distinguishes grey from coloured, so the mono/reverse call
+   between those two is yours.
 
 ## Pre-cleaning
 
-`prepare-sources.py` handles two things normalisation cannot:
+`prepare-sources.py` handles what normalisation cannot:
 
 * **Flat JPEG on white** (Marriage Pact was supplied this way). Pasted in
   as-is it shows a white rectangle on both themes. The script maps
   luminance to alpha, which keeps antialiased edges clean and makes the
   knockout letters genuinely transparent.
+* **Colour art flattened onto white** (the Stanford seal). `key_white`
+  cannot be used here — it maps luminance to alpha and would hand back a
+  black seal. The ground is *un-matted* instead: alpha is read from how
+  far each pixel sits from white and the white is divided back out, which
+  keeps the cardinal at full strength rather than leaving it washed pink
+  along every antialiased edge.
+* **A badge whose ground is part of the mark** (the Stimson roundel: a
+  navy glyph on a pale green disc). Keying by luminance would take the
+  pale disc too, so only white *reachable from an edge* is flooded away
+  and the disc is left intact.
 * **Black wordmark + brand colour** (PwC). A CSS `invert()` on the dark
   theme would flip the palette too — orange would become blue. Instead a
   dark twin is baked, lifting only the near-grey dark pixels and leaving
@@ -98,9 +112,20 @@ than bounding box:
 4. composite onto an identical transparent canvas, left-aligned and
    vertically centred, at 3x for retina.
 
+One mark needs a step past this. A seal engraved in hairlines — Stanford
+— loses most of its ink to antialiasing at 20px and comes out pink and
+weightless however it is scaled, because the strokes are thinner than a
+pixel. `ALPHA_GAMMA` in `normalise-logos.py` pushes that partial coverage
+back up (0.7 for `stanford`) after the downscale, restoring the drawing's
+weight without thickening the strokes. It is for fine line art only; on a
+solid mark it just fattens the edges.
+
 Slot is **44x20 CSS px** -> canvas **132x60**. At the current settings
-PwC and the Oxford crest fill the slot, Knot lands at 81% of its naive
-fit and Marriage Pact at 79%.
+PwC, the Oxford crest and the Stanford seal fill the slot, Knot lands at
+81% of its naive fit and Marriage Pact and Stimson at 79%. Adding a logo
+shifts the common ink target, so every other mark is rescaled slightly —
+that is the point of the balance, and why the whole folder is rewritten
+on each run.
 
 Regenerate from the repo root:
 

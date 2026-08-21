@@ -7,9 +7,9 @@
     ],
     "drawn_css": [
       16.0,
-      19.0
+      19.3
     ],
-    "pct_of_naive_fit": 0.957
+    "pct_of_naive_fit": 0.959
   },
   "knot": {
     "mono": true,
@@ -19,9 +19,9 @@
     ],
     "drawn_css": [
       35.7,
-      13.3
+      13.7
     ],
-    "pct_of_naive_fit": 0.809
+    "pct_of_naive_fit": 0.811
   },
   "marriage-pact": {
     "mono": true,
@@ -30,10 +30,10 @@
       20
     ],
     "drawn_css": [
-      23.3,
+      23.7,
       15.7
     ],
-    "pct_of_naive_fit": 0.786
+    "pct_of_naive_fit": 0.788
   },
   "oxford": {
     "mono": true,
@@ -70,5 +70,29 @@
       20.0
     ],
     "pct_of_naive_fit": 1.0
+  },
+  "stanford": {
+    "mono": false,
+    "slot": [
+      44,
+      20
+    ],
+    "drawn_css": [
+      20.0,
+      20.0
+    ],
+    "pct_of_naive_fit": 1.0
+  },
+  "stimson": {
+    "mono": false,
+    "slot": [
+      44,
+      20
+    ],
+    "drawn_css": [
+      15.7,
+      15.7
+    ],
+    "pct_of_naive_fit": 0.789
   }
 }
