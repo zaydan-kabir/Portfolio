@@ -179,7 +179,7 @@
       margin-bottom:8px;
       border-bottom:1px solid transparent;
     }
-    .left { display:flex; flex-direction:column; gap:10px; position:relative; overflow:hidden; min-height:0; }
+    .left { display:flex; flex-direction:column; gap:6px; position:relative; overflow:hidden; min-height:0; }
     .name { font-size:26px; font-weight:400; letter-spacing:-0.02em; color:var(--ink); }
     .name-cursor {
       display:inline-block; width:2px; height:.85em;
@@ -190,20 +190,20 @@
     .nav-links { display:flex; gap:28px; align-items:baseline; }
     .divider { width:100%; height:1px; background:var(--gray3); flex-shrink:0; }
     .section-label { font-size:12.5px; font-weight:400; color:var(--ink); letter-spacing:.01em; flex-shrink:0; }
-    .hobbies { display:flex; flex-direction:column; gap:3px; flex-shrink:0; }
+    .bio { font-size:11px; font-weight:300; color:var(--gray2); line-height:1.45; font-style:italic; flex-shrink:0; }
+    .hobbies { display:flex; flex-direction:column; gap:2px; flex-shrink:0; }
     .hobby { display:flex; align-items:flex-start; gap:7px; font-size:11px; color:var(--gray2); font-style:italic; font-weight:300; line-height:1.4; }
     .hobby-dash { color:var(--gray); flex-shrink:0; }
     .exp-block { flex-shrink:0; }
-    .exp-item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid var(--gray3); }
+    .exp-item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--gray3); }
     .exp-item:last-child { border-bottom:none; }
     .exp-left { display:flex; align-items:center; gap:12px; min-width:0; }
     .exp-text { display:flex; flex-direction:column; gap:1px; min-width:0; }
-    /* Fixed logo gutter. Every mark is pre-normalised to a 64x28 canvas
+    /* Fixed logo gutter. Every mark is pre-normalised to this exact 64x28 box
        (see uploads/logos/) and balanced by ink area rather than bounding box,
        so a dense square mark and an airy wordmark carry the same visual
-       weight and all of them share one centre axis. Displayed at 80x35 —
-       the same 16:7 ratio, so the normalisation survives the scale-up. */
-    .exp-logo { flex:none; width:80px; height:35px; display:flex; align-items:center; justify-content:center; }
+       weight and all of them share one centre axis. */
+    .exp-logo { flex:none; width:64px; height:28px; display:flex; align-items:center; justify-content:center; }
     .exp-logo img { max-width:100%; max-height:100%; object-fit:contain; display:block; }
     /* Single-colour marks would disappear on the dark theme, so flip those. */
     html[data-theme="dark"] .exp-logo img.mono { filter:invert(1) brightness(1.7); }
@@ -224,7 +224,7 @@
        rhythm so a pending row reads as awaiting art rather than broken.
        Dropping the file into uploads/logos/ replaces it, no code change. */
     .exp-monogram {
-      display:none; width:32px; height:32px; flex:none;
+      display:none; width:26px; height:26px; flex:none;
       border:1px dashed var(--gray3); border-radius:4px;
       font-size:0; opacity:.75;
     }
@@ -233,10 +233,10 @@
     .exp-org { font-size:12px; font-weight:400; color:var(--ink); line-height:1.3; }
     .exp-role { font-size:11px; font-weight:300; font-style:italic; color:var(--gray2); }
     .exp-year { font-size:10.5px; color:var(--gray2); font-style:italic; white-space:nowrap; flex-shrink:0; }
-    .edu { margin-top:0; flex-shrink:0; display:flex; flex-direction:column; gap:6px; }
+    .edu { margin-top:0; flex-shrink:0; display:flex; flex-direction:column; gap:3px; }
     /* Same logo gutter as Experience, so the marks in both blocks sit on
        one shared centre axis and the org names on one shared left edge. */
-    .edu-item { display:flex; align-items:center; gap:12px; min-width:0; padding:7px 0; }
+    .edu-item { display:flex; align-items:center; gap:12px; min-width:0; padding:4px 0; }
     .edu-text { display:flex; flex-direction:column; gap:1px; min-width:0; }
     .edu-school { font-size:12px; font-weight:400; color:var(--ink); line-height:1.3; }
     .edu-degree { font-size:11px; color:var(--gray2); font-style:italic; font-weight:300; line-height:1.35; margin-top:0; }
@@ -385,16 +385,7 @@
       }
       .name { font-size:22px; }
       .section-label { font-size:12px; }
-      .hobby { font-size:11px; }
-    }
-
-    /* ── Short viewports: tighten the spread so the fixed-height
-       column still fits; the logo gutter keeps its full size ── */
-    @media (min-width:768px) and (max-height:820px) {
-      .left { gap:6px; }
-      .exp-item { padding:6px 0; }
-      .edu-item { padding:4px 0; }
-      .edu { gap:3px; }
+      .bio, .hobby { font-size:11px; }
     }
 
     /* ── Mobile: ≤767px — single column, scrollable ── */
@@ -433,6 +424,7 @@
 
       .name { font-size:24px; }
       .section-label { font-size:13px; }
+      .bio { font-size:12px; }
       .hobby { font-size:12px; }
       .exp-org { font-size:12px; }
       .exp-role { font-size:11px; }
@@ -525,6 +517,8 @@
     <!-- LEFT COLUMN -->
     <div class="left">
       <div class="name" id="hey-name"></div>
+      <div class="divider"></div>
+      <p class="bio">Raised between Bangladesh and Canada and now based in California, I study Design and Political Science at Stanford University, where I build impactful work at the intersection of systems, people, and social change. My work is driven by a commitment to uplift others and to embody the change I want to see in the world.</p>
       <div class="divider"></div>
       <div class="section-label">You are talking to a doppelgänger if I am not:</div>
       <div class="hobbies">
