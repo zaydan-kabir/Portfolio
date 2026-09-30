@@ -65,43 +65,66 @@
     .ring.r3 { inset: 21%; border-color: rgba(240,240,240,.46); border-style: dashed; }
     .ring.r4 { inset: 33%; border-color: rgba(180,210,255,.4); }
 
+    /* Tick containers fill the mechanism so tick origins scale with it. */
     .ticks {
       position: absolute;
       inset: 0;
       transform-origin: 50% 50%;
+      pointer-events: none;
     }
+    /* Each tick is a tall invisible arm from top of container to center.
+       The visible mark sits at the top via ::before, so rotating the arm
+       rotates the mark around the mechanism center at scale-independent
+       geometry (no hardcoded px). */
     .tick {
       position: absolute;
       left: 50%;
       top: 0;
       width: 1px;
+      height: 50%;
+      margin-left: -0.5px;
+      transform-origin: 50% 100%;
+      background: transparent;
+    }
+    .tick::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1px;
       height: 10px;
       background: rgba(240,240,240,.42);
-      transform-origin: 50% calc(50vmin);
     }
-    .tick.long { height: 16px; background: rgba(240,240,240,.7); }
-
-    .ticks-outer .tick { transform-origin: 50% 280px; }
-    .ticks-mid .tick { transform-origin: 50% 220px; height: 8px; background: rgba(240,240,240,.34); }
-
-    .orbit-dot {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: rgba(220,235,255,.92);
-      box-shadow: 0 0 10px rgba(180,210,255,.7), 0 0 22px rgba(180,210,255,.32);
-      transform: translate(-50%, -50%) translateY(-46%);
-      z-index: 6;
+    .tick.long::before {
+      height: 16px;
+      background: rgba(240,240,240,.7);
+    }
+    .ticks-mid .tick { height: 39.5%; }
+    .ticks-mid .tick::before {
+      height: 8px;
+      background: rgba(240,240,240,.34);
     }
 
+    /* Orbit dot rides on a rotating arm. Position it at 4% from top =
+       46% of the arm's height above the center, using % of the arm, so it
+       scales with the mechanism. */
     .orbit-arm {
       position: absolute;
       inset: 0;
       transform-origin: 50% 50%;
       pointer-events: none;
+    }
+    .orbit-dot {
+      position: absolute;
+      left: 50%;
+      top: 4%;
+      width: 7px;
+      height: 7px;
+      margin-left: -3.5px;
+      border-radius: 50%;
+      background: rgba(220,235,255,.92);
+      box-shadow: 0 0 10px rgba(180,210,255,.7), 0 0 22px rgba(180,210,255,.32);
+      z-index: 6;
     }
 
     .core {
@@ -283,61 +306,77 @@
         for (let i = 0; i < 60; i++) {
           const t = document.createElement('span');
           t.className = 'tick' + (i % 5 === 0 ? ' long' : '');
-          t.style.transform = `translateX(-50%) rotate(${i * 6}deg)`;
+          t.style.transform = `rotate(${i * 6}deg)`;
           outer.appendChild(t);
         }
         const mid = document.getElementById('ticks-mid');
         for (let i = 0; i < 24; i++) {
           const t = document.createElement('span');
           t.className = 'tick';
-          t.style.transform = `translateX(-50%) rotate(${i * 15}deg)`;
+          t.style.transform = `rotate(${i * 15}deg)`;
           mid.appendChild(t);
         }
       })();
+
+      // Wait for GSAP AND at least one animation frame so layout has settled
+      // before the timeline records "from" state (fixes intermittent misload
+      // where the mechanism appeared shrunk / off-center on first paint).
+      function bootTimeline() {
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+
+        tl.from('.mechanism', { scale: 0.78, opacity: 0, duration: 1.0, ease: 'power3.out', transformOrigin: '50% 50%' }, 0)
+          .from('.ring.r1', { opacity: 0, duration: 0.8, ease: 'sine.out' }, 0.15)
+          .from('.ring.r2', { opacity: 0, duration: 0.8, ease: 'sine.out' }, 0.28)
+          .from('.ring.r3', { opacity: 0, duration: 0.8, ease: 'sine.out' }, 0.4)
+          .from('.ring.r4', { opacity: 0, duration: 0.8, ease: 'sine.out' }, 0.52)
+          .from('.ticks-outer .tick', { opacity: 0, duration: 0.5, stagger: { each: 0.008, from: 'start' }, ease: 'power2.out' }, 0.55)
+          .from('.ticks-mid .tick', { opacity: 0, duration: 0.5, stagger: { each: 0.012, from: 'start' }, ease: 'power2.out' }, 0.7)
+          .from('.core', { scale: 0, opacity: 0, duration: 0.9, ease: 'back.out(1.6)', transformOrigin: '50% 50%' }, 0.85)
+          .from('.orbit-dot', { opacity: 0, scale: 0, duration: 0.55, ease: 'back.out(1.8)', transformOrigin: '50% 50%' }, 1.25)
+          .from('.crosshair', { opacity: 0, duration: 0.9, stagger: 0.08, ease: 'sine.out' }, 0.6)
+          .from('.label', { opacity: 0, x: -16, duration: 0.7, ease: 'power2.out' }, 1.1)
+          .from('.label .dot', { scale: 0, opacity: 0, duration: 0.4, ease: 'back.out(2)', transformOrigin: '50% 50%' }, 1.35)
+          .from('.sublabel', { opacity: 0, x: -10, duration: 0.7, ease: 'power2.out' }, 1.32)
+          .from('.meta', { opacity: 0, x: 12, duration: 0.7, ease: 'power2.out' }, 1.4);
+
+        tl.to('.ticks-outer', { rotation: 360, duration: 13.2, ease: 'none', transformOrigin: '50% 50%' }, 0)
+          .to('.ticks-mid',   { rotation: -360, duration: 13.2, ease: 'none', transformOrigin: '50% 50%' }, 0)
+          .to('.ring.r3',     { rotation: 360, duration: 13.2, ease: 'none', transformOrigin: '50% 50%' }, 0)
+          .to('.ring.r4',     { rotation: -360, duration: 13.2, ease: 'none', transformOrigin: '50% 50%' }, 0)
+          .to('.orbit-arm',   { rotation: 360, duration: 6.6,  ease: 'none', repeat: 1, transformOrigin: '50% 50%' }, 0);
+
+        tl.to('.core', { scale: 1.06, duration: 3.3, repeat: 3, yoyo: true, ease: 'sine.inOut', transformOrigin: '50% 50%' }, 1.0)
+          .to('.label .dot', { opacity: 0.55, duration: 0.9, repeat: 12, yoyo: true, ease: 'sine.inOut' }, 1.5)
+          .to('.starfield .star', {
+            opacity: 0.28,
+            duration: 1.4,
+            stagger: { each: 0.04, from: 'random', repeat: 3, yoyo: true },
+            ease: 'sine.inOut'
+          }, 1.6);
+
+        window.__timelines['interstellar-automata-preview'] = tl;
+
+        if (!window.__hyperframes) {
+          tl.eventCallback('onComplete', () => tl.restart());
+          tl.play(0);
+        }
+      }
+
+      function waitForGsap() {
+        if (window.gsap) {
+          // Two rAFs so layout + font metrics have settled before GSAP samples
+          // computed styles for the "from" states.
+          requestAnimationFrame(() => requestAnimationFrame(bootTimeline));
+        } else {
+          setTimeout(waitForGsap, 30);
+        }
+      }
+      window.addEventListener('load', waitForGsap);
+      if (document.readyState === 'complete') waitForGsap();
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
-    <script>
-      window.__timelines = window.__timelines || {};
-      const tl = gsap.timeline({ paused: true });
-
-      tl.from('.mechanism', { scale: 0.78, opacity: 0, duration: 1.0, ease: 'power3.out' }, 0)
-        .from('.ring.r1', { opacity: 0, duration: 0.8, ease: 'sine.out' }, 0.15)
-        .from('.ring.r2', { opacity: 0, duration: 0.8, ease: 'sine.out' }, 0.28)
-        .from('.ring.r3', { opacity: 0, duration: 0.8, ease: 'sine.out' }, 0.4)
-        .from('.ring.r4', { opacity: 0, duration: 0.8, ease: 'sine.out' }, 0.52)
-        .from('.ticks-outer .tick', { opacity: 0, duration: 0.5, stagger: { each: 0.008, from: 'start' }, ease: 'power2.out' }, 0.55)
-        .from('.ticks-mid .tick', { opacity: 0, duration: 0.5, stagger: { each: 0.012, from: 'start' }, ease: 'power2.out' }, 0.7)
-        .from('.core', { scale: 0, opacity: 0, duration: 0.9, ease: 'back.out(1.6)' }, 0.85)
-        .from('.orbit-dot', { opacity: 0, scale: 0, duration: 0.55, ease: 'back.out(1.8)' }, 1.25)
-        .from('.crosshair', { opacity: 0, duration: 0.9, stagger: 0.08, ease: 'sine.out' }, 0.6)
-        .from('.label', { opacity: 0, x: -16, duration: 0.7, ease: 'power2.out' }, 1.1)
-        .from('.label .dot', { scale: 0, opacity: 0, duration: 0.4, ease: 'back.out(2)' }, 1.35)
-        .from('.sublabel', { opacity: 0, x: -10, duration: 0.7, ease: 'power2.out' }, 1.32)
-        .from('.meta', { opacity: 0, x: 12, duration: 0.7, ease: 'power2.out' }, 1.4);
-
-      tl.to('.ticks-outer', { rotation: 360, duration: 13.2, ease: 'none', transformOrigin: '50% 50%' }, 0)
-        .to('.ticks-mid', { rotation: -360, duration: 13.2, ease: 'none', transformOrigin: '50% 50%' }, 0)
-        .to('.ring.r3', { rotation: 360, duration: 13.2, ease: 'none', transformOrigin: '50% 50%' }, 0)
-        .to('.ring.r4', { rotation: -360, duration: 13.2, ease: 'none', transformOrigin: '50% 50%' }, 0)
-        .to('.orbit-arm', { rotation: 360, duration: 6.6, ease: 'none', repeat: 1, transformOrigin: '50% 50%' }, 0);
-
-      tl.to('.core', { scale: 1.06, duration: 3.3, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 1.0)
-        .to('.label .dot', { opacity: 0.55, duration: 0.9, repeat: 12, yoyo: true, ease: 'sine.inOut' }, 1.5)
-        .to('.starfield .star', {
-          opacity: 0.28,
-          duration: 1.4,
-          stagger: { each: 0.04, from: 'random', repeat: 3, yoyo: true },
-          ease: 'sine.inOut'
-        }, 1.6);
-
-      window.__timelines['interstellar-automata-preview'] = tl;
-
-      if (!window.__hyperframes) {
-        tl.eventCallback('onComplete', () => tl.restart());
-        tl.play(0);
-      }
-    </script>
   </div>
 </body>
 </html>
