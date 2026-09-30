@@ -99,7 +99,7 @@
       height: 16px;
       background: rgba(240,240,240,.7);
     }
-    .ticks-mid .tick { height: 39.5%; }
+    .ticks-mid .tick { height: 41%; }
     .ticks-mid .tick::before {
       height: 8px;
       background: rgba(240,240,240,.34);
@@ -129,11 +129,13 @@
 
     .core {
       position: absolute;
-      left: 50%;
-      top: 50%;
+      /* Centered by geometry (not transform) so GSAP's scale animations
+         don't fight the -50%/-50% translation. width/height = 13.5%,
+         so top/left = (100 - 13.5)/2 = 43.25%. */
+      left: 43.25%;
+      top: 43.25%;
       width: 13.5%;
-      aspect-ratio: 1;
-      transform: translate(-50%, -50%);
+      height: 13.5%;
       border-radius: 50%;
       background: radial-gradient(circle at 38% 36%, #fff5dd 0%, #ffe4b8 32%, #d3a76a 70%, #6c4a25 100%);
       box-shadow:
@@ -141,6 +143,8 @@
         0 0 64px rgba(255,210,150,.32),
         0 0 140px rgba(255,196,128,.18);
       z-index: 5;
+      transform-origin: 50% 50%;
+      will-change: transform;
     }
 
     .core::after {
