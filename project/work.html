@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- v=20261013-6tile-grid — Animal Liberation retired; 6-tile magazine layout -->
+  <!-- v=20261013-knot-top — Knot banner moved to top of grid -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -307,12 +307,12 @@
        plus Book Cover and Type Poster as tall portrait tiles. Bottom —
        Design Manifesto and Knot side by side in a single band, splitting
        the same width the row above spans. */
-    .grid-item:nth-child(1) { grid-column: 1 / span 4; grid-row: 1 / span 4; }        /* Clarity */
-    .grid-item:nth-child(2) { grid-column: 1 / span 4; grid-row: 5 / span 3; }        /* Design Manifesto */
-    .grid-item:nth-child(3) { grid-column: 5 / span 2; grid-row: 1 / span 4; }        /* Book Cover Re-Design */
-    .grid-item:nth-child(4) { grid-column: 7 / span 2; grid-row: 1 / span 4; }        /* Type Design Poster */
-    .grid-item:nth-child(5) { grid-column: 1 / span 8; grid-row: 8 / span 2; }        /* Currently Building @ Knot — full-width banner */
-    .grid-item:nth-child(6) { grid-column: 5 / span 4; grid-row: 5 / span 3; }        /* Interstellar Automata */
+    .grid-item:nth-child(1) { grid-column: 1 / span 8; grid-row: 1 / span 2; }        /* Knot — full-width TOP banner */
+    .grid-item:nth-child(2) { grid-column: 1 / span 4; grid-row: 3 / span 4; }        /* Clarity */
+    .grid-item:nth-child(3) { grid-column: 1 / span 4; grid-row: 7 / span 3; }        /* Design Manifesto */
+    .grid-item:nth-child(4) { grid-column: 5 / span 2; grid-row: 3 / span 4; }        /* Book Cover Re-Design */
+    .grid-item:nth-child(5) { grid-column: 7 / span 2; grid-row: 3 / span 4; }        /* Type Design Poster */
+    .grid-item:nth-child(6) { grid-column: 5 / span 4; grid-row: 7 / span 3; }        /* Interstellar Automata */
 
     .grid-item img, .grid-item iframe {
       width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.08) saturate(.92) contrast(.96);
@@ -435,12 +435,12 @@
       .work-bio p { max-width: 100%; }
       .tool-stack { --stack-gap: 8px; }
       .work-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: clamp(52px, 10vw, 84px); gap: clamp(12px, 2.2vw, 20px); }
-      .grid-item:nth-child(1) { grid-column: 1 / span 6; grid-row: 1 / span 4; }   /* Clarity — full-width hero */
-      .grid-item:nth-child(2) { grid-column: 1 / span 3; grid-row: 9 / span 3; }   /* Design Manifesto */
-      .grid-item:nth-child(3) { grid-column: 1 / span 3; grid-row: 5 / span 4; }   /* Book Cover */
-      .grid-item:nth-child(4) { grid-column: 4 / span 3; grid-row: 5 / span 4; }   /* Type Design Poster */
-      .grid-item:nth-child(5) { grid-column: 1 / span 6; grid-row: 12 / span 2; }  /* Knot — full-width banner */
-      .grid-item:nth-child(6) { grid-column: 4 / span 3; grid-row: 9 / span 3; }   /* Interstellar Automata */
+      .grid-item:nth-child(1) { grid-column: 1 / span 6; grid-row: 1 / span 2; }   /* Knot — full-width TOP banner */
+      .grid-item:nth-child(2) { grid-column: 1 / span 6; grid-row: 3 / span 4; }   /* Clarity — hero below Knot */
+      .grid-item:nth-child(3) { grid-column: 1 / span 3; grid-row: 11 / span 3; }  /* Design Manifesto */
+      .grid-item:nth-child(4) { grid-column: 1 / span 3; grid-row: 7 / span 4; }   /* Book Cover */
+      .grid-item:nth-child(5) { grid-column: 4 / span 3; grid-row: 7 / span 4; }   /* Type Design Poster */
+      .grid-item:nth-child(6) { grid-column: 4 / span 3; grid-row: 11 / span 3; }  /* Interstellar Automata */
     }
     @media (max-width: 560px) {
       #header { padding-left: 18px; padding-right: 18px; }
@@ -493,11 +493,11 @@
         border-radius: 6px;
         box-shadow: none;
       }
-      .grid-item:nth-child(3)::before, .grid-item:nth-child(4)::before,
-      .grid-item:nth-child(3) img, .grid-item:nth-child(3) iframe,
-      .grid-item:nth-child(4) img, .grid-item:nth-child(4) iframe { aspect-ratio: 3 / 4; }  /* portrait pieces */
-      .grid-item:nth-child(5)::before,
-      .grid-item:nth-child(5) img, .grid-item:nth-child(5) iframe { aspect-ratio: 16 / 9; } /* Knot banner */
+      .grid-item:nth-child(1)::before,
+      .grid-item:nth-child(1) img, .grid-item:nth-child(1) iframe { aspect-ratio: 16 / 9; } /* Knot banner */
+      .grid-item:nth-child(4)::before, .grid-item:nth-child(5)::before,
+      .grid-item:nth-child(4) img, .grid-item:nth-child(4) iframe,
+      .grid-item:nth-child(5) img, .grid-item:nth-child(5) iframe { aspect-ratio: 3 / 4; }  /* portrait pieces */
       .grid-item:nth-child(6)::before,
       .grid-item:nth-child(6) img, .grid-item:nth-child(6) iframe { aspect-ratio: 1512 / 982; } /* Interstellar Automata */
 
@@ -611,6 +611,11 @@
   </section>
 
   <main class="work-grid">
+    <a class="grid-item" href="https://www.knotapi.com" target="_blank" rel="noopener noreferrer" data-project-link="knot" aria-label="Open Knot at knotapi.com">
+      <iframe src="knot-hyperframe/index.html?v=20260708-inline" loading="eager" title="Knot animated preview" aria-hidden="true" style="background:#000"></iframe>
+      <div class="grid-overlay"><span class="item-name">Knot</span><span class="item-subtitle">Design Engineering, Product Design, UI/UX Design</span></div>
+    </a>
+
     <a class="grid-item" href="https://www.figma.com/proto/3dCviEDLEf30MnsgTHKnNu/Team-6?node-id=4437-308&amp;starting-point-node-id=4361%3A131" data-project-link="clarity" target="_blank" rel="noopener noreferrer" aria-label="Open Clarity Figma prototype">
       <iframe data-src="clarity-hyperframe/index.html?v=20260529-blobs" title="Clarity animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay">
@@ -632,11 +637,6 @@
     <a class="grid-item" href="uploads/Type%20Design%20Poster%20copy.pdf" target="_blank" rel="noopener noreferrer" data-project-link="type-poster" aria-label="Open Type Design Poster PDF">
       <iframe data-src="type-poster-hyperframe/index.html?v=20260531-preview" title="Type Design Poster animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Type Design Poster</span><span class="item-subtitle">Type Design, Print Design, Graphic Design</span></div>
-    </a>
-
-    <a class="grid-item" href="https://www.knotapi.com" target="_blank" rel="noopener noreferrer" data-project-link="knot" aria-label="Open Knot at knotapi.com">
-      <iframe src="knot-hyperframe/index.html?v=20260708-inline" loading="eager" title="Knot animated preview" aria-hidden="true" style="background:#000"></iframe>
-      <div class="grid-overlay"><span class="item-name">Knot</span><span class="item-subtitle">Design Engineering, Product Design, UI/UX Design</span></div>
     </a>
 
     <a class="grid-item" href="https://youtu.be/Q-NRXm59fLE" data-project-link="interstellar-automata" target="_blank" rel="noopener noreferrer" aria-label="Open Interstellar Automata video">
