@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- v=20261013-v4-dm-left — V4 grid, Design Manifesto now mid-left, Interstellar bottom-right -->
+  <!-- v=20261014-mobile-caption — Clarity laptop zoomed out; Interstellar overlay renders on mobile -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -503,6 +503,18 @@
       .grid-item:nth-child(5) img, .grid-item:nth-child(5) iframe,
       .grid-item:nth-child(6) img, .grid-item:nth-child(6) iframe { aspect-ratio: 4 / 3; } /* V4 — six equal landscape tiles */
 
+      /* On mobile, fixed-size compositions (data-w/data-h, e.g. Interstellar)
+         must behave like every other mobile iframe so the caption below the
+         tile renders. Reset the inline width/height/transform that
+         fitHyperframes() applied and let the iframe fill the ::before box. */
+      .grid-item iframe[data-w] {
+        width: 100% !important;
+        height: 100% !important;
+        aspect-ratio: 4 / 3 !important;
+        transform: none !important;
+        transform-origin: 0 0 !important;
+      }
+
       /* Caption below the tile — plain text on the page, no scrim, theme-aware. */
       .grid-item .grid-overlay,
       .grid-item:hover .grid-overlay {
@@ -619,7 +631,7 @@
     </a>
 
     <a class="grid-item" href="https://www.figma.com/proto/3dCviEDLEf30MnsgTHKnNu/Team-6?node-id=4437-308&amp;starting-point-node-id=4361%3A131" data-project-link="clarity" target="_blank" rel="noopener noreferrer" aria-label="Open Clarity Figma prototype">
-      <iframe data-src="clarity-hyperframe/index.html?v=20260529-blobs" title="Clarity animated preview" aria-hidden="true"></iframe>
+      <iframe data-src="clarity-hyperframe/index.html?v=20261014-smaller" title="Clarity animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay">
         <span class="item-name">Clarity</span>
         <span class="item-subtitle">Game Design, UI Design, Design Thinking</span>
@@ -843,9 +855,19 @@
       }
 
       // Compositions with data-w/data-h render at a fixed native size, so
-      // scale each from that size to cover its tile.
+      // scale each from that size to cover its tile. On narrow viewports the
+      // tiles collapse into the mobile single-column stack with their own
+      // captions beneath, so clear any inline sizing from a prior desktop
+      // layout and let the CSS mobile rules take over.
       function fitHyperframes() {
+        var mobile = window.matchMedia('(max-width: 560px)').matches;
         document.querySelectorAll('.grid-item iframe[data-w]').forEach(function (f) {
+          if (mobile) {
+            f.style.width = '';
+            f.style.height = '';
+            f.style.transform = '';
+            return;
+          }
           var tile = f.closest('.grid-item');
           var w = parseFloat(f.getAttribute('data-w')), h = parseFloat(f.getAttribute('data-h'));
           if (!tile || !w || !h) return;
