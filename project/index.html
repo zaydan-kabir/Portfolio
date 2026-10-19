@@ -190,7 +190,8 @@
     .nav-links { display:flex; gap:28px; align-items:baseline; }
     .divider { width:100%; height:1px; background:var(--gray3); flex-shrink:0; }
     .section-label { font-size:12.5px; font-weight:400; color:var(--ink); letter-spacing:.01em; flex-shrink:0; }
-    .bio { font-size:11px; font-weight:300; color:var(--gray2); line-height:1.45; font-style:italic; flex-shrink:0; }
+    .bio { font-size:13.5px; font-weight:400; color:var(--ink); line-height:1.5; font-style:normal; flex-shrink:0; margin:0; }
+    .bio + .bio { margin-top:6px; }
     .hobbies { display:flex; flex-direction:column; gap:2px; flex-shrink:0; }
     .hobby { display:flex; align-items:flex-start; gap:7px; font-size:11px; color:var(--gray2); font-style:italic; font-weight:300; line-height:1.4; }
     .hobby-dash { color:var(--gray); flex-shrink:0; }
@@ -385,7 +386,7 @@
       }
       .name { font-size:22px; }
       .section-label { font-size:12px; }
-      .bio, .hobby { font-size:11px; }
+      .bio { font-size:12.5px; line-height:1.5; }
     }
 
     /* ── Mobile: ≤767px — single column, scrollable ── */
@@ -518,17 +519,9 @@
     <div class="left">
       <div class="name" id="hey-name"></div>
       <div class="divider"></div>
-      <p class="bio">Raised between Bangladesh and Canada and now based in California, I study Design and Political Science at Stanford University. The mission? Leave everything I am a part of better than I found it. Have fun doing it. And come away with some incredible stories.</p>
+      <p class="bio">Raised between Bangladesh and Canada and now based in California, where I study at Stanford University.</p>
+      <p class="bio">My mission? My mission is to make a difference in the world.</p>
       <div class="divider"></div>
-      <!-- Kept in markup for future restore; hidden on the live page per request 2026-10-19 -->
-      <div class="section-label" hidden>You are talking to a doppelgänger if I am not:</div>
-      <div class="hobbies" hidden>
-        <div class="hobby"><span class="hobby-dash">•</span> Reading &amp; philosophizing</div>
-        <div class="hobby"><span class="hobby-dash">•</span> Spending time with loved ones</div>
-        <div class="hobby"><span class="hobby-dash">•</span> Listening to Ethel Cain or Sienna Spiro</div>
-        <div class="hobby"><span class="hobby-dash">•</span> Working out at the gym</div>
-      </div>
-      <div class="divider" hidden></div>
       <div class="section-label">Experience</div>
       <div class="divider"></div>
       <div class="exp-block">
