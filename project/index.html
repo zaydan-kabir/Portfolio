@@ -179,8 +179,8 @@
       margin-bottom:8px;
       border-bottom:1px solid transparent;
     }
-    .left { display:flex; flex-direction:column; gap:0; position:relative; overflow:hidden; min-height:0; }
-    .name { font-size:28px; font-weight:400; letter-spacing:-0.02em; color:var(--ink); margin-bottom:12px; }
+    .left { display:flex; flex-direction:column; gap:6px; position:relative; overflow:hidden; min-height:0; }
+    .name { font-size:26px; font-weight:400; letter-spacing:-0.02em; color:var(--ink); }
     .name-cursor {
       display:inline-block; width:2px; height:.85em;
       background:var(--gray2); margin-left:2px; vertical-align:middle;
@@ -188,30 +188,23 @@
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
     .nav-links { display:flex; gap:28px; align-items:baseline; }
-    /* Hairline rules act as section breaks. The rhythm around them —
-       14px breathing room below each rule, 20px before the next
-       section-label — is what gives the left column its vertical cadence. */
-    .divider { width:100%; height:1px; background:var(--gray3); flex-shrink:0; margin-bottom:12px; }
-    /* Section labels: a quiet uppercase marker, visually subordinate to the
-       content it introduces. Not another body-weight line fighting the bio
-       for attention — a tiny signpost that steps aside. */
-    .section-label { font-size:10.5px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--gray2); flex-shrink:0; margin-top:4px; margin-bottom:4px; }
-    .bio { font-size:13px; font-weight:400; color:var(--ink); line-height:1.55; font-style:normal; flex-shrink:0; margin:0; }
-    .bio + .bio { margin-top:10px; }
-    .bio:last-of-type { margin-bottom:4px; }
+    .divider { width:100%; height:1px; background:var(--gray3); flex-shrink:0; }
+    .section-label { font-size:12.5px; font-weight:400; color:var(--ink); letter-spacing:.01em; flex-shrink:0; }
+    .bio { font-size:13.5px; font-weight:400; color:var(--ink); line-height:1.5; font-style:normal; flex-shrink:0; margin:0; }
+    .bio + .bio { margin-top:6px; }
     .hobbies { display:flex; flex-direction:column; gap:2px; flex-shrink:0; }
     .hobby { display:flex; align-items:flex-start; gap:7px; font-size:11px; color:var(--gray2); font-style:italic; font-weight:300; line-height:1.4; }
     .hobby-dash { color:var(--gray); flex-shrink:0; }
     .exp-block { flex-shrink:0; }
-    .exp-item { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--gray3); }
+    .exp-item { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--gray3); }
     .exp-item:last-child { border-bottom:none; }
     .exp-left { display:flex; align-items:center; gap:14px; min-width:0; }
-    .exp-text { display:flex; flex-direction:column; gap:2px; min-width:0; }
-    /* Fixed logo gutter. Every mark is pre-normalised to this exact 72x32 box
+    .exp-text { display:flex; flex-direction:column; gap:1px; min-width:0; }
+    /* Fixed logo gutter. Every mark is pre-normalised to this exact 76x34 box
        (see uploads/logos/) and balanced by ink area rather than bounding box,
        so a dense square mark and an airy wordmark carry the same visual
        weight and all of them share one centre axis. */
-    .exp-logo { flex:none; width:72px; height:32px; display:flex; align-items:center; justify-content:center; }
+    .exp-logo { flex:none; width:76px; height:34px; display:flex; align-items:center; justify-content:center; }
     .exp-logo img { max-width:100%; max-height:100%; object-fit:contain; display:block; }
     /* Single-colour marks would disappear on the dark theme, so flip those. */
     html[data-theme="dark"] .exp-logo img.mono { filter:invert(1) brightness(1.7); }
@@ -238,16 +231,16 @@
     }
     .exp-logo.missing img { display:none !important; }
     .exp-logo.missing .exp-monogram { display:block; }
-    .exp-org { font-size:12.5px; font-weight:500; color:var(--ink); line-height:1.3; }
-    .exp-role { font-size:11.5px; font-weight:300; font-style:italic; color:var(--gray2); line-height:1.35; }
-    .exp-year { font-size:11px; color:var(--gray2); font-style:italic; white-space:nowrap; flex-shrink:0; }
+    .exp-org { font-size:13px; font-weight:400; color:var(--ink); line-height:1.3; }
+    .exp-role { font-size:12px; font-weight:300; font-style:italic; color:var(--gray2); }
+    .exp-year { font-size:11.5px; color:var(--gray2); font-style:italic; white-space:nowrap; flex-shrink:0; }
     .edu { margin-top:0; flex-shrink:0; display:flex; flex-direction:column; gap:4px; }
     /* Same logo gutter as Experience, so the marks in both blocks sit on
        one shared centre axis and the org names on one shared left edge. */
-    .edu-item { display:flex; align-items:center; gap:14px; min-width:0; padding:7px 0; }
-    .edu-text { display:flex; flex-direction:column; gap:2px; min-width:0; }
-    .edu-school { font-size:12.5px; font-weight:500; color:var(--ink); line-height:1.3; }
-    .edu-degree { font-size:11.5px; color:var(--gray2); font-style:italic; font-weight:300; line-height:1.35; margin-top:0; }
+    .edu-item { display:flex; align-items:center; gap:14px; min-width:0; padding:6px 0; }
+    .edu-text { display:flex; flex-direction:column; gap:1px; min-width:0; }
+    .edu-school { font-size:13px; font-weight:400; color:var(--ink); line-height:1.3; }
+    .edu-degree { font-size:12px; color:var(--gray2); font-style:italic; font-weight:300; line-height:1.35; margin-top:0; }
     .img-col-center { display:flex; flex-direction:column; min-height:0; }
     .img-col-right { display:flex; flex-direction:column; gap:16px; min-height:0; }
     .img-box {
@@ -431,14 +424,14 @@
       .left { overflow-y:visible; min-height:0; gap:10px; }
 
       .name { font-size:24px; }
-      .section-label { font-size:10.5px; }
-      .bio { font-size:12.5px; line-height:1.55; }
+      .section-label { font-size:13px; }
+      .bio { font-size:12px; }
       .hobby { font-size:12px; }
-      .exp-org { font-size:12.5px; }
-      .exp-role { font-size:11.5px; }
+      .exp-org { font-size:12px; }
+      .exp-role { font-size:11px; }
       .exp-year { font-size:11px; }
-      .edu-school { font-size:12.5px; }
-      .edu-degree { font-size:11.5px; }
+      .edu-school { font-size:12px; }
+      .edu-degree { font-size:11px; }
 
       /* Center portrait: full width, show full image uncropped */
       .img-col-center {
