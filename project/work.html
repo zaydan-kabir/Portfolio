@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- v=20261014-mobile-caption — Clarity laptop zoomed out; Interstellar overlay renders on mobile -->
+  <!-- v=20261019-mobile-caption-fix — iframe[data-w] uses height:auto so Interstellar caption actually renders on mobile -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -506,10 +506,15 @@
       /* On mobile, fixed-size compositions (data-w/data-h, e.g. Interstellar)
          must behave like every other mobile iframe so the caption below the
          tile renders. Reset the inline width/height/transform that
-         fitHyperframes() applied and let the iframe fill the ::before box. */
+         fitHyperframes() applied and let the iframe size from width +
+         aspect-ratio (height: auto — percentage height collapses to 0 against
+         an auto-height parent, which is what hid the caption on mobile). */
       .grid-item iframe[data-w] {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
         width: 100% !important;
-        height: 100% !important;
+        height: auto !important;
         aspect-ratio: 4 / 3 !important;
         transform: none !important;
         transform-origin: 0 0 !important;
