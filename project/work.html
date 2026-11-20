@@ -630,12 +630,12 @@
   </section>
 
   <main class="work-grid">
-    <a class="grid-item" href="case-knot.html" data-page="case-knot.html" data-project-link="knot" aria-label="Open Knot case study">
+    <a class="grid-item" href="https://www.knotapi.com" target="_blank" rel="noopener noreferrer" data-project-link="knot" aria-label="Open Knot at knotapi.com">
       <iframe src="knot-hyperframe/index.html?v=20260708-inline" loading="eager" title="Knot animated preview" aria-hidden="true" style="background:#000"></iframe>
       <div class="grid-overlay"><span class="item-name">Knot</span><span class="item-subtitle">Design Engineering, Product Design, UI/UX Design</span></div>
     </a>
 
-    <a class="grid-item" href="case-clarity.html" data-page="case-clarity.html" data-project-link="clarity" aria-label="Open Clarity case study">
+    <a class="grid-item" href="https://www.figma.com/proto/3dCviEDLEf30MnsgTHKnNu/Team-6?node-id=4437-308&amp;starting-point-node-id=4361%3A131" data-project-link="clarity" target="_blank" rel="noopener noreferrer" aria-label="Open Clarity Figma prototype">
       <iframe data-src="clarity-hyperframe/index.html?v=20261014-smaller" title="Clarity animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay">
         <span class="item-name">Clarity</span>
@@ -643,7 +643,7 @@
       </div>
     </a>
 
-    <a class="grid-item" href="case-design-manifesto.html" data-page="case-design-manifesto.html" data-project-link="design-manifesto" aria-label="Open Design Manifesto case study">
+    <a class="grid-item" href="design-manifesto.html" target="_blank" rel="noopener noreferrer" data-project-link="design-manifesto" aria-label="Open Design Manifesto">
       <iframe data-src="design-manifesto-hyperframe/index.html?v=20260508-bee-fig" title="Design Manifesto animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Design Manifesto</span><span class="item-subtitle">Creative Coding, UI Design</span></div>
     </a>
@@ -653,7 +653,7 @@
       <div class="grid-overlay"><span class="item-name">Type Design Poster</span><span class="item-subtitle">Type Design, Print Design, Graphic Design</span></div>
     </a>
 
-    <a class="grid-item" href="case-interstellar-automata.html" data-page="case-interstellar-automata.html" data-project-link="interstellar-automata" aria-label="Open Interstellar Automata case study">
+    <a class="grid-item" href="https://youtu.be/Q-NRXm59fLE" data-project-link="interstellar-automata" target="_blank" rel="noopener noreferrer" aria-label="Open Interstellar Automata video">
       <iframe data-src="interstellar-automata-hyperframe/index.html?v=20260930-center-core" data-w="1512" data-h="982" title="Interstellar Automata animated preview" aria-hidden="true"></iframe>
       <div class="grid-overlay"><span class="item-name">Interstellar Automata</span><span class="item-subtitle">Product Design</span></div>
     </a>
@@ -752,6 +752,14 @@
         if (link.getAttribute('href') === '#') e.preventDefault();
       });
     });
+
+    const manifestoLink = document.querySelector('[data-project-link="design-manifesto"]');
+    if (manifestoLink) {
+      manifestoLink.addEventListener('click', e => {
+        e.preventDefault();
+        window.open(manifestoLink.href, '_blank', 'noopener,noreferrer');
+      });
+    }
 
     // Design stack: a native horizontal scroller that also auto-advances.
     // The auto-scroll runs on rAF (adjusting scrollLeft); users can freely
