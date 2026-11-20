@@ -1,0 +1,202 @@
+/* ───────────────────────────────────────────────────────────────
+   Shared styles for the project case-study pages
+   (case-knot.html, case-clarity.html, case-design-manifesto.html,
+    case-interstellar-automata.html).
+   Edit this one file to change the look of every case study.
+   ─────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  background: var(--bg, #0a0a0a);
+  color: var(--ink, #f0f0f0);
+  font-family: 'Lora', Georgia, serif;
+  cursor: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+html[data-theme="light"] { --muted: rgba(10,10,10,.62); --line: rgba(10,10,10,.14); }
+html[data-theme="dark"]  { --muted: rgba(240,240,240,.58); --line: rgba(240,240,240,.14); }
+
+a, a:hover, a:active, button, button:hover { cursor: none !important; }
+
+/* ── Custom cursor + trail (same as the rest of the site) ── */
+#safe-area-top {
+  position: fixed; left: 0; right: 0;
+  top: calc(-1 * env(safe-area-inset-top, 0px));
+  height: calc(env(safe-area-inset-top, 0px) * 2);
+  background: var(--bg, #0a0a0a);
+  z-index: 2000; pointer-events: none;
+}
+#cursor {
+  position: fixed; top: 0; left: 0;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--theme-cursor, #fff);
+  pointer-events: none;
+  transform: translate3d(-20px, -20px, 0) translate(-50%, -50%);
+  z-index: 10003;
+  transition: opacity .15s;
+}
+#cursor.hidden { opacity: 0; }
+#trail-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 10001; }
+html[data-theme="light"] #trail-canvas { filter: none !important; }
+
+#page-out {
+  position: fixed; inset: 0;
+  background: var(--ink, #f0f0f0);
+  z-index: 8888;
+  transform: scaleY(0); transform-origin: bottom;
+  transition: transform 0.45s cubic-bezier(.76,0,.24,1);
+}
+#page-out.covering  { transform: scaleY(1); transform-origin: bottom; }
+#page-out.revealing { transform: scaleY(0); transform-origin: top;
+  transition: transform 0.45s cubic-bezier(.76,0,.24,1) 0.05s; }
+
+/* ── Header (matches work.html) ── */
+#header {
+  position: fixed; left: 0; right: 0;
+  top: calc(-1 * env(safe-area-inset-top, 0px));
+  z-index: 1000;
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 0px) + 24px) 48px 10px;
+  border-bottom: 1px solid var(--gray3, #2a2a2a);
+  background: var(--bg, #0a0a0a);
+}
+.h-name {
+  font-size: 14px; font-weight: 400; letter-spacing: -0.01em;
+  color: var(--gray2, #8a8a8a); text-decoration: none; transition: color .2s;
+}
+.h-name:hover { color: var(--ink); }
+.h-nav { display: flex; gap: 28px; align-items: baseline; }
+.h-link {
+  font-size: 13px; font-weight: 300; font-style: italic; color: var(--gray2, #8a8a8a);
+  text-decoration: none; letter-spacing: .02em; position: relative; transition: color .2s;
+}
+.h-link::after {
+  content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 1px;
+  background: var(--ink); transform: scaleX(0); transition: transform .2s ease;
+}
+.h-link:hover, .h-link.active { color: var(--ink); }
+.h-link:hover::after, .h-link.active::after { transform: scaleX(1); }
+
+/* ── Page layout ── */
+.cs {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 112px) 48px 120px;
+}
+
+.cs-back {
+  display: inline-block;
+  font-size: 13px; font-style: italic; color: var(--muted);
+  text-decoration: none; margin-bottom: 40px; transition: color .2s;
+}
+.cs-back:hover { color: var(--ink); }
+
+.cs-title {
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 400; letter-spacing: -0.02em; line-height: 1.05;
+}
+.cs-tags {
+  margin-top: 14px;
+  font-size: 14px; font-style: italic; color: var(--muted);
+}
+
+/* ── The embedded work ── */
+.cs-embed {
+  position: relative;
+  margin-top: 48px;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 0 1px var(--line);
+}
+.cs-embed.ratio-video { aspect-ratio: 16 / 9; }
+.cs-embed iframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: 0; display: block;
+}
+.cs-embed-caption {
+  margin-top: 14px;
+  display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between;
+  font-size: 12px; font-style: italic; color: var(--muted);
+}
+.cs-embed-caption a {
+  color: var(--ink); text-decoration: none;
+  border-bottom: 1px solid currentColor; padding-bottom: 1px;
+}
+.cs-embed-caption a:hover { opacity: .7; }
+
+/* ── Quick facts row (Role / Timeline / Team / Tools) ── */
+.cs-facts {
+  margin-top: 72px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  padding: 28px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.cs-facts dt {
+  font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  margin-bottom: 8px;
+}
+.cs-facts dd { font-size: 15px; line-height: 1.5; }
+
+/* ── Written sections ── */
+.cs-section {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 32px;
+  margin-top: 72px;
+}
+.cs-section h2 {
+  font-size: 11px; font-weight: 400; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); padding-top: 6px;
+}
+.cs-body { max-width: 640px; }
+.cs-body p { font-size: 17px; line-height: 1.75; }
+.cs-body p + p { margin-top: 1.1em; }
+.cs-body img { display: block; width: 100%; height: auto; border-radius: 4px; margin: 28px 0 8px; }
+.cs-body figcaption { font-size: 12px; font-style: italic; color: var(--muted); }
+
+/* Placeholder text you haven't written yet — shows faded + italic.
+   Delete class="todo" once you replace the text. */
+.todo { color: var(--muted); font-style: italic; }
+
+/* ── Next project link ── */
+.cs-next {
+  display: block;
+  margin-top: 120px; padding-top: 32px;
+  border-top: 1px solid var(--line);
+  text-decoration: none; color: var(--ink);
+}
+.cs-next span { display: block; font-size: 12px; font-style: italic; color: var(--muted); margin-bottom: 8px; }
+.cs-next strong { font-size: clamp(26px, 4vw, 40px); font-weight: 400; letter-spacing: -0.01em; }
+.cs-next:hover strong { opacity: .7; }
+
+/* ── Phones ── */
+@media (max-width: 700px) {
+  #header { padding: calc(env(safe-area-inset-top, 0px) + 18px) 18px 9px; }
+  .h-nav { gap: 16px; }
+  .cs { padding: calc(env(safe-area-inset-top, 0px) + 80px) 16px 80px; }
+  .cs-back { margin-bottom: 24px; }
+  .cs-embed { margin-top: 32px; aspect-ratio: 4 / 5; }
+  .cs-embed.ratio-video { aspect-ratio: 16 / 9; }
+  .cs-facts { grid-template-columns: 1fr 1fr; margin-top: 48px; }
+  .cs-section { grid-template-columns: 1fr; gap: 12px; margin-top: 48px; }
+  .cs-body p { font-size: 16px; }
+  .cs-next { margin-top: 80px; }
+}
+
+/* Touch devices: use the normal cursor */
+@media (pointer: coarse) {
+  html, body { cursor: auto; }
+  a, button, a:hover, button:hover { cursor: auto !important; }
+  #cursor, #trail-canvas { display: none; }
+}
